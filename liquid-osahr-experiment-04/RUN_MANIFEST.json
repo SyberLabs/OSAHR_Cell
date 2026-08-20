@@ -1,0 +1,9 @@
+{
+  "experiment": "liquid-osahr-experiment-04",
+  "calibration_seed": 440318,
+  "confirmatory_seed": 880419,
+  "horizon": 3.0,
+  "calibration_sha256": "e02561373dddf46fd00d45cfb9b00adcaa02b92cc6cf8c5879651eb35f794021",
+  "confirmatory_sha256": "73227e650d18322b9d5ace7ed04043e2ebf5f094b9c46b6d8a2bfdf51b5b09b2",
+  "frozen": true
+}

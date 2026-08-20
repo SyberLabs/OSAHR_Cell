@@ -1,0 +1,8 @@
+model_name,best_epoch,best_val_nll_interval,train_seconds,parameter_count,checkpoint,comparison_tier
+cfc,25,0.4269124806395264,checkpointed,11235,artifacts/checkpoints/cfc.pt,equal_hidden_width
+gru_dt,45,0.4287007867566693,checkpointed,4515,artifacts/checkpoints/gru_dt.pt,equal_hidden_width
+lstm_dt,45,0.4339326236351825,checkpointed,5987,artifacts/checkpoints/lstm_dt.pt,equal_hidden_width
+mlp_dt,44,0.4445304788920302,checkpointed,1571,artifacts/checkpoints/mlp_dt.pt,equal_hidden_width
+ltc_capped,10,0.8620395061048695,7.611,1201,artifacts/checkpoints/ltc_capped.pt,resource_capped
+constant,0,,0.0,3,,analytic
+gru_param_matched,43,0.4289600119090437,8.368131682,11181,artifacts/checkpoints/gru_param_matched.pt,parameter_matched

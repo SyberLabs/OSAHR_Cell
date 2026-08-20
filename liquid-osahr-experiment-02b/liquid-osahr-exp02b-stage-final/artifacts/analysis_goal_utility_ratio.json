@@ -1,0 +1,212 @@
+{
+  "metric": "goal_utility_ratio",
+  "regimes": {
+    "id": {
+      "oracle_effect": {
+        "mean": 0.014797335334910677,
+        "lo": 0.0,
+        "hi": 0.034077442897935926
+      },
+      "models": {
+        "mechanistic": {
+          "effect_mean": -0.0005090260807585678,
+          "effect_mae": 0.015306361415669245,
+          "effect_rmse": 0.02453176043256145,
+          "sign_agreement": 0.6,
+          "level_mae": 0.04250530491386267,
+          "effect_error_ci": {
+            "mean": -0.015306361415669245,
+            "lo": -0.03413840383619528,
+            "hi": -0.000448065142499221
+          }
+        },
+        "residual_intervention": {
+          "effect_mean": -0.0008861259868030436,
+          "effect_mae": 0.01568346132171372,
+          "effect_rmse": 0.024580641668753553,
+          "sign_agreement": 0.6,
+          "level_mae": 0.034811772553014916,
+          "effect_error_ci": {
+            "mean": -0.01568346132171372,
+            "lo": -0.034138403836195264,
+            "hi": -0.0008251650485437079
+          }
+        },
+        "residual_predictive": {
+          "effect_mean": -0.005113296029754233,
+          "effect_mae": 0.01991063136466491,
+          "effect_rmse": 0.042716268672552335,
+          "sign_agreement": 0.8,
+          "level_mae": 0.04096702326364006,
+          "effect_error_ci": {
+            "mean": -0.01991063136466491,
+            "lo": -0.058081563996907316,
+            "hi": 0.0
+          }
+        },
+        "residual_raw": {
+          "effect_mean": -0.005113296029754233,
+          "effect_mae": 0.01991063136466491,
+          "effect_rmse": 0.042716268672552335,
+          "sign_agreement": 0.8,
+          "level_mae": 0.04096702326364006,
+          "effect_error_ci": {
+            "mean": -0.01991063136466491,
+            "lo": -0.058081563996907316,
+            "hi": 0.0
+          }
+        },
+        "residual_robust": {
+          "effect_mean": -0.0008861259868030436,
+          "effect_mae": 0.01568346132171372,
+          "effect_rmse": 0.024580641668753553,
+          "sign_agreement": 0.6,
+          "level_mae": 0.034811772553014916,
+          "effect_error_ci": {
+            "mean": -0.01568346132171372,
+            "lo": -0.034138403836195264,
+            "hi": -0.0008251650485437079
+          }
+        }
+      }
+    },
+    "high_mobility": {
+      "oracle_effect": {
+        "mean": -0.009933257719572297,
+        "lo": -0.06510474876847296,
+        "hi": 0.030323317073170687
+      },
+      "models": {
+        "mechanistic": {
+          "effect_mean": 0.010821818181818177,
+          "effect_mae": 0.0388623929745612,
+          "effect_rmse": 0.05741264657256186,
+          "sign_agreement": 0.6,
+          "level_mae": 0.04386477412008577,
+          "effect_error_ci": {
+            "mean": 0.020755075901390474,
+            "lo": -0.0204111574279379,
+            "hi": 0.06917674876847293
+          }
+        },
+        "residual_intervention": {
+          "effect_mean": 0.02203623781455266,
+          "effect_mae": 0.10680820521154433,
+          "effect_rmse": 0.1661355021814441,
+          "sign_agreement": 0.6,
+          "level_mae": 0.09619540590907541,
+          "effect_error_ci": {
+            "mean": 0.03196949553412496,
+            "lo": -0.10682612916259368,
+            "hi": 0.19187074505789783
+          }
+        },
+        "residual_predictive": {
+          "effect_mean": 0.010270483660130702,
+          "effect_mae": 0.03831105845287373,
+          "effect_rmse": 0.057100943577601405,
+          "sign_agreement": 0.6,
+          "level_mae": 0.19134220667940002,
+          "effect_error_ci": {
+            "mean": 0.020203741379703,
+            "lo": -0.02096249194962537,
+            "hi": 0.06917674876847293
+          }
+        },
+        "residual_raw": {
+          "effect_mean": 0.010270483660130702,
+          "effect_mae": 0.03831105845287373,
+          "effect_rmse": 0.057100943577601405,
+          "sign_agreement": 0.6,
+          "level_mae": 0.19134220667940002,
+          "effect_error_ci": {
+            "mean": 0.020203741379703,
+            "lo": -0.02096249194962537,
+            "hi": 0.06917674876847293
+          }
+        },
+        "residual_robust": {
+          "effect_mean": -0.018892516389011738,
+          "effect_mae": 0.024236790429875022,
+          "effect_rmse": 0.031403577472085754,
+          "sign_agreement": 0.6,
+          "level_mae": 0.03847031334808077,
+          "effect_error_ci": {
+            "mean": -0.00895925866943944,
+            "lo": -0.03470534162282796,
+            "hi": 0.015371931627581503
+          }
+        }
+      }
+    },
+    "high_stress": {
+      "oracle_effect": {
+        "mean": 0.00435681712880207,
+        "lo": -0.05659581322056888,
+        "hi": 0.08260625848764822
+      },
+      "models": {
+        "mechanistic": {
+          "effect_mean": 0.04088607496575911,
+          "effect_mae": 0.03652925783695704,
+          "effect_rmse": 0.05054589500958284,
+          "sign_agreement": 0.6,
+          "level_mae": 0.08827358108895124,
+          "effect_error_ci": {
+            "mean": 0.03652925783695704,
+            "lo": 0.0056166345211462465,
+            "hi": 0.06744188115276784
+          }
+        },
+        "residual_intervention": {
+          "effect_mean": 0.05485577710757411,
+          "effect_mae": 0.05049895997877204,
+          "effect_rmse": 0.05627455679149807,
+          "sign_agreement": 0.4,
+          "level_mae": 0.18872781873779138,
+          "effect_error_ci": {
+            "mean": 0.05049895997877204,
+            "lo": 0.02642579143406616,
+            "hi": 0.07059908895995573
+          }
+        },
+        "residual_predictive": {
+          "effect_mean": 0.00934898010098011,
+          "effect_mae": 0.04831534913674349,
+          "effect_rmse": 0.06421585977986534,
+          "sign_agreement": 0.8,
+          "level_mae": 0.12591897696533644,
+          "effect_error_ci": {
+            "mean": 0.004992162972178038,
+            "lo": -0.05204478536617505,
+            "hi": 0.05408128040203604
+          }
+        },
+        "residual_raw": {
+          "effect_mean": 0.00934898010098011,
+          "effect_mae": 0.04831534913674349,
+          "effect_rmse": 0.06421585977986534,
+          "sign_agreement": 0.8,
+          "level_mae": 0.12591897696533644,
+          "effect_error_ci": {
+            "mean": 0.004992162972178038,
+            "lo": -0.05204478536617505,
+            "hi": 0.05408128040203604
+          }
+        },
+        "residual_robust": {
+          "effect_mean": 0.03995038928887207,
+          "effect_mae": 0.035593572160069996,
+          "effect_rmse": 0.05006706498300026,
+          "sign_agreement": 0.6,
+          "level_mae": 0.07068638861501218,
+          "effect_error_ci": {
+            "mean": 0.035593572160069996,
+            "lo": 0.004680948844259203,
+            "hi": 0.0665061954758808
+          }
+        }
+      }
+    }
+  }
+}

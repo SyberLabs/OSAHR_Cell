@@ -1,0 +1,77 @@
+{
+  "experiment": "Liquid-OSAHR 02B",
+  "version": "0.2.0",
+  "status": "completed research prototype",
+  "dataset_seed": 26021802,
+  "training_seed": 260218,
+  "id_calibration_root_seed": 99117,
+  "multiregime_calibration_root_seed": 771177,
+  "pilot_root_seed": 620218,
+  "confirmatory_root_seed": 920218,
+  "ood_hazard_root_seed": 332211,
+  "residual_parameters": 14280,
+  "predictive_trust": 1.0,
+  "id_intervention_trust": 0.5,
+  "robust_intervention_trust": 0.0,
+  "calibration": {
+    "regimes": [
+      "id",
+      "high_mobility",
+      "high_stress"
+    ],
+    "scenarios_per_regime": 6,
+    "bootstrap_selection_replicates": 20000
+  },
+  "confirmatory": {
+    "rows": 400,
+    "regimes": [
+      "high_mobility",
+      "high_stress",
+      "id",
+      "weak_channel"
+    ],
+    "scenarios": 20,
+    "replicates_per_arm": 2,
+    "events": 8083,
+    "thinning_rejections": 8865,
+    "unique_final_hashes": 400,
+    "macro_goal_utility_effect_mae": {
+      "mechanistic_calibrated": 0.09301,
+      "residual_quarter": 0.067283,
+      "residual_idcal": 0.07188,
+      "residual_predictive": 0.082255
+    },
+    "paired_residual_quarter_vs_mechanistic_macro_delta_abs_effect_error": {
+      "estimate": -0.025727,
+      "ci95": [
+        -0.054221,
+        0.000237
+      ]
+    }
+  },
+  "semantic_contract": {
+    "alpha_zero_exact_mechanistic": true,
+    "residual_bounded": true,
+    "matcher_backend": "incremental with reference audit",
+    "scheduler": "exact thinning conditional on declared rates"
+  },
+  "external_trace_adapters": [
+    "srsRAN JSON/E2SM-KPM canonical adapter",
+    "native srsRAN scheduler JSON adapter",
+    "5G-LENA/ns-3 CSV alias adapter"
+  ],
+  "primary_endpoint": "scenario-level absolute error in oracle semantic-vs-throughput goal-utility effect",
+  "limitations": [
+    "standards-informed surrogate, not full NR stack",
+    "synthetic teacher",
+    "small confirmatory scenario count per regime",
+    "no claim of real-network efficacy"
+  ],
+  "verification": {
+    "tests_total": 60,
+    "experiment_tests": 24,
+    "osahr_reference_tests": 36,
+    "confirmatory_bootstrap_replicates": 50000,
+    "wheel_sha256": "53814c43320de0ca55f185405384547a113fb206d75b8c6b27a685b499da0474"
+  }
+}

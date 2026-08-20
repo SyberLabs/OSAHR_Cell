@@ -1,0 +1,53 @@
+{
+  "release": "Liquid-OSAHR Experiment 02B 0.2.0",
+  "tests": {
+    "total": 60,
+    "02b": 24,
+    "osahr_reference": 36
+  },
+  "confirmatory": {
+    "rows": 400,
+    "independent_scenarios": 20,
+    "regimes": [
+      "id",
+      "high_mobility",
+      "high_stress",
+      "weak_channel"
+    ],
+    "replicates_per_arm": 2,
+    "accepted_events": 8083,
+    "thinning_rejections": 8865,
+    "unique_final_hashes": 400,
+    "bootstrap_resamples": 50000
+  },
+  "calibration": {
+    "selected_alpha": 0.0,
+    "leave_one_scenario_out_alpha0": "18/18",
+    "bootstrap_alpha0_frequency": 0.9667
+  },
+  "predictive": {
+    "best_alpha_all_ood_regimes": 1.0
+  },
+  "primary_holdout": {
+    "macro_goal_utility_effect_mae": {
+      "mechanistic_calibrated": 0.09301,
+      "residual_quarter": 0.067283,
+      "residual_idcal": 0.07188,
+      "residual_predictive": 0.082255
+    },
+    "alpha025_vs_alpha0_delta_abs_effect_error": {
+      "estimate": -0.025727,
+      "ci95": [
+        -0.054221,
+        0.000237
+      ]
+    }
+  },
+  "telemetry_adapters": [
+    "generic srsRAN/O-RAN KPM JSONL",
+    "native srsRAN scheduler JSONL",
+    "5G-LENA/ns-3 CSV aliases"
+  ],
+  "wheel_sha256": "53814c43320de0ca55f185405384547a113fb206d75b8c6b27a685b499da0474",
+  "interpretation": "Predictive hazard fidelity, intervention fidelity, and transport validity are distinct; no single fixed residual trust coefficient dominated all regimes and estimands."
+}

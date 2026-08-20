@@ -1,0 +1,30 @@
+{
+  "protocol_status": "FROZEN before confirmatory root seed 110518 was executed",
+  "claim_grammar_version": "osahr05_claim_v0",
+  "confirmatory_seed_declared": 110518,
+  "horizon": 22.0,
+  "grid": [
+    0.0,
+    0.25,
+    0.5,
+    1.0
+  ],
+  "eps_zero": 0.0,
+  "eps_sensitivity": 0.02,
+  "regimes": [
+    "id",
+    "high_mobility",
+    "high_stress",
+    "weak_channel"
+  ],
+  "n_scenarios": 6,
+  "replicates": 2,
+  "residual_checkpoint": "D:\\syberlabs\\osahr_project\\liquid-osahr-experiment-02b\\liquid-osahr-exp02b-stage-final\\artifacts\\residual_cfc.pt",
+  "grammar_files": [
+    "D:\\syberlabs\\osahr_project\\liquid-osahr-experiment-05\\liquid_osahr05\\protocol.py",
+    "D:\\syberlabs\\osahr_project\\liquid-osahr-experiment-05\\liquid_osahr05\\claims.py"
+  ],
+  "grammar_sha256": "c039f6b22a3643c6016b0d398c628f0536ebcf5cc819cf9ed38cd976611fbb8c",
+  "answering_object": "claim_status",
+  "selects_alpha": false
+}

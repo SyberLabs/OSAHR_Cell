@@ -1,0 +1,9 @@
+# Exact versions used for the release verification environment
+python==3.13.5
+torch==2.10.0+cpu
+numpy==2.3.5
+pandas==2.2.3
+scipy==1.17.0
+setuptools==82.0.1
+wheel==0.46.3
+pytest==9.0.2

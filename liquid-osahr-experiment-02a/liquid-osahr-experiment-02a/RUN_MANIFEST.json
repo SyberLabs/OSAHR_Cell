@@ -1,0 +1,91 @@
+{
+  "experiment": "Liquid-OSAHR Experiment 02A",
+  "version": "0.1.0",
+  "date": "2026-08-18",
+  "purpose": "Closed-loop topology-coupled continuous neural state with analytically bounded stochastic OSAHR rewrite hazards; policy-effect recovery against an oracle.",
+  "environment": {
+    "python": "3.13.5",
+    "torch": "2.10.0+cpu",
+    "numpy": "2.3.5",
+    "pandas": "2.2.3",
+    "scipy": "1.17.0"
+  },
+  "hazard_bounds": {
+    "service": 5.0,
+    "failure": 0.22,
+    "recovery": 0.85,
+    "handover": 0.24,
+    "floor": 1e-05
+  },
+  "model_parameters": {
+    "cfc_closed": 13952,
+    "cfc_nojump": 13952,
+    "gru_closed": 14166
+  },
+  "identification": {
+    "train_traces": 20,
+    "train_frames": 1572,
+    "val_traces": 5,
+    "val_frames": 365,
+    "test_traces": 7,
+    "test_frames": 587,
+    "main_seed": 260218
+  },
+  "counterfactual": {
+    "root_seed": 912017,
+    "horizon": 10.0,
+    "regimes": [
+      "id",
+      "high_mobility",
+      "high_stress"
+    ],
+    "scenarios_per_regime": 6,
+    "replicates_per_arm": 2,
+    "models": [
+      "oracle",
+      "cfc_closed",
+      "cfc_nojump",
+      "cfc_openloop",
+      "gru_closed"
+    ],
+    "policies": [
+      "throughput",
+      "semantic"
+    ],
+    "rows": 360,
+    "bootstrap_scenario_resamples": 50000
+  },
+  "thinning_audit": {
+    "rows": 360,
+    "max_events": 134,
+    "max_thinning_rejections": 272,
+    "total_thinning_rejections": 25372,
+    "total_thinning_windows": 979,
+    "rejection_per_event_mean": 0.9333671998847081,
+    "state_hash_unique": 360
+  },
+  "tests": {
+    "liquid_osahr02a": 17,
+    "osahr_reference": 36,
+    "compileall": true,
+    "wheel_target_smoke": true
+  },
+  "exactness_boundary": {
+    "exact_relative_to_declared_model": [
+      "typed matching",
+      "DPO rewrite semantics",
+      "certified sigmoid neural hazard bounds",
+      "rejection thinning conditional on field",
+      "oracle continuous flow",
+      "liquid anchor/jump lifecycle",
+      "state hashing/replay"
+    ],
+    "model_approximations": [
+      "synthetic RAN teacher",
+      "learned neural field",
+      "small task/network model",
+      "learned jump map",
+      "no standards-complete RF/PHY stack"
+    ]
+  }
+}

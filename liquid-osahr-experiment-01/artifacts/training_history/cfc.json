@@ -1,0 +1,172 @@
+[
+  {
+    "epoch": 1,
+    "train_nll_interval": 1.1219607654449015,
+    "val_nll_interval": 0.9795014451521793
+  },
+  {
+    "epoch": 2,
+    "train_nll_interval": 0.8226636802718986,
+    "val_nll_interval": 0.6460633151961769
+  },
+  {
+    "epoch": 3,
+    "train_nll_interval": 0.571478194547547,
+    "val_nll_interval": 0.5379450795992539
+  },
+  {
+    "epoch": 4,
+    "train_nll_interval": 0.520633691487968,
+    "val_nll_interval": 0.5208421988967143
+  },
+  {
+    "epoch": 5,
+    "train_nll_interval": 0.4984020631159805,
+    "val_nll_interval": 0.4958726663746041
+  },
+  {
+    "epoch": 6,
+    "train_nll_interval": 0.48251943235405514,
+    "val_nll_interval": 0.4889468425176213
+  },
+  {
+    "epoch": 7,
+    "train_nll_interval": 0.47572812256335023,
+    "val_nll_interval": 0.4784949532072515
+  },
+  {
+    "epoch": 8,
+    "train_nll_interval": 0.46671545057606023,
+    "val_nll_interval": 0.46489704140248594
+  },
+  {
+    "epoch": 9,
+    "train_nll_interval": 0.45960485567677084,
+    "val_nll_interval": 0.45710632411349594
+  },
+  {
+    "epoch": 10,
+    "train_nll_interval": 0.45422416355311035,
+    "val_nll_interval": 0.45266834180070875
+  },
+  {
+    "epoch": 11,
+    "train_nll_interval": 0.44920032356883416,
+    "val_nll_interval": 0.4491970489741563
+  },
+  {
+    "epoch": 12,
+    "train_nll_interval": 0.4442826555847267,
+    "val_nll_interval": 0.44498310728978463
+  },
+  {
+    "epoch": 13,
+    "train_nll_interval": 0.43900928265084943,
+    "val_nll_interval": 0.44211105139743934
+  },
+  {
+    "epoch": 14,
+    "train_nll_interval": 0.4345177444883474,
+    "val_nll_interval": 0.4403493909815394
+  },
+  {
+    "epoch": 15,
+    "train_nll_interval": 0.4306373013526731,
+    "val_nll_interval": 0.43861381536207394
+  },
+  {
+    "epoch": 16,
+    "train_nll_interval": 0.42683669638514776,
+    "val_nll_interval": 0.43716368038768344
+  },
+  {
+    "epoch": 17,
+    "train_nll_interval": 0.42433978113051624,
+    "val_nll_interval": 0.43634789607764823
+  },
+  {
+    "epoch": 18,
+    "train_nll_interval": 0.42055315222088185,
+    "val_nll_interval": 0.43557111915735414
+  },
+  {
+    "epoch": 19,
+    "train_nll_interval": 0.41763139899679536,
+    "val_nll_interval": 0.43266151531690533
+  },
+  {
+    "epoch": 20,
+    "train_nll_interval": 0.41618669033979827,
+    "val_nll_interval": 0.43383300585205603
+  },
+  {
+    "epoch": 21,
+    "train_nll_interval": 0.41340753464896546,
+    "val_nll_interval": 0.42910506842733703
+  },
+  {
+    "epoch": 22,
+    "train_nll_interval": 0.41117035141049196,
+    "val_nll_interval": 0.43940955957798
+  },
+  {
+    "epoch": 23,
+    "train_nll_interval": 0.410450870750253,
+    "val_nll_interval": 0.42850476414029043
+  },
+  {
+    "epoch": 24,
+    "train_nll_interval": 0.4077377692863954,
+    "val_nll_interval": 0.4330980517369011
+  },
+  {
+    "epoch": 25,
+    "train_nll_interval": 0.40638817545685174,
+    "val_nll_interval": 0.42691248063952647
+  },
+  {
+    "epoch": 26,
+    "train_nll_interval": 0.40493269264233384,
+    "val_nll_interval": 0.4328951730122318
+  },
+  {
+    "epoch": 27,
+    "train_nll_interval": 0.40313050421294594,
+    "val_nll_interval": 0.4294287159475235
+  },
+  {
+    "epoch": 28,
+    "train_nll_interval": 0.40100266549551566,
+    "val_nll_interval": 0.4369013185249236
+  },
+  {
+    "epoch": 29,
+    "train_nll_interval": 0.40018687552665305,
+    "val_nll_interval": 0.4296831107837315
+  },
+  {
+    "epoch": 30,
+    "train_nll_interval": 0.39836006010102826,
+    "val_nll_interval": 0.44049410986781207
+  },
+  {
+    "epoch": 31,
+    "train_nll_interval": 0.3974510061246493,
+    "val_nll_interval": 0.42913646275958023
+  },
+  {
+    "epoch": 32,
+    "train_nll_interval": 0.3964547471424706,
+    "val_nll_interval": 0.43230564027577956
+  },
+  {
+    "epoch": 33,
+    "train_nll_interval": 0.39425437412586845,
+    "val_nll_interval": 0.4345529190052585
+  },
+  {
+    "epoch": 34,
+    "train_nll_interval": 0.3923376168106663,
+    "val_nll_interval": 0.42991337037614036
+  }
+]

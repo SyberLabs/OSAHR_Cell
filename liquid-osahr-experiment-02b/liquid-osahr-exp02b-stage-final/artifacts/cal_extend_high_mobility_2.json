@@ -1,0 +1,52 @@
+{
+  "regime": "high_mobility",
+  "scenario": 2,
+  "scenario_params": {
+    "mobility": 1.7080098629433247,
+    "stress": 0.9028221705922099,
+    "channel": 1.0804460619001643,
+    "demand": 0.8798835950175712
+  },
+  "horizon": 2.0,
+  "oracle": {
+    "throughput": 0.0,
+    "semantic": 0.0
+  },
+  "grid": {
+    "0.00": {
+      "trust": 0,
+      "throughput": 0.0,
+      "semantic": 0.0,
+      "effect": 0.0,
+      "error": 0.0
+    },
+    "0.25": {
+      "trust": 0.25,
+      "throughput": 0.0,
+      "semantic": 0.0,
+      "effect": 0.0,
+      "error": 0.0
+    },
+    "0.50": {
+      "trust": 0.5,
+      "throughput": 0.0,
+      "semantic": 0.0,
+      "effect": 0.0,
+      "error": 0.0
+    },
+    "0.75": {
+      "trust": 0.75,
+      "throughput": 0.0,
+      "semantic": 0.0,
+      "effect": 0.0,
+      "error": 0.0
+    },
+    "1.00": {
+      "trust": 1.0,
+      "throughput": 0.0,
+      "semantic": 0.0,
+      "effect": 0.0,
+      "error": 0.0
+    }
+  }
+}

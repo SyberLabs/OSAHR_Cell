@@ -1,0 +1,70 @@
+{
+  "model_name": "cfc_closed",
+  "parameter_count": 13952,
+  "best_epoch": 12,
+  "best_val_loss": 0.01608811877667904,
+  "train_seconds": 25.213845942000034,
+  "history": [
+    {
+      "epoch": 1,
+      "train_loss": 0.1471643267583301,
+      "val_loss": 0.07400131225585938
+    },
+    {
+      "epoch": 2,
+      "train_loss": 0.06829973855280998,
+      "val_loss": 0.038412149995565414
+    },
+    {
+      "epoch": 3,
+      "train_loss": 0.06411944829287723,
+      "val_loss": 0.034122273325920105
+    },
+    {
+      "epoch": 4,
+      "train_loss": 0.04011053952883749,
+      "val_loss": 0.03702821955084801
+    },
+    {
+      "epoch": 5,
+      "train_loss": 0.04636761634764629,
+      "val_loss": 0.031733542680740356
+    },
+    {
+      "epoch": 6,
+      "train_loss": 0.03747304427762144,
+      "val_loss": 0.022385047748684883
+    },
+    {
+      "epoch": 7,
+      "train_loss": 0.03684757434248773,
+      "val_loss": 0.024043185636401176
+    },
+    {
+      "epoch": 8,
+      "train_loss": 0.034337223484951045,
+      "val_loss": 0.02181876264512539
+    },
+    {
+      "epoch": 9,
+      "train_loss": 0.029753553128917407,
+      "val_loss": 0.02328547090291977
+    },
+    {
+      "epoch": 10,
+      "train_loss": 0.030035797670085466,
+      "val_loss": 0.019232502207159996
+    },
+    {
+      "epoch": 11,
+      "train_loss": 0.02604610994505594,
+      "val_loss": 0.018879780545830727
+    },
+    {
+      "epoch": 12,
+      "train_loss": 0.02451192102757574,
+      "val_loss": 0.01608811877667904
+    }
+  ],
+  "checkpoint": "/mnt/data/liquid_osahr_exp02a_work/liquid-osahr-experiment-02a/artifacts/cfc_closed_seed260218.pt"
+}

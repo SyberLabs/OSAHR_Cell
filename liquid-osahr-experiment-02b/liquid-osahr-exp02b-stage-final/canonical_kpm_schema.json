@@ -1,0 +1,23 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Liquid-OSAHR Canonical RAN KPM Record",
+  "type": "object",
+  "required": ["time_s", "source"],
+  "properties": {
+    "time_s": {"type": "number"},
+    "ue_id": {"type": ["string", "null"]},
+    "cell_id": {"type": ["string", "null"]},
+    "rsrp_dbm": {"type": ["number", "null"]},
+    "rsrq_db": {"type": ["number", "null"]},
+    "sinr_db": {"type": ["number", "null"]},
+    "cqi": {"type": ["number", "null"]},
+    "dl_throughput_mbps": {"type": ["number", "null"]},
+    "ul_throughput_mbps": {"type": ["number", "null"]},
+    "dl_drop_rate": {"type": ["number", "null"], "minimum": 0},
+    "ul_success_rate": {"type": ["number", "null"], "minimum": 0},
+    "dl_volume_bytes": {"type": ["number", "null"], "minimum": 0},
+    "ul_volume_bytes": {"type": ["number", "null"], "minimum": 0},
+    "source": {"type": "string"}
+  },
+  "additionalProperties": false
+}

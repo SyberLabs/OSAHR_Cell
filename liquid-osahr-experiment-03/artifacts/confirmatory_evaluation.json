@@ -1,0 +1,2578 @@
+{
+  "fields": {
+    "T_strict": {
+      "protocol": "T_strict",
+      "grid": [
+        0.0,
+        0.25,
+        0.5,
+        1.0
+      ],
+      "default_alpha": 0.0,
+      "lam": 0.1,
+      "primary_estimand": "goal_utility_ratio",
+      "share_primary": false,
+      "calibration_horizon": 2.0,
+      "notes": {
+        "calibration_regimes": [
+          "id",
+          "high_mobility",
+          "high_stress"
+        ],
+        "predictive_weight_source": "02b_intervention_calibration_multi",
+        "excluded_alpha_0.75": true
+      },
+      "cells": [
+        {
+          "estimand": "goal_utility_ratio",
+          "intervention": "semantic_vs_throughput",
+          "regime": "high_mobility",
+          "alpha": 0.0,
+          "objective_by_alpha": {
+            "0.00": 0.0737315227519064,
+            "0.25": 0.07621007554338359,
+            "0.50": 0.07541098254054208,
+            "1.00": 0.08937401522988249
+          },
+          "mae_by_alpha": {
+            "0.00": 0.07126436781609195,
+            "0.25": 0.07394320337864113,
+            "0.50": 0.07335456451160728,
+            "1.00": 0.08763413440408041
+          },
+          "predictive_nmae_by_alpha": {
+            "0.00": 0.024671549358144515,
+            "0.25": 0.02266872164742453,
+            "0.50": 0.02056418028934808,
+            "1.00": 0.017398808258020794
+          },
+          "inadequacy": false,
+          "n_scenarios": 6,
+          "calibration_horizon": 2.0
+        },
+        {
+          "estimand": "goal_utility_ratio",
+          "intervention": "semantic_vs_throughput",
+          "regime": "high_stress",
+          "alpha": 0.0,
+          "objective_by_alpha": {
+            "0.00": 0.07097007720325438,
+            "0.25": 0.18502356673495782,
+            "0.50": 0.1490495027662134,
+            "1.00": 0.22079567603324685
+          },
+          "mae_by_alpha": {
+            "0.00": 0.06850292226743993,
+            "0.25": 0.18275669457021537,
+            "0.50": 0.1469930847372786,
+            "1.00": 0.21905579520744475
+          },
+          "predictive_nmae_by_alpha": {
+            "0.00": 0.024671549358144515,
+            "0.25": 0.02266872164742453,
+            "0.50": 0.02056418028934808,
+            "1.00": 0.017398808258020794
+          },
+          "inadequacy": false,
+          "n_scenarios": 6,
+          "calibration_horizon": 2.0
+        },
+        {
+          "estimand": "goal_utility_ratio",
+          "intervention": "semantic_vs_throughput",
+          "regime": "id",
+          "alpha": 0.5,
+          "objective_by_alpha": {
+            "0.00": 0.007100801676169739,
+            "0.25": 0.006900518905097739,
+            "0.50": 0.006690064769290094,
+            "1.00": 0.01048993488256468
+          },
+          "mae_by_alpha": {
+            "0.00": 0.004633646740355287,
+            "0.25": 0.004633646740355287,
+            "0.50": 0.004633646740355287,
+            "1.00": 0.008750054056762602
+          },
+          "predictive_nmae_by_alpha": {
+            "0.00": 0.024671549358144515,
+            "0.25": 0.02266872164742453,
+            "0.50": 0.02056418028934808,
+            "1.00": 0.017398808258020794
+          },
+          "inadequacy": false,
+          "n_scenarios": 6,
+          "calibration_horizon": 2.0
+        }
+      ]
+    },
+    "T_primary_share": {
+      "protocol": "T_primary_share",
+      "grid": [
+        0.0,
+        0.25,
+        0.5,
+        1.0
+      ],
+      "default_alpha": 0.0,
+      "lam": 0.1,
+      "primary_estimand": "goal_utility_ratio",
+      "share_primary": true,
+      "calibration_horizon": 2.0,
+      "notes": {
+        "calibration_regimes": [
+          "id",
+          "high_mobility",
+          "high_stress"
+        ],
+        "predictive_weight_source": "02b_intervention_calibration_multi",
+        "excluded_alpha_0.75": true
+      },
+      "cells": [
+        {
+          "estimand": "goal_utility_ratio",
+          "intervention": "semantic_vs_throughput",
+          "regime": "high_mobility",
+          "alpha": 0.0,
+          "objective_by_alpha": {
+            "0.00": 0.0737315227519064,
+            "0.25": 0.07621007554338359,
+            "0.50": 0.07541098254054208,
+            "1.00": 0.08937401522988249
+          },
+          "mae_by_alpha": {
+            "0.00": 0.07126436781609195,
+            "0.25": 0.07394320337864113,
+            "0.50": 0.07335456451160728,
+            "1.00": 0.08763413440408041
+          },
+          "predictive_nmae_by_alpha": {
+            "0.00": 0.024671549358144515,
+            "0.25": 0.02266872164742453,
+            "0.50": 0.02056418028934808,
+            "1.00": 0.017398808258020794
+          },
+          "inadequacy": false,
+          "n_scenarios": 6,
+          "calibration_horizon": 2.0
+        },
+        {
+          "estimand": "goal_utility_ratio",
+          "intervention": "semantic_vs_throughput",
+          "regime": "high_stress",
+          "alpha": 0.0,
+          "objective_by_alpha": {
+            "0.00": 0.07097007720325438,
+            "0.25": 0.18502356673495782,
+            "0.50": 0.1490495027662134,
+            "1.00": 0.22079567603324685
+          },
+          "mae_by_alpha": {
+            "0.00": 0.06850292226743993,
+            "0.25": 0.18275669457021537,
+            "0.50": 0.1469930847372786,
+            "1.00": 0.21905579520744475
+          },
+          "predictive_nmae_by_alpha": {
+            "0.00": 0.024671549358144515,
+            "0.25": 0.02266872164742453,
+            "0.50": 0.02056418028934808,
+            "1.00": 0.017398808258020794
+          },
+          "inadequacy": false,
+          "n_scenarios": 6,
+          "calibration_horizon": 2.0
+        },
+        {
+          "estimand": "goal_utility_ratio",
+          "intervention": "semantic_vs_throughput",
+          "regime": "id",
+          "alpha": 0.5,
+          "objective_by_alpha": {
+            "0.00": 0.007100801676169739,
+            "0.25": 0.006900518905097739,
+            "0.50": 0.006690064769290094,
+            "1.00": 0.01048993488256468
+          },
+          "mae_by_alpha": {
+            "0.00": 0.004633646740355287,
+            "0.25": 0.004633646740355287,
+            "0.50": 0.004633646740355287,
+            "1.00": 0.008750054056762602
+          },
+          "predictive_nmae_by_alpha": {
+            "0.00": 0.024671549358144515,
+            "0.25": 0.02266872164742453,
+            "0.50": 0.02056418028934808,
+            "1.00": 0.017398808258020794
+          },
+          "inadequacy": false,
+          "n_scenarios": 6,
+          "calibration_horizon": 2.0
+        }
+      ]
+    },
+    "T_intervention_only": {
+      "protocol": "T_intervention_only",
+      "grid": [
+        0.0,
+        0.25,
+        0.5,
+        1.0
+      ],
+      "default_alpha": 0.0,
+      "lam": 0.0,
+      "primary_estimand": "goal_utility_ratio",
+      "share_primary": false,
+      "calibration_horizon": 2.0,
+      "notes": {
+        "calibration_regimes": [
+          "id",
+          "high_mobility",
+          "high_stress"
+        ],
+        "predictive_weight_source": "02b_intervention_calibration_multi",
+        "excluded_alpha_0.75": true
+      },
+      "cells": [
+        {
+          "estimand": "goal_utility_ratio",
+          "intervention": "semantic_vs_throughput",
+          "regime": "high_mobility",
+          "alpha": 0.0,
+          "objective_by_alpha": {
+            "0.00": 0.07126436781609195,
+            "0.25": 0.07394320337864113,
+            "0.50": 0.07335456451160728,
+            "1.00": 0.08763413440408041
+          },
+          "mae_by_alpha": {
+            "0.00": 0.07126436781609195,
+            "0.25": 0.07394320337864113,
+            "0.50": 0.07335456451160728,
+            "1.00": 0.08763413440408041
+          },
+          "predictive_nmae_by_alpha": {
+            "0.00": 0.024671549358144515,
+            "0.25": 0.02266872164742453,
+            "0.50": 0.02056418028934808,
+            "1.00": 0.017398808258020794
+          },
+          "inadequacy": false,
+          "n_scenarios": 6,
+          "calibration_horizon": 2.0
+        },
+        {
+          "estimand": "goal_utility_ratio",
+          "intervention": "semantic_vs_throughput",
+          "regime": "high_stress",
+          "alpha": 0.0,
+          "objective_by_alpha": {
+            "0.00": 0.06850292226743993,
+            "0.25": 0.18275669457021537,
+            "0.50": 0.1469930847372786,
+            "1.00": 0.21905579520744475
+          },
+          "mae_by_alpha": {
+            "0.00": 0.06850292226743993,
+            "0.25": 0.18275669457021537,
+            "0.50": 0.1469930847372786,
+            "1.00": 0.21905579520744475
+          },
+          "predictive_nmae_by_alpha": {
+            "0.00": 0.024671549358144515,
+            "0.25": 0.02266872164742453,
+            "0.50": 0.02056418028934808,
+            "1.00": 0.017398808258020794
+          },
+          "inadequacy": false,
+          "n_scenarios": 6,
+          "calibration_horizon": 2.0
+        },
+        {
+          "estimand": "goal_utility_ratio",
+          "intervention": "semantic_vs_throughput",
+          "regime": "id",
+          "alpha": 0.0,
+          "objective_by_alpha": {
+            "0.00": 0.004633646740355287,
+            "0.25": 0.004633646740355287,
+            "0.50": 0.004633646740355287,
+            "1.00": 0.008750054056762602
+          },
+          "mae_by_alpha": {
+            "0.00": 0.004633646740355287,
+            "0.25": 0.004633646740355287,
+            "0.50": 0.004633646740355287,
+            "1.00": 0.008750054056762602
+          },
+          "predictive_nmae_by_alpha": {
+            "0.00": 0.024671549358144515,
+            "0.25": 0.02266872164742453,
+            "0.50": 0.02056418028934808,
+            "1.00": 0.017398808258020794
+          },
+          "inadequacy": false,
+          "n_scenarios": 6,
+          "calibration_horizon": 2.0
+        }
+      ]
+    }
+  },
+  "calibration_loso": {
+    "id": [
+      0.5,
+      0.5,
+      0.5,
+      1.0,
+      0.5,
+      0.5
+    ],
+    "high_mobility": [
+      0.0,
+      0.0,
+      0.0,
+      1.0,
+      0.0,
+      0.0
+    ],
+    "high_stress": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  "confirmatory": {
+    "goal_utility_ratio": {
+      "global": {
+        "0.00": {
+          "regimes": {
+            "id": {
+              "mae": {
+                "mean": 0.09670571046832165,
+                "lo": 0.036111339378803994,
+                "hi": 0.1573000815578393,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.0,
+              "sources": {}
+            },
+            "high_mobility": {
+              "mae": {
+                "mean": 0.04032955683150097,
+                "lo": 0.011115260679997796,
+                "hi": 0.08913455246570261,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.0,
+              "sources": {}
+            },
+            "high_stress": {
+              "mae": {
+                "mean": 0.1791403207066018,
+                "lo": 0.03835357512208708,
+                "hi": 0.3631227274045446,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.0,
+              "sources": {}
+            },
+            "weak_channel": {
+              "mae": {
+                "mean": 0.05586552608879998,
+                "lo": 0.0026326241134751794,
+                "hi": 0.10909842806412477,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.0,
+              "sources": {}
+            }
+          },
+          "macro": {
+            "mean": 0.09301027852380608,
+            "lo": 0.049672547043835454,
+            "hi": 0.14387209444713536,
+            "n": 20
+          }
+        },
+        "0.25": {
+          "regimes": {
+            "id": {
+              "mae": {
+                "mean": 0.06474978618550736,
+                "lo": 0.021143405505085887,
+                "hi": 0.12698623575651072,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.25,
+              "sources": {}
+            },
+            "high_mobility": {
+              "mae": {
+                "mean": 0.05112344477717159,
+                "lo": 0.005996750605877299,
+                "hi": 0.10248769544843347,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.25,
+              "sources": {}
+            },
+            "high_stress": {
+              "mae": {
+                "mean": 0.07072459776576669,
+                "lo": 0.002961209019286648,
+                "hi": 0.16217878117627244,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.25,
+              "sources": {}
+            },
+            "weak_channel": {
+              "mae": {
+                "mean": 0.08253401414564296,
+                "lo": 0.03398270773516918,
+                "hi": 0.13108532055611674,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.25,
+              "sources": {}
+            }
+          },
+          "macro": {
+            "mean": 0.06728296071852215,
+            "lo": 0.03909991840577374,
+            "hi": 0.09831706544575455,
+            "n": 20
+          }
+        },
+        "0.50": {
+          "regimes": {
+            "id": {
+              "mae": {
+                "mean": 0.05109318222461473,
+                "lo": 0.00543485891153912,
+                "hi": 0.1184348881969198,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.5,
+              "sources": {}
+            },
+            "high_mobility": {
+              "mae": {
+                "mean": 0.07031701172338493,
+                "lo": 0.010306211882263527,
+                "hi": 0.1388665845777802,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.5,
+              "sources": {}
+            },
+            "high_stress": {
+              "mae": {
+                "mean": 0.10340831199792899,
+                "lo": 0.02205817938219836,
+                "hi": 0.2314606829621459,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.5,
+              "sources": {}
+            },
+            "weak_channel": {
+              "mae": {
+                "mean": 0.06270290806729847,
+                "lo": 0.006764882044133147,
+                "hi": 0.125247548600852,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.5,
+              "sources": {}
+            }
+          },
+          "macro": {
+            "mean": 0.07188035350330678,
+            "lo": 0.036515375423603585,
+            "hi": 0.11279987708381882,
+            "n": 20
+          }
+        },
+        "1.00": {
+          "regimes": {
+            "id": {
+              "mae": {
+                "mean": 0.05694076425781669,
+                "lo": 0.01712059514164005,
+                "hi": 0.12036227281230442,
+                "n": 5
+              },
+              "mean_selected_alpha": 1.0,
+              "sources": {}
+            },
+            "high_mobility": {
+              "mae": {
+                "mean": 0.0565315010380647,
+                "lo": 0.005835742639401653,
+                "hi": 0.10810837302605932,
+                "n": 5
+              },
+              "mean_selected_alpha": 1.0,
+              "sources": {}
+            },
+            "high_stress": {
+              "mae": {
+                "mean": 0.12395466586938626,
+                "lo": 0.024381161325867963,
+                "hi": 0.299958976268519,
+                "n": 5
+              },
+              "mean_selected_alpha": 1.0,
+              "sources": {}
+            },
+            "weak_channel": {
+              "mae": {
+                "mean": 0.09159240338770748,
+                "lo": 0.010945582105976116,
+                "hi": 0.21562452419469177,
+                "n": 5
+              },
+              "mean_selected_alpha": 1.0,
+              "sources": {}
+            }
+          },
+          "macro": {
+            "mean": 0.08225483363824379,
+            "lo": 0.03744303242252726,
+            "hi": 0.1373170642007508,
+            "n": 20
+          }
+        }
+      },
+      "T_strict": {
+        "regimes": {
+          "id": {
+            "mae": {
+              "mean": 0.05109318222461473,
+              "lo": 0.00543485891153912,
+              "hi": 0.1184348881969198,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.5,
+            "sources": {
+              "calibrated_cell": 5
+            }
+          },
+          "high_mobility": {
+            "mae": {
+              "mean": 0.04032955683150097,
+              "lo": 0.011115260679997796,
+              "hi": 0.08913455246570261,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "calibrated_cell": 5
+            }
+          },
+          "high_stress": {
+            "mae": {
+              "mean": 0.1791403207066018,
+              "lo": 0.03835357512208708,
+              "hi": 0.3631227274045446,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "calibrated_cell": 5
+            }
+          },
+          "weak_channel": {
+            "mae": {
+              "mean": 0.05586552608879998,
+              "lo": 0.0026326241134751794,
+              "hi": 0.10909842806412477,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          }
+        },
+        "macro": {
+          "mean": 0.08160714646287935,
+          "lo": 0.03852887543437041,
+          "hi": 0.13262982529700018,
+          "n": 20
+        }
+      },
+      "paired_T_strict_vs_alpha0": {
+        "regimes": {
+          "id": {
+            "mean": -0.045612528243706915,
+            "lo": -0.10540758824724923,
+            "hi": -0.00305331376864757,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": -0.011403132060926729,
+          "lo": -0.02963087792925298,
+          "hi": 0.0,
+          "n": 20
+        }
+      },
+      "paired_T_strict_vs_alpha1": {
+        "regimes": {
+          "id": {
+            "mean": -0.005847582033201959,
+            "lo": -0.014704036422186484,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": -0.016201944206563734,
+            "lo": -0.067533709820028,
+            "hi": 0.013058773931898759,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.055185654837215534,
+            "lo": 0.010566091095376118,
+            "hi": 0.11815790072154486,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": -0.0357268772989075,
+            "lo": -0.12006011422331422,
+            "hi": 0.018668614384066695,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": -0.0006476871753644143,
+          "lo": -0.031232836707290046,
+          "hi": 0.027835363077440417,
+          "n": 20
+        }
+      },
+      "T_primary_share": {
+        "regimes": {
+          "id": {
+            "mae": {
+              "mean": 0.05109318222461473,
+              "lo": 0.00543485891153912,
+              "hi": 0.1184348881969198,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.5,
+            "sources": {
+              "calibrated_cell": 5
+            }
+          },
+          "high_mobility": {
+            "mae": {
+              "mean": 0.04032955683150097,
+              "lo": 0.011115260679997796,
+              "hi": 0.08913455246570261,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "calibrated_cell": 5
+            }
+          },
+          "high_stress": {
+            "mae": {
+              "mean": 0.1791403207066018,
+              "lo": 0.03835357512208708,
+              "hi": 0.3631227274045446,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "calibrated_cell": 5
+            }
+          },
+          "weak_channel": {
+            "mae": {
+              "mean": 0.05586552608879998,
+              "lo": 0.0026326241134751794,
+              "hi": 0.10909842806412477,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          }
+        },
+        "macro": {
+          "mean": 0.08160714646287935,
+          "lo": 0.03837414111877088,
+          "hi": 0.13304777962364583,
+          "n": 20
+        }
+      },
+      "paired_T_primary_share_vs_alpha0": {
+        "regimes": {
+          "id": {
+            "mean": -0.045612528243706915,
+            "lo": -0.10540758824724923,
+            "hi": -0.00305331376864757,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": -0.011403132060926729,
+          "lo": -0.0298989824012153,
+          "hi": 0.0,
+          "n": 20
+        }
+      },
+      "paired_T_primary_share_vs_alpha1": {
+        "regimes": {
+          "id": {
+            "mean": -0.005847582033201959,
+            "lo": -0.014704036422186484,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": -0.016201944206563734,
+            "lo": -0.067533709820028,
+            "hi": 0.013058773931898759,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.055185654837215534,
+            "lo": 0.010566091095376118,
+            "hi": 0.11815790072154486,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": -0.0357268772989075,
+            "lo": -0.12006011422331422,
+            "hi": 0.018668614384066695,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": -0.0006476871753644143,
+          "lo": -0.03080901617634179,
+          "hi": 0.027730114143234064,
+          "n": 20
+        }
+      },
+      "T_intervention_only": {
+        "regimes": {
+          "id": {
+            "mae": {
+              "mean": 0.09670571046832165,
+              "lo": 0.036111339378803994,
+              "hi": 0.1573000815578393,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "calibrated_cell": 5
+            }
+          },
+          "high_mobility": {
+            "mae": {
+              "mean": 0.04032955683150097,
+              "lo": 0.011115260679997796,
+              "hi": 0.08913455246570261,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "calibrated_cell": 5
+            }
+          },
+          "high_stress": {
+            "mae": {
+              "mean": 0.1791403207066018,
+              "lo": 0.03835357512208708,
+              "hi": 0.3631227274045446,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "calibrated_cell": 5
+            }
+          },
+          "weak_channel": {
+            "mae": {
+              "mean": 0.05586552608879998,
+              "lo": 0.0026326241134751794,
+              "hi": 0.10909842806412477,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          }
+        },
+        "macro": {
+          "mean": 0.09301027852380608,
+          "lo": 0.04977897228607325,
+          "hi": 0.14402998551300494,
+          "n": 20
+        }
+      },
+      "paired_T_intervention_only_vs_alpha0": {
+        "regimes": {
+          "id": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 20
+        }
+      },
+      "paired_T_intervention_only_vs_alpha1": {
+        "regimes": {
+          "id": {
+            "mean": 0.039764946210504956,
+            "lo": -0.0058031406203369554,
+            "hi": 0.09672129653662788,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": -0.016201944206563734,
+            "lo": -0.067533709820028,
+            "hi": 0.013058773931898759,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.055185654837215534,
+            "lo": 0.010566091095376118,
+            "hi": 0.11607408119725446,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": -0.0357268772989075,
+            "lo": -0.12006011422331422,
+            "hi": 0.019559787257868146,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": 0.010755444885562316,
+          "lo": -0.02285057734704711,
+          "hi": 0.042966799825981124,
+          "n": 20
+        }
+      },
+      "paired_vs_alpha0": {
+        "regimes": {
+          "id": {
+            "mean": -0.045612528243706915,
+            "lo": -0.10540758824724923,
+            "hi": -0.00305331376864757,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": -0.011403132060926729,
+          "lo": -0.02963087792925298,
+          "hi": 0.0,
+          "n": 20
+        }
+      },
+      "paired_vs_alpha1": {
+        "regimes": {
+          "id": {
+            "mean": -0.005847582033201959,
+            "lo": -0.014704036422186484,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": -0.016201944206563734,
+            "lo": -0.067533709820028,
+            "hi": 0.013058773931898759,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.055185654837215534,
+            "lo": 0.010566091095376118,
+            "hi": 0.11815790072154486,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": -0.0357268772989075,
+            "lo": -0.12006011422331422,
+            "hi": 0.018668614384066695,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": -0.0006476871753644143,
+          "lo": -0.031232836707290046,
+          "hi": 0.027835363077440417,
+          "n": 20
+        }
+      }
+    },
+    "critical_success_rate": {
+      "global": {
+        "0.00": {
+          "regimes": {
+            "id": {
+              "mae": {
+                "mean": 0.11499999999999999,
+                "lo": 0.025,
+                "hi": 0.205,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.0,
+              "sources": {}
+            },
+            "high_mobility": {
+              "mae": {
+                "mean": 0.0416666666666667,
+                "lo": 0.0,
+                "hi": 0.10833333333333339,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.0,
+              "sources": {}
+            },
+            "high_stress": {
+              "mae": {
+                "mean": 0.31,
+                "lo": 0.08666666666666667,
+                "hi": 0.6,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.0,
+              "sources": {}
+            },
+            "weak_channel": {
+              "mae": {
+                "mean": 0.045,
+                "lo": 0.0,
+                "hi": 0.095,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.0,
+              "sources": {}
+            }
+          },
+          "macro": {
+            "mean": 0.12791666666666665,
+            "lo": 0.06291666666666666,
+            "hi": 0.2066666666666667,
+            "n": 20
+          }
+        },
+        "0.25": {
+          "regimes": {
+            "id": {
+              "mae": {
+                "mean": 0.09166666666666667,
+                "lo": 0.016666666666666673,
+                "hi": 0.175,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.25,
+              "sources": {}
+            },
+            "high_mobility": {
+              "mae": {
+                "mean": 0.0666666666666667,
+                "lo": 0.0,
+                "hi": 0.1333333333333334,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.25,
+              "sources": {}
+            },
+            "high_stress": {
+              "mae": {
+                "mean": 0.12666666666666665,
+                "lo": 0.006666666666666643,
+                "hi": 0.31999999999999995,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.25,
+              "sources": {}
+            },
+            "weak_channel": {
+              "mae": {
+                "mean": 0.10333333333333335,
+                "lo": 0.019999999999999997,
+                "hi": 0.1866666666666667,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.25,
+              "sources": {}
+            }
+          },
+          "macro": {
+            "mean": 0.09708333333333333,
+            "lo": 0.04791666666666666,
+            "hi": 0.15500000000000003,
+            "n": 20
+          }
+        },
+        "0.50": {
+          "regimes": {
+            "id": {
+              "mae": {
+                "mean": 0.075,
+                "lo": 0.0,
+                "hi": 0.175,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.5,
+              "sources": {}
+            },
+            "high_mobility": {
+              "mae": {
+                "mean": 0.10833333333333335,
+                "lo": 0.025,
+                "hi": 0.1916666666666667,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.5,
+              "sources": {}
+            },
+            "high_stress": {
+              "mae": {
+                "mean": 0.20666666666666664,
+                "lo": 0.046666666666666634,
+                "hi": 0.39,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.5,
+              "sources": {}
+            },
+            "weak_channel": {
+              "mae": {
+                "mean": 0.07833333333333337,
+                "lo": 0.016666666666666698,
+                "hi": 0.14500000000000002,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.5,
+              "sources": {}
+            }
+          },
+          "macro": {
+            "mean": 0.11708333333333334,
+            "lo": 0.06458333333333333,
+            "hi": 0.17333333333333337,
+            "n": 20
+          }
+        },
+        "1.00": {
+          "regimes": {
+            "id": {
+              "mae": {
+                "mean": 0.075,
+                "lo": 0.0,
+                "hi": 0.175,
+                "n": 5
+              },
+              "mean_selected_alpha": 1.0,
+              "sources": {}
+            },
+            "high_mobility": {
+              "mae": {
+                "mean": 0.08333333333333334,
+                "lo": 0.0,
+                "hi": 0.18333333333333335,
+                "n": 5
+              },
+              "mean_selected_alpha": 1.0,
+              "sources": {}
+            },
+            "high_stress": {
+              "mae": {
+                "mean": 0.17380952380952377,
+                "lo": 0.030952380952380933,
+                "hi": 0.40714285714285703,
+                "n": 5
+              },
+              "mean_selected_alpha": 1.0,
+              "sources": {}
+            },
+            "weak_channel": {
+              "mae": {
+                "mean": 0.13333333333333336,
+                "lo": 0.016666666666666698,
+                "hi": 0.29,
+                "n": 5
+              },
+              "mean_selected_alpha": 1.0,
+              "sources": {}
+            }
+          },
+          "macro": {
+            "mean": 0.11636904761904762,
+            "lo": 0.053333333333333344,
+            "hi": 0.19041666666666665,
+            "n": 20
+          }
+        }
+      },
+      "T_strict": {
+        "regimes": {
+          "id": {
+            "mae": {
+              "mean": 0.11499999999999999,
+              "lo": 0.025,
+              "hi": 0.205,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          },
+          "high_mobility": {
+            "mae": {
+              "mean": 0.0416666666666667,
+              "lo": 0.0,
+              "hi": 0.10833333333333339,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          },
+          "high_stress": {
+            "mae": {
+              "mean": 0.31,
+              "lo": 0.08666666666666667,
+              "hi": 0.6,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          },
+          "weak_channel": {
+            "mae": {
+              "mean": 0.045,
+              "lo": 0.0,
+              "hi": 0.095,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          }
+        },
+        "macro": {
+          "mean": 0.12791666666666665,
+          "lo": 0.06250000000000001,
+          "hi": 0.20666666666666664,
+          "n": 20
+        }
+      },
+      "paired_T_strict_vs_alpha0": {
+        "regimes": {
+          "id": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 20
+        }
+      },
+      "paired_T_strict_vs_alpha1": {
+        "regimes": {
+          "id": {
+            "mean": 0.039999999999999994,
+            "lo": 0.0,
+            "hi": 0.11999999999999997,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": -0.04166666666666665,
+            "lo": -0.15,
+            "hi": 0.025000000000000043,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.13619047619047622,
+            "lo": 0.046190476190476226,
+            "hi": 0.2261904761904762,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": -0.08833333333333337,
+            "lo": -0.2166666666666667,
+            "hi": -0.0050000000000000044,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": 0.011547619047619046,
+          "lo": -0.04970238095238095,
+          "hi": 0.06863095238095239,
+          "n": 20
+        }
+      },
+      "T_primary_share": {
+        "regimes": {
+          "id": {
+            "mae": {
+              "mean": 0.075,
+              "lo": 0.0,
+              "hi": 0.175,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.5,
+            "sources": {
+              "inherit_primary_estimand": 5
+            }
+          },
+          "high_mobility": {
+            "mae": {
+              "mean": 0.0416666666666667,
+              "lo": 0.0,
+              "hi": 0.10833333333333339,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "inherit_primary_estimand": 5
+            }
+          },
+          "high_stress": {
+            "mae": {
+              "mean": 0.31,
+              "lo": 0.08666666666666667,
+              "hi": 0.6,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "inherit_primary_estimand": 5
+            }
+          },
+          "weak_channel": {
+            "mae": {
+              "mean": 0.045,
+              "lo": 0.0,
+              "hi": 0.095,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          }
+        },
+        "macro": {
+          "mean": 0.1179166666666667,
+          "lo": 0.05291666666666668,
+          "hi": 0.19749999999999998,
+          "n": 20
+        }
+      },
+      "paired_T_primary_share_vs_alpha0": {
+        "regimes": {
+          "id": {
+            "mean": -0.039999999999999994,
+            "lo": -0.11999999999999997,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": -0.009999999999999998,
+          "lo": -0.029999999999999992,
+          "hi": 0.0,
+          "n": 20
+        }
+      },
+      "paired_T_primary_share_vs_alpha1": {
+        "regimes": {
+          "id": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": -0.04166666666666665,
+            "lo": -0.15,
+            "hi": 0.025000000000000043,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.13619047619047622,
+            "lo": 0.046190476190476226,
+            "hi": 0.2261904761904762,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": -0.08833333333333337,
+            "lo": -0.2166666666666667,
+            "hi": -0.0050000000000000044,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": 0.0015476190476190477,
+          "lo": -0.055958333333333325,
+          "hi": 0.05624999999999999,
+          "n": 20
+        }
+      },
+      "T_intervention_only": {
+        "regimes": {
+          "id": {
+            "mae": {
+              "mean": 0.11499999999999999,
+              "lo": 0.025,
+              "hi": 0.205,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          },
+          "high_mobility": {
+            "mae": {
+              "mean": 0.0416666666666667,
+              "lo": 0.0,
+              "hi": 0.10833333333333339,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          },
+          "high_stress": {
+            "mae": {
+              "mean": 0.31,
+              "lo": 0.08666666666666667,
+              "hi": 0.6,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          },
+          "weak_channel": {
+            "mae": {
+              "mean": 0.045,
+              "lo": 0.0,
+              "hi": 0.095,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          }
+        },
+        "macro": {
+          "mean": 0.12791666666666665,
+          "lo": 0.06291666666666666,
+          "hi": 0.20666666666666664,
+          "n": 20
+        }
+      },
+      "paired_T_intervention_only_vs_alpha0": {
+        "regimes": {
+          "id": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 20
+        }
+      },
+      "paired_T_intervention_only_vs_alpha1": {
+        "regimes": {
+          "id": {
+            "mean": 0.039999999999999994,
+            "lo": 0.0,
+            "hi": 0.11999999999999997,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": -0.04166666666666665,
+            "lo": -0.15,
+            "hi": 0.025000000000000043,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.13619047619047622,
+            "lo": 0.046190476190476226,
+            "hi": 0.2261904761904762,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": -0.08833333333333337,
+            "lo": -0.2166666666666667,
+            "hi": -0.0050000000000000044,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": 0.011547619047619046,
+          "lo": -0.04958333333333336,
+          "hi": 0.0686919642857144,
+          "n": 20
+        }
+      }
+    },
+    "mean_latency": {
+      "global": {
+        "0.00": {
+          "regimes": {
+            "id": {
+              "mae": {
+                "mean": 0.051977335282906066,
+                "lo": 0.02720775968937599,
+                "hi": 0.07190884450029691,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.0,
+              "sources": {}
+            },
+            "high_mobility": {
+              "mae": {
+                "mean": 0.0687585483904036,
+                "lo": 0.015002577271446781,
+                "hi": 0.13412497066015364,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.0,
+              "sources": {}
+            },
+            "high_stress": {
+              "mae": {
+                "mean": 0.1857747847241302,
+                "lo": 0.09410576781919511,
+                "hi": 0.3266275261406039,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.0,
+              "sources": {}
+            },
+            "weak_channel": {
+              "mae": {
+                "mean": 0.09818317229890827,
+                "lo": 0.004230644118215343,
+                "hi": 0.21895799492391355,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.0,
+              "sources": {}
+            }
+          },
+          "macro": {
+            "mean": 0.10117346017408704,
+            "lo": 0.06086711745669573,
+            "hi": 0.14795265810467537,
+            "n": 20
+          }
+        },
+        "0.25": {
+          "regimes": {
+            "id": {
+              "mae": {
+                "mean": 0.042904954832977495,
+                "lo": 0.023945078583355085,
+                "hi": 0.05928516378510862,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.25,
+              "sources": {}
+            },
+            "high_mobility": {
+              "mae": {
+                "mean": 0.012039901759660077,
+                "lo": 0.0030800826689127425,
+                "hi": 0.02099972085040741,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.25,
+              "sources": {}
+            },
+            "high_stress": {
+              "mae": {
+                "mean": 0.17796026009802257,
+                "lo": 0.08154631099044427,
+                "hi": 0.31999400328615213,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.25,
+              "sources": {}
+            },
+            "weak_channel": {
+              "mae": {
+                "mean": 0.12228650825997125,
+                "lo": 0.02558534426164356,
+                "hi": 0.2500642657362534,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.25,
+              "sources": {}
+            }
+          },
+          "macro": {
+            "mean": 0.08879790623765785,
+            "lo": 0.049885787262995515,
+            "hi": 0.13523764056910562,
+            "n": 20
+          }
+        },
+        "0.50": {
+          "regimes": {
+            "id": {
+              "mae": {
+                "mean": 0.04155324570317189,
+                "lo": 0.024602686214986645,
+                "hi": 0.05635806657705957,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.5,
+              "sources": {}
+            },
+            "high_mobility": {
+              "mae": {
+                "mean": 0.042762403935339977,
+                "lo": 0.004084008284082829,
+                "hi": 0.10765443536811634,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.5,
+              "sources": {}
+            },
+            "high_stress": {
+              "mae": {
+                "mean": 0.1640861237616109,
+                "lo": 0.05696261326132934,
+                "hi": 0.35577104806048654,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.5,
+              "sources": {}
+            },
+            "weak_channel": {
+              "mae": {
+                "mean": 0.09379939924633866,
+                "lo": 0.023692302174874523,
+                "hi": 0.1659734847456804,
+                "n": 5
+              },
+              "mean_selected_alpha": 0.5,
+              "sources": {}
+            }
+          },
+          "macro": {
+            "mean": 0.08555029316161536,
+            "lo": 0.04471726547984768,
+            "hi": 0.1390675849169326,
+            "n": 20
+          }
+        },
+        "1.00": {
+          "regimes": {
+            "id": {
+              "mae": {
+                "mean": 0.02690393151690209,
+                "lo": 0.008935622668037668,
+                "hi": 0.044872240365766515,
+                "n": 5
+              },
+              "mean_selected_alpha": 1.0,
+              "sources": {}
+            },
+            "high_mobility": {
+              "mae": {
+                "mean": 0.060127411999085265,
+                "lo": 0.01124206622514875,
+                "hi": 0.13578664429949594,
+                "n": 5
+              },
+              "mean_selected_alpha": 1.0,
+              "sources": {}
+            },
+            "high_stress": {
+              "mae": {
+                "mean": 0.0613978178946903,
+                "lo": 0.0336436288265282,
+                "hi": 0.08915200696285239,
+                "n": 5
+              },
+              "mean_selected_alpha": 1.0,
+              "sources": {}
+            },
+            "weak_channel": {
+              "mae": {
+                "mean": 0.12472856172454312,
+                "lo": 0.04527370140240803,
+                "hi": 0.20307544758706894,
+                "n": 5
+              },
+              "mean_selected_alpha": 1.0,
+              "sources": {}
+            }
+          },
+          "macro": {
+            "mean": 0.06828943078380519,
+            "lo": 0.04091301539675803,
+            "hi": 0.0960557413500789,
+            "n": 20
+          }
+        }
+      },
+      "T_strict": {
+        "regimes": {
+          "id": {
+            "mae": {
+              "mean": 0.051977335282906066,
+              "lo": 0.02720775968937599,
+              "hi": 0.07190884450029691,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          },
+          "high_mobility": {
+            "mae": {
+              "mean": 0.0687585483904036,
+              "lo": 0.015002577271446781,
+              "hi": 0.13412497066015364,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          },
+          "high_stress": {
+            "mae": {
+              "mean": 0.1857747847241302,
+              "lo": 0.09410576781919511,
+              "hi": 0.3266275261406039,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          },
+          "weak_channel": {
+            "mae": {
+              "mean": 0.09818317229890827,
+              "lo": 0.004230644118215343,
+              "hi": 0.21895799492391355,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          }
+        },
+        "macro": {
+          "mean": 0.10117346017408704,
+          "lo": 0.06060656544308187,
+          "hi": 0.14770494573124934,
+          "n": 20
+        }
+      },
+      "paired_T_strict_vs_alpha0": {
+        "regimes": {
+          "id": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 20
+        }
+      },
+      "paired_T_strict_vs_alpha1": {
+        "regimes": {
+          "id": {
+            "mean": 0.025073403766003977,
+            "lo": 0.004759256212803464,
+            "hi": 0.052138955831216305,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": 0.008631136391318333,
+            "lo": -0.0060386661555301814,
+            "hi": 0.026671273346834102,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.12437696682943991,
+            "lo": 0.03659121039386777,
+            "hi": 0.2498754558802568,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": -0.026545389425634846,
+            "lo": -0.12316599873238662,
+            "hi": 0.06380375085572257,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": 0.032884029390281844,
+          "lo": -0.008665490857963514,
+          "hi": 0.08029094614652005,
+          "n": 20
+        }
+      },
+      "T_primary_share": {
+        "regimes": {
+          "id": {
+            "mae": {
+              "mean": 0.04155324570317189,
+              "lo": 0.02456759953379315,
+              "hi": 0.05635806657705957,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.5,
+            "sources": {
+              "inherit_primary_estimand": 5
+            }
+          },
+          "high_mobility": {
+            "mae": {
+              "mean": 0.0687585483904036,
+              "lo": 0.015002577271446781,
+              "hi": 0.13412497066015364,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "inherit_primary_estimand": 5
+            }
+          },
+          "high_stress": {
+            "mae": {
+              "mean": 0.1857747847241302,
+              "lo": 0.09410576781919511,
+              "hi": 0.3266275261406039,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "inherit_primary_estimand": 5
+            }
+          },
+          "weak_channel": {
+            "mae": {
+              "mean": 0.09818317229890827,
+              "lo": 0.004230644118215343,
+              "hi": 0.21895799492391355,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          }
+        },
+        "macro": {
+          "mean": 0.09856743777915349,
+          "lo": 0.05834783454125203,
+          "hi": 0.14565829217967965,
+          "n": 20
+        }
+      },
+      "paired_T_primary_share_vs_alpha0": {
+        "regimes": {
+          "id": {
+            "mean": -0.010424089579734175,
+            "lo": -0.029403777572133104,
+            "hi": 0.007361681023359101,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": -0.0026060223949335437,
+          "lo": -0.008223254150490411,
+          "hi": 0.001721324724097434,
+          "n": 20
+        }
+      },
+      "paired_T_primary_share_vs_alpha1": {
+        "regimes": {
+          "id": {
+            "mean": 0.014649314186269802,
+            "lo": 0.0018475981935516471,
+            "hi": 0.027962583049456223,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": 0.008631136391318333,
+            "lo": -0.0060386661555301814,
+            "hi": 0.026671273346834102,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.12437696682943991,
+            "lo": 0.03659121039386777,
+            "hi": 0.2498754558802568,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": -0.026545389425634846,
+            "lo": -0.12386722289217311,
+            "hi": 0.06310252669593608,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": 0.0302780069953483,
+          "lo": -0.011145353915433726,
+          "hi": 0.07823969318921045,
+          "n": 20
+        }
+      },
+      "T_intervention_only": {
+        "regimes": {
+          "id": {
+            "mae": {
+              "mean": 0.051977335282906066,
+              "lo": 0.02891314588684448,
+              "hi": 0.07190884450029691,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          },
+          "high_mobility": {
+            "mae": {
+              "mean": 0.0687585483904036,
+              "lo": 0.015002577271446781,
+              "hi": 0.13412497066015364,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          },
+          "high_stress": {
+            "mae": {
+              "mean": 0.1857747847241302,
+              "lo": 0.09490943853779103,
+              "hi": 0.3266275261406039,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          },
+          "weak_channel": {
+            "mae": {
+              "mean": 0.09818317229890827,
+              "lo": 0.004230644118215343,
+              "hi": 0.21895799492391355,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {
+              "default_mechanistic": 5
+            }
+          }
+        },
+        "macro": {
+          "mean": 0.10117346017408704,
+          "lo": 0.060766875750454,
+          "hi": 0.1476992980122543,
+          "n": 20
+        }
+      },
+      "paired_T_intervention_only_vs_alpha0": {
+        "regimes": {
+          "id": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 20
+        }
+      },
+      "paired_T_intervention_only_vs_alpha1": {
+        "regimes": {
+          "id": {
+            "mean": 0.025073403766003977,
+            "lo": 0.004759256212803464,
+            "hi": 0.052138955831216305,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": 0.008631136391318333,
+            "lo": -0.0060386661555301814,
+            "hi": 0.026671273346834102,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": 0.12437696682943991,
+            "lo": 0.03659121039386777,
+            "hi": 0.2498754558802568,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": -0.026545389425634846,
+            "lo": -0.12386722289217311,
+            "hi": 0.06310252669593608,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": 0.032884029390281844,
+          "lo": -0.009133111001598573,
+          "hi": 0.08018594240189653,
+          "n": 20
+        }
+      }
+    }
+  },
+  "exploratory": {
+    "goal_utility_ratio": {
+      "label": "exploratory_confirmatory_loso",
+      "loso": {
+        "regimes": {
+          "id": {
+            "mae": {
+              "mean": 0.05109318222461473,
+              "lo": 0.00543485891153912,
+              "hi": 0.1184348881969198,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.5,
+            "sources": {}
+          },
+          "high_mobility": {
+            "mae": {
+              "mean": 0.08017154159890136,
+              "lo": 0.03722306787511829,
+              "hi": 0.12312001532268443,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.25,
+            "sources": {}
+          },
+          "high_stress": {
+            "mae": {
+              "mean": 0.07072459776576669,
+              "lo": 0.002961209019286648,
+              "hi": 0.16217878117627244,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.25,
+            "sources": {}
+          },
+          "weak_channel": {
+            "mae": {
+              "mean": 0.09504428885156273,
+              "lo": 0.0026326241134751794,
+              "hi": 0.22160023559357303,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.2,
+            "sources": {}
+          }
+        },
+        "macro": {
+          "mean": 0.07425840261021137,
+          "lo": 0.03865181065265398,
+          "hi": 0.1148898521911452,
+          "n": 20
+        }
+      },
+      "oracle_cell": {
+        "regimes": {
+          "id": {
+            "mae": {
+              "mean": 0.05109318222461473,
+              "lo": 0.00543485891153912,
+              "hi": 0.1184348881969198,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.25,
+            "sources": {}
+          },
+          "high_mobility": {
+            "mae": {
+              "mean": 0.030023017119560746,
+              "lo": 0.0013425164809911516,
+              "hi": 0.08348037746613132,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.45,
+            "sources": {}
+          },
+          "high_stress": {
+            "mae": {
+              "mean": 0.05081485694990012,
+              "lo": 0.0025779087364742326,
+              "hi": 0.14266848325616088,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.25,
+            "sources": {}
+          },
+          "weak_channel": {
+            "mae": {
+              "mean": 0.048257161628694256,
+              "lo": 0.0026326241134751794,
+              "hi": 0.09645558284517902,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.2,
+            "sources": {}
+          }
+        },
+        "macro": {
+          "mean": 0.04504705448069246,
+          "lo": 0.01769532088537497,
+          "hi": 0.07734343531559966,
+          "n": 20
+        }
+      },
+      "paired_loso_vs_alpha0": {
+        "regimes": {
+          "id": {
+            "mean": -0.045612528243706915,
+            "lo": -0.10540758824724923,
+            "hi": -0.00305331376864757,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": 0.0398419847674004,
+            "lo": 0.0,
+            "hi": 0.08655753324956961,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": -0.10841572294083512,
+            "lo": -0.2009439462282722,
+            "hi": -0.033729890172646826,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": 0.039178762762762755,
+            "lo": 0.0,
+            "hi": 0.11753628828828826,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": -0.01875187591359472,
+          "lo": -0.06356482524218608,
+          "hi": 0.022501153698185675,
+          "n": 20
+        }
+      }
+    },
+    "critical_success_rate": {
+      "label": "exploratory_confirmatory_loso",
+      "loso": {
+        "regimes": {
+          "id": {
+            "mae": {
+              "mean": 0.11499999999999999,
+              "lo": 0.025,
+              "hi": 0.205,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.4,
+            "sources": {}
+          },
+          "high_mobility": {
+            "mae": {
+              "mean": 0.0916666666666667,
+              "lo": 0.008333333333333349,
+              "hi": 0.18333333333333335,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.2,
+            "sources": {}
+          },
+          "high_stress": {
+            "mae": {
+              "mean": 0.22666666666666666,
+              "lo": 0.033333333333333284,
+              "hi": 0.42000000000000004,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.3,
+            "sources": {}
+          },
+          "weak_channel": {
+            "mae": {
+              "mean": 0.045,
+              "lo": 0.0,
+              "hi": 0.095,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {}
+          }
+        },
+        "macro": {
+          "mean": 0.11958333333333333,
+          "lo": 0.06249999999999998,
+          "hi": 0.18083333333333335,
+          "n": 20
+        }
+      },
+      "oracle_cell": {
+        "regimes": {
+          "id": {
+            "mae": {
+              "mean": 0.075,
+              "lo": 0.0,
+              "hi": 0.175,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.1,
+            "sources": {}
+          },
+          "high_mobility": {
+            "mae": {
+              "mean": 0.03333333333333335,
+              "lo": 0.0,
+              "hi": 0.10000000000000005,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.2,
+            "sources": {}
+          },
+          "high_stress": {
+            "mae": {
+              "mean": 0.08166666666666664,
+              "lo": 0.0,
+              "hi": 0.2316666666666666,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.3,
+            "sources": {}
+          },
+          "weak_channel": {
+            "mae": {
+              "mean": 0.045,
+              "lo": 0.0,
+              "hi": 0.095,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.0,
+            "sources": {}
+          }
+        },
+        "macro": {
+          "mean": 0.05874999999999999,
+          "lo": 0.01958333333333332,
+          "hi": 0.10500000000000001,
+          "n": 20
+        }
+      },
+      "paired_loso_vs_alpha0": {
+        "regimes": {
+          "id": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": 0.05,
+            "lo": 0.0,
+            "hi": 0.15,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": -0.08333333333333336,
+            "lo": -0.29500000000000004,
+            "hi": 0.225,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": 0.0,
+            "lo": 0.0,
+            "hi": 0.0,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": -0.00833333333333334,
+          "lo": -0.07875000000000001,
+          "hi": 0.06875,
+          "n": 20
+        }
+      }
+    },
+    "mean_latency": {
+      "label": "exploratory_confirmatory_loso",
+      "loso": {
+        "regimes": {
+          "id": {
+            "mae": {
+              "mean": 0.02690393151690209,
+              "lo": 0.008935622668037668,
+              "hi": 0.044872240365766515,
+              "n": 5
+            },
+            "mean_selected_alpha": 1.0,
+            "sources": {}
+          },
+          "high_mobility": {
+            "mae": {
+              "mean": 0.012039901759660077,
+              "lo": 0.0030800826689127425,
+              "hi": 0.02099972085040741,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.25,
+            "sources": {}
+          },
+          "high_stress": {
+            "mae": {
+              "mean": 0.0613978178946903,
+              "lo": 0.0336436288265282,
+              "hi": 0.08915200696285239,
+              "n": 5
+            },
+            "mean_selected_alpha": 1.0,
+            "sources": {}
+          },
+          "weak_channel": {
+            "mae": {
+              "mean": 0.14237235137812781,
+              "lo": 0.04189838663860821,
+              "hi": 0.24284631611764745,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.4,
+            "sources": {}
+          }
+        },
+        "macro": {
+          "mean": 0.060678500637345055,
+          "lo": 0.03428337171702187,
+          "hi": 0.08781644028790252,
+          "n": 20
+        }
+      },
+      "oracle_cell": {
+        "regimes": {
+          "id": {
+            "mae": {
+              "mean": 0.02690393151690209,
+              "lo": 0.008935622668037668,
+              "hi": 0.044872240365766515,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.9,
+            "sources": {}
+          },
+          "high_mobility": {
+            "mae": {
+              "mean": 0.011931492884414169,
+              "lo": 0.0029666142475844536,
+              "hi": 0.020896371521243885,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.55,
+            "sources": {}
+          },
+          "high_stress": {
+            "mae": {
+              "mean": 0.055679895180573216,
+              "lo": 0.0336436288265282,
+              "hi": 0.07771616153461822,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.8,
+            "sources": {}
+          },
+          "weak_channel": {
+            "mae": {
+              "mean": 0.04939768555773374,
+              "lo": 0.003805574899444597,
+              "hi": 0.10942261715785602,
+              "n": 5
+            },
+            "mean_selected_alpha": 0.3,
+            "sources": {}
+          }
+        },
+        "macro": {
+          "mean": 0.0359782512849058,
+          "lo": 0.021966741028743453,
+          "hi": 0.052143249303518886,
+          "n": 20
+        }
+      },
+      "paired_loso_vs_alpha0": {
+        "regimes": {
+          "id": {
+            "mean": -0.025073403766003977,
+            "lo": -0.052138955831216305,
+            "hi": -0.004759256212803464,
+            "n": 5
+          },
+          "high_mobility": {
+            "mean": -0.05671864663074352,
+            "lo": -0.1286295434034593,
+            "hi": -0.005378020099568293,
+            "n": 5
+          },
+          "high_stress": {
+            "mean": -0.12437696682943991,
+            "lo": -0.2498754558802568,
+            "hi": -0.03659121039386777,
+            "n": 5
+          },
+          "weak_channel": {
+            "mean": 0.04418917907921956,
+            "lo": 0.00028718782618133434,
+            "hi": 0.13029304581838244,
+            "n": 5
+          }
+        },
+        "macro": {
+          "mean": -0.04049495953674197,
+          "lo": -0.08920476460916514,
+          "hi": 0.0036074518249649907,
+          "n": 20
+        }
+      }
+    }
+  },
+  "interpretation": "Calibrated cells: high_mobility\u2192\u03b1=0.00, high_stress\u2192\u03b1=0.00, id\u2192\u03b1=0.50. Uncalibrated support (other queries, weak_channel) is \u03b1=0 by protocol. On the primary confirmatory endpoint, the paired difference versus global \u03b1=0 is -0.01140  [-0.02963, 0.00000] and is unresolved. The identifiable ID cell (\u03b1=0.5 via predictive tie-break on tied intervention MAE) is the only calibrated departure from \u03b1=0, and it improved ID confirmatory recovery. High-stress remains on the mechanistic fallback because calibration penalized residual trust there. Frozen T therefore cannot capture any later high-stress residual benefit; that is a transport/design limit, not a silent interpolation. Confirmatory high-stress MAE under T_strict is 0.17914. Exploratory LOSO on the confirmatory holdout is reported separately. It is not a frozen-protocol confirmation."
+}

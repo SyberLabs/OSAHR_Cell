@@ -1,0 +1,7 @@
+model_name,best_epoch,best_val_nll_interval,train_seconds,parameter_count,checkpoint
+cfc,2,1.2412264464331455,0.0872781080000209,3195,/mnt/data/liquid_osahr_exp01/artifacts_smoke/checkpoints/cfc.pt
+ltc,2,1.054810821032915,0.262954714999978,579,/mnt/data/liquid_osahr_exp01/artifacts_smoke/checkpoints/ltc.pt
+gru_dt,2,1.0434357690029457,0.04802463099997567,483,/mnt/data/liquid_osahr_exp01/artifacts_smoke/checkpoints/gru_dt.pt
+lstm_dt,2,1.1119334736808402,0.038379429000030996,635,/mnt/data/liquid_osahr_exp01/artifacts_smoke/checkpoints/lstm_dt.pt
+mlp_dt,2,1.4758504648677637,0.008350489000008565,179,/mnt/data/liquid_osahr_exp01/artifacts_smoke/checkpoints/mlp_dt.pt
+constant,0,,0.0,3,

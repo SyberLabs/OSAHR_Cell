@@ -1,0 +1,19 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "liquid-osahr-experiment-04"
+version = "0.1.0"
+description = "Same-horizon multi-query residual-trust calibration over Liquid-OSAHR 02B"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = ["numpy>=2.0", "pandas>=2.0"]
+
+[tool.setuptools.packages.find]
+include = ["liquid_osahr04*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "../liquid-osahr-experiment-03"]
+addopts = "-q"

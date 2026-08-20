@@ -1,0 +1,693 @@
+{
+  "bootstrap_seed": 20260812,
+  "bootstrap_samples": 20000,
+  "summary": {
+    "no_outage": {
+      "throughput": {
+        "goal_utility_ratio": {
+          "n": 20,
+          "mean": 0.8783270569566499,
+          "sd": 0.016212003084518787,
+          "ci95_low": 0.870739605956171,
+          "ci95_high": 0.8859145079571289
+        },
+        "critical_success_rate": {
+          "n": 20,
+          "mean": 0.9922703782006108,
+          "sd": 0.016476888201265725,
+          "ci95_low": 0.9845589571494481,
+          "ci95_high": 0.9999817992517736
+        },
+        "background_success_rate": {
+          "n": 20,
+          "mean": 0.9988947239863215,
+          "sd": 0.0034024869597286994,
+          "ci95_low": 0.9973023110715126,
+          "ci95_high": 1.0004871369011306
+        },
+        "timely_task_rate": {
+          "n": 20,
+          "mean": 0.9969459433572258,
+          "sd": 0.005800805584428671,
+          "ci95_low": 0.994231082774872,
+          "ci95_high": 0.9996608039395795
+        },
+        "semantic_efficiency": {
+          "n": 20,
+          "mean": 0.14759721533776807,
+          "sd": 0.016241489025209003,
+          "ci95_low": 0.13999596449225923,
+          "ci95_high": 0.1551984661832769
+        },
+        "mean_latency": {
+          "n": 20,
+          "mean": 0.6111822372535988,
+          "sd": 0.09704503231467902,
+          "ci95_low": 0.5657637640588423,
+          "ci95_high": 0.6566007104483552
+        },
+        "energy": {
+          "n": 20,
+          "mean": 352.58100000000024,
+          "sd": 30.27501486809151,
+          "ci95_low": 338.41185688715615,
+          "ci95_high": 366.75014311284434
+        },
+        "reroutes": {
+          "n": 20,
+          "mean": 0.0,
+          "sd": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0
+        },
+        "max_queued": {
+          "n": 20,
+          "mean": 2.15,
+          "sd": 0.36634754853252327,
+          "ci95_low": 1.9785440695301584,
+          "ci95_high": 2.3214559304698414
+        }
+      },
+      "semantic": {
+        "goal_utility_ratio": {
+          "n": 20,
+          "mean": 0.8777614921737765,
+          "sd": 0.015126792356454005,
+          "ci95_low": 0.8706819354280333,
+          "ci95_high": 0.8848410489195198
+        },
+        "critical_success_rate": {
+          "n": 20,
+          "mean": 0.9908008563573768,
+          "sd": 0.018005621783522337,
+          "ci95_low": 0.98237396596614,
+          "ci95_high": 0.9992277467486136
+        },
+        "background_success_rate": {
+          "n": 20,
+          "mean": 0.9984861829115428,
+          "sd": 0.0037025131155232495,
+          "ci95_low": 0.9967533534335192,
+          "ci95_high": 1.0002190123895665
+        },
+        "timely_task_rate": {
+          "n": 20,
+          "mean": 0.9959496042068124,
+          "sd": 0.00573465666023078,
+          "ci95_low": 0.9932657022739525,
+          "ci95_high": 0.9986335061396724
+        },
+        "semantic_efficiency": {
+          "n": 20,
+          "mean": 0.15091803413079344,
+          "sd": 0.01838232644243351,
+          "ci95_low": 0.14231484053222074,
+          "ci95_high": 0.15952122772936614
+        },
+        "mean_latency": {
+          "n": 20,
+          "mean": 0.617895349591582,
+          "sd": 0.1153975822325706,
+          "ci95_low": 0.5638876186407116,
+          "ci95_high": 0.6719030805424524
+        },
+        "energy": {
+          "n": 20,
+          "mean": 352.0500000000002,
+          "sd": 29.821901171348692,
+          "ci95_low": 338.0929206249779,
+          "ci95_high": 366.00707937502244
+        },
+        "reroutes": {
+          "n": 20,
+          "mean": 0.0,
+          "sd": 0.0,
+          "ci95_low": 0.0,
+          "ci95_high": 0.0
+        },
+        "max_queued": {
+          "n": 20,
+          "mean": 1.7,
+          "sd": 0.4701623459816272,
+          "ci95_low": 1.479957248724412,
+          "ci95_high": 1.920042751275588
+        }
+      }
+    },
+    "moderate_outage": {
+      "throughput": {
+        "goal_utility_ratio": {
+          "n": 30,
+          "mean": 0.7994736266968503,
+          "sd": 0.07371399204758168,
+          "ci95_low": 0.7719483697013455,
+          "ci95_high": 0.8269988836923551
+        },
+        "critical_success_rate": {
+          "n": 30,
+          "mean": 0.8698250729020077,
+          "sd": 0.10143689751598553,
+          "ci95_low": 0.8319479128758362,
+          "ci95_high": 0.9077022329281792
+        },
+        "background_success_rate": {
+          "n": 30,
+          "mean": 0.9656718344236862,
+          "sd": 0.04163153159593501,
+          "ci95_low": 0.9501263650431253,
+          "ci95_high": 0.9812173038042471
+        },
+        "timely_task_rate": {
+          "n": 30,
+          "mean": 0.9349941204879708,
+          "sd": 0.05518677551703079,
+          "ci95_low": 0.9143870398420199,
+          "ci95_high": 0.9556012011339218
+        },
+        "semantic_efficiency": {
+          "n": 30,
+          "mean": 0.13941979189692205,
+          "sd": 0.020449948182650536,
+          "ci95_low": 0.1317836557491352,
+          "ci95_high": 0.1470559280447089
+        },
+        "mean_latency": {
+          "n": 30,
+          "mean": 1.225857570096972,
+          "sd": 0.43364613960300585,
+          "ci95_low": 1.06393144038775,
+          "ci95_high": 1.387783699806194
+        },
+        "energy": {
+          "n": 30,
+          "mean": 354.1226666666669,
+          "sd": 34.60684474187889,
+          "ci95_low": 341.2002584662145,
+          "ci95_high": 367.04507486711924
+        },
+        "reroutes": {
+          "n": 30,
+          "mean": 0.8,
+          "sd": 1.0954451150103324,
+          "ci95_low": 0.3909540715734594,
+          "ci95_high": 1.2090459284265407
+        },
+        "max_queued": {
+          "n": 30,
+          "mean": 9.866666666666667,
+          "sd": 5.618524369614679,
+          "ci95_low": 7.768675187527611,
+          "ci95_high": 11.964658145805723
+        }
+      },
+      "qos": {
+        "goal_utility_ratio": {
+          "n": 30,
+          "mean": 0.7895011908701718,
+          "sd": 0.07468192965458838,
+          "ci95_low": 0.7616145000322118,
+          "ci95_high": 0.8173878817081318
+        },
+        "critical_success_rate": {
+          "n": 30,
+          "mean": 0.8521141896414195,
+          "sd": 0.10069362000160079,
+          "ci95_low": 0.8145145740004336,
+          "ci95_high": 0.8897138052824054
+        },
+        "background_success_rate": {
+          "n": 30,
+          "mean": 0.95564778356279,
+          "sd": 0.04576391445401054,
+          "ci95_low": 0.9385592570635898,
+          "ci95_high": 0.9727363100619902
+        },
+        "timely_task_rate": {
+          "n": 30,
+          "mean": 0.9229733952244851,
+          "sd": 0.05926161487633891,
+          "ci95_low": 0.900844744555465,
+          "ci95_high": 0.9451020458935051
+        },
+        "semantic_efficiency": {
+          "n": 30,
+          "mean": 0.1357641712305151,
+          "sd": 0.020166608128603644,
+          "ci95_low": 0.12823383599769872,
+          "ci95_high": 0.14329450646333147
+        },
+        "mean_latency": {
+          "n": 30,
+          "mean": 1.3081991434170912,
+          "sd": 0.49526076697745586,
+          "ci95_low": 1.1232657337321859,
+          "ci95_high": 1.4931325531019966
+        },
+        "energy": {
+          "n": 30,
+          "mean": 354.45200000000017,
+          "sd": 38.52796193720203,
+          "ci95_low": 340.0654225758664,
+          "ci95_high": 368.8385774241339
+        },
+        "reroutes": {
+          "n": 30,
+          "mean": 0.5333333333333333,
+          "sd": 0.68144538746106,
+          "ci95_low": 0.2788774437898724,
+          "ci95_high": 0.7877892228767942
+        },
+        "max_queued": {
+          "n": 30,
+          "mean": 11.6,
+          "sd": 6.382087000563266,
+          "ci95_low": 9.21688954866558,
+          "ci95_high": 13.983110451334419
+        }
+      },
+      "semantic": {
+        "goal_utility_ratio": {
+          "n": 30,
+          "mean": 0.826380279090015,
+          "sd": 0.039746546019364296,
+          "ci95_low": 0.8115386748914462,
+          "ci95_high": 0.8412218832885838
+        },
+        "critical_success_rate": {
+          "n": 30,
+          "mean": 0.9051990646691586,
+          "sd": 0.05080505000929275,
+          "ci95_low": 0.8862281472173865,
+          "ci95_high": 0.9241699821209306
+        },
+        "background_success_rate": {
+          "n": 30,
+          "mean": 0.9695663499554515,
+          "sd": 0.04342483115210676,
+          "ci95_low": 0.9533512515155705,
+          "ci95_high": 0.9857814483953325
+        },
+        "timely_task_rate": {
+          "n": 30,
+          "mean": 0.9484238269377163,
+          "sd": 0.03914298377554832,
+          "ci95_low": 0.9338075965849039,
+          "ci95_high": 0.9630400572905288
+        },
+        "semantic_efficiency": {
+          "n": 30,
+          "mean": 0.14202021694504854,
+          "sd": 0.016853510111625693,
+          "ci95_low": 0.13572701284345282,
+          "ci95_high": 0.14831342104664427
+        },
+        "mean_latency": {
+          "n": 30,
+          "mean": 1.1486212326947403,
+          "sd": 0.37262267357813655,
+          "ci95_low": 1.0094816396854538,
+          "ci95_high": 1.2877608257040267
+        },
+        "energy": {
+          "n": 30,
+          "mean": 354.66933333333344,
+          "sd": 34.75797412188282,
+          "ci95_low": 341.69049249494316,
+          "ci95_high": 367.6481741717237
+        },
+        "reroutes": {
+          "n": 30,
+          "mean": 0.5,
+          "sd": 0.682288239221013,
+          "ci95_low": 0.2452293844369952,
+          "ci95_high": 0.7547706155630047
+        },
+        "max_queued": {
+          "n": 30,
+          "mean": 10.033333333333333,
+          "sd": 4.9652817632543025,
+          "ci95_low": 8.179266652201097,
+          "ci95_high": 11.88740001446557
+        }
+      }
+    },
+    "severe_outage": {
+      "throughput": {
+        "goal_utility_ratio": {
+          "n": 20,
+          "mean": 0.6733683404197635,
+          "sd": 0.09843617968208491,
+          "ci95_low": 0.627298790215608,
+          "ci95_high": 0.7194378906239189
+        },
+        "critical_success_rate": {
+          "n": 20,
+          "mean": 0.6876529853766259,
+          "sd": 0.11964766456881895,
+          "ci95_low": 0.6316561546639204,
+          "ci95_high": 0.7436498160893313
+        },
+        "background_success_rate": {
+          "n": 20,
+          "mean": 0.9006155269544791,
+          "sd": 0.08676479332559342,
+          "ci95_low": 0.8600083537080545,
+          "ci95_high": 0.9412227002009037
+        },
+        "timely_task_rate": {
+          "n": 20,
+          "mean": 0.8312869964244209,
+          "sd": 0.09296407949031286,
+          "ci95_low": 0.7877784679433879,
+          "ci95_high": 0.874795524905454
+        },
+        "semantic_efficiency": {
+          "n": 20,
+          "mean": 0.11398471680114423,
+          "sd": 0.019756229891889292,
+          "ci95_low": 0.10473851659519619,
+          "ci95_high": 0.12323091700709228
+        },
+        "mean_latency": {
+          "n": 20,
+          "mean": 2.17109369799991,
+          "sd": 1.0141649192771507,
+          "ci95_low": 1.6964499052925084,
+          "ci95_high": 2.6457374907073112
+        },
+        "energy": {
+          "n": 20,
+          "mean": 358.0180000000003,
+          "sd": 40.01492610987753,
+          "ci95_low": 339.290438108749,
+          "ci95_high": 376.7455618912516
+        },
+        "reroutes": {
+          "n": 20,
+          "mean": 1.1,
+          "sd": 1.1652874052533588,
+          "ci95_low": 0.5546287067217409,
+          "ci95_high": 1.6453712932782594
+        },
+        "max_queued": {
+          "n": 20,
+          "mean": 14.7,
+          "sd": 7.041979386806704,
+          "ci95_low": 11.40425219726235,
+          "ci95_high": 17.99574780273765
+        }
+      },
+      "semantic": {
+        "goal_utility_ratio": {
+          "n": 20,
+          "mean": 0.7101695760381042,
+          "sd": 0.11129137275932217,
+          "ci95_low": 0.658083610276492,
+          "ci95_high": 0.7622555417997163
+        },
+        "critical_success_rate": {
+          "n": 20,
+          "mean": 0.740575679609871,
+          "sd": 0.1379249032706759,
+          "ci95_low": 0.6760248378751208,
+          "ci95_high": 0.8051265213446213
+        },
+        "background_success_rate": {
+          "n": 20,
+          "mean": 0.8796944808423739,
+          "sd": 0.08705212431010616,
+          "ci95_low": 0.8389528325557865,
+          "ci95_high": 0.9204361291289613
+        },
+        "timely_task_rate": {
+          "n": 20,
+          "mean": 0.8373816483279504,
+          "sd": 0.09766106496686618,
+          "ci95_low": 0.7916748629771453,
+          "ci95_high": 0.8830884336787554
+        },
+        "semantic_efficiency": {
+          "n": 20,
+          "mean": 0.11803459933400902,
+          "sd": 0.026713631235380713,
+          "ci95_low": 0.1055322350680617,
+          "ci95_high": 0.13053696359995634
+        },
+        "mean_latency": {
+          "n": 20,
+          "mean": 2.200118272156188,
+          "sd": 0.9676636793588784,
+          "ci95_low": 1.747237729646927,
+          "ci95_high": 2.652998814665449
+        },
+        "energy": {
+          "n": 20,
+          "mean": 365.24900000000025,
+          "sd": 36.36894422732852,
+          "ci95_low": 348.2278101553279,
+          "ci95_high": 382.2701898446726
+        },
+        "reroutes": {
+          "n": 20,
+          "mean": 1.0,
+          "sd": 0.9733285267845752,
+          "ci95_low": 0.5444682272853422,
+          "ci95_high": 1.4555317727146577
+        },
+        "max_queued": {
+          "n": 20,
+          "mean": 15.55,
+          "sd": 6.012924675887328,
+          "ci95_low": 12.735864626966904,
+          "ci95_high": 18.364135373033097
+        }
+      }
+    }
+  },
+  "comparisons": {
+    "moderate_semantic_minus_throughput": {
+      "goal_utility_ratio": {
+        "mean_difference": 0.0269066523931647,
+        "independent_bootstrap_ci95_low": -0.0018560783251014648,
+        "independent_bootstrap_ci95_high": 0.05738191388735474,
+        "welch_p": 0.08531547672442336
+      },
+      "critical_success_rate": {
+        "mean_difference": 0.035373991767150836,
+        "independent_bootstrap_ci95_low": -0.0032405574118478135,
+        "independent_bootstrap_ci95_high": 0.07572841453365894,
+        "welch_p": 0.0949312001560781
+      },
+      "background_success_rate": {
+        "mean_difference": 0.0038945155317653413,
+        "independent_bootstrap_ci95_low": -0.017520813404278707,
+        "independent_bootstrap_ci95_high": 0.02461100034156698,
+        "welch_p": 0.7241855411280155
+      },
+      "timely_task_rate": {
+        "mean_difference": 0.013429706449745504,
+        "independent_bootstrap_ci95_low": -0.010120695085960075,
+        "independent_bootstrap_ci95_high": 0.03708397276957426,
+        "welch_p": 0.2819443645748823
+      },
+      "semantic_efficiency": {
+        "mean_difference": 0.0026004250481264923,
+        "independent_bootstrap_ci95_low": -0.00676817257106444,
+        "independent_bootstrap_ci95_high": 0.012031633763559658,
+        "welch_p": 0.5930676130865884
+      },
+      "mean_latency": {
+        "mean_difference": -0.07723633740223179,
+        "independent_bootstrap_ci95_low": -0.2801433356196797,
+        "independent_bootstrap_ci95_high": 0.12341369269799074,
+        "welch_p": 0.4624083788058309
+      },
+      "energy": {
+        "mean_difference": 0.5466666666665674,
+        "independent_bootstrap_ci95_low": -16.345533333333368,
+        "independent_bootstrap_ci95_high": 17.733449999999955,
+        "welch_p": 0.9515323712680117
+      },
+      "reroutes": {
+        "mean_difference": -0.30000000000000004,
+        "independent_bootstrap_ci95_low": -0.7666666666666668,
+        "independent_bootstrap_ci95_high": 0.1333333333333333,
+        "welch_p": 0.2089979034352961
+      },
+      "max_queued": {
+        "mean_difference": 0.16666666666666607,
+        "independent_bootstrap_ci95_low": -2.4333333333333336,
+        "independent_bootstrap_ci95_high": 2.7666666666666675,
+        "welch_p": 0.9035268900051835
+      }
+    },
+    "moderate_semantic_minus_qos": {
+      "goal_utility_ratio": {
+        "mean_difference": 0.036879088219843204,
+        "independent_bootstrap_ci95_low": 0.0071189199797913084,
+        "independent_bootstrap_ci95_high": 0.06772074720107471,
+        "welch_p": 0.0212958288303578
+      },
+      "critical_success_rate": {
+        "mean_difference": 0.053084875027739065,
+        "independent_bootstrap_ci95_low": 0.014240294547778476,
+        "independent_bootstrap_ci95_high": 0.09301577814493608,
+        "welch_p": 0.013458599366648612
+      },
+      "background_success_rate": {
+        "mean_difference": 0.013918566392661536,
+        "independent_bootstrap_ci95_low": -0.009147206348924,
+        "independent_bootstrap_ci95_high": 0.03529426861074995,
+        "welch_p": 0.23181057189628537
+      },
+      "timely_task_rate": {
+        "mean_difference": 0.025450431713231247,
+        "independent_bootstrap_ci95_low": 0.0005093348052057773,
+        "independent_bootstrap_ci95_high": 0.05072288328657383,
+        "welch_p": 0.05522315367102942
+      },
+      "semantic_efficiency": {
+        "mean_difference": 0.006256045714533448,
+        "independent_bootstrap_ci95_low": -0.0028900697697512917,
+        "independent_bootstrap_ci95_high": 0.015550407920274635,
+        "welch_p": 0.19762023617258634
+      },
+      "mean_latency": {
+        "mean_difference": -0.15957791072235095,
+        "independent_bootstrap_ci95_low": -0.37630742659828653,
+        "independent_bootstrap_ci95_high": 0.05617136182160623,
+        "welch_p": 0.16421684435862455
+      },
+      "energy": {
+        "mean_difference": 0.2173333333332721,
+        "independent_bootstrap_ci95_low": -18.592149999999933,
+        "independent_bootstrap_ci95_high": 18.107333333333315,
+        "welch_p": 0.9817771130102743
+      },
+      "reroutes": {
+        "mean_difference": -0.033333333333333326,
+        "independent_bootstrap_ci95_low": -0.3666666666666667,
+        "independent_bootstrap_ci95_high": 0.3,
+        "welch_p": 0.8504933821182751
+      },
+      "max_queued": {
+        "mean_difference": -1.5666666666666664,
+        "independent_bootstrap_ci95_low": -4.4,
+        "independent_bootstrap_ci95_high": 1.299999999999999,
+        "welch_p": 0.2932618940190751
+      }
+    },
+    "no_outage_semantic_minus_throughput": {
+      "goal_utility_ratio": {
+        "mean_difference": -0.0005655647828733956,
+        "independent_bootstrap_ci95_low": -0.010101328434087915,
+        "independent_bootstrap_ci95_high": 0.00895253709148221,
+        "welch_p": 0.9097860759438573
+      },
+      "critical_success_rate": {
+        "mean_difference": -0.0014695218432340118,
+        "independent_bootstrap_ci95_low": -0.012119140789297942,
+        "independent_bootstrap_ci95_high": 0.008888905957858195,
+        "welch_p": 0.7891934269595238
+      },
+      "background_success_rate": {
+        "mean_difference": -0.00040854107477872326,
+        "independent_bootstrap_ci95_low": -0.0025342746366607493,
+        "independent_bootstrap_ci95_high": 0.0017336687995749625,
+        "welch_p": 0.7183777536701808
+      },
+      "timely_task_rate": {
+        "mean_difference": -0.0009963391504133057,
+        "independent_bootstrap_ci95_low": -0.004451557529499833,
+        "independent_bootstrap_ci95_high": 0.002501983959473316,
+        "welch_p": 0.5880845303291683
+      },
+      "semantic_efficiency": {
+        "mean_difference": 0.0033208187930253708,
+        "independent_bootstrap_ci95_low": -0.006988880919398386,
+        "independent_bootstrap_ci95_high": 0.013965823703247466,
+        "welch_p": 0.5485396949816497
+      },
+      "mean_latency": {
+        "mean_difference": 0.006713112337983218,
+        "independent_bootstrap_ci95_low": -0.05579334218360387,
+        "independent_bootstrap_ci95_high": 0.0710236797042979,
+        "welch_p": 0.8432677137773504
+      },
+      "energy": {
+        "mean_difference": -0.5310000000000628,
+        "independent_bootstrap_ci95_low": -18.84202499999993,
+        "independent_bootstrap_ci95_high": 17.58905000000005,
+        "welch_p": 0.9557298890387632
+      },
+      "reroutes": {
+        "mean_difference": 0.0,
+        "independent_bootstrap_ci95_low": 0.0,
+        "independent_bootstrap_ci95_high": 0.0,
+        "welch_p": NaN
+      },
+      "max_queued": {
+        "mean_difference": -0.44999999999999996,
+        "independent_bootstrap_ci95_low": -0.7000000000000002,
+        "independent_bootstrap_ci95_high": -0.19999999999999996,
+        "welch_p": 0.0017787658761948628
+      }
+    },
+    "severe_semantic_minus_throughput": {
+      "goal_utility_ratio": {
+        "mean_difference": 0.0368012356183407,
+        "independent_bootstrap_ci95_low": -0.027620430473774656,
+        "independent_bootstrap_ci95_high": 0.10117300287550199,
+        "welch_p": 0.27505641040798184
+      },
+      "critical_success_rate": {
+        "mean_difference": 0.05292269423324514,
+        "independent_bootstrap_ci95_low": -0.024772176264676263,
+        "independent_bootstrap_ci95_high": 0.12936973910631372,
+        "welch_p": 0.20286881429190917
+      },
+      "background_success_rate": {
+        "mean_difference": -0.020921046112105213,
+        "independent_bootstrap_ci95_low": -0.07383640986714676,
+        "independent_bootstrap_ci95_high": 0.031110145091890546,
+        "welch_p": 0.4512131346502237
+      },
+      "timely_task_rate": {
+        "mean_difference": 0.006094651903529424,
+        "independent_bootstrap_ci95_low": -0.05089730721570444,
+        "independent_bootstrap_ci95_high": 0.06448252749939365,
+        "welch_p": 0.8408829124344056
+      },
+      "semantic_efficiency": {
+        "mean_difference": 0.004049882532864785,
+        "independent_bootstrap_ci95_low": -0.009835196690353277,
+        "independent_bootstrap_ci95_high": 0.018265174024232025,
+        "welch_p": 0.5891324482333242
+      },
+      "mean_latency": {
+        "mean_difference": 0.029024574156278238,
+        "independent_bootstrap_ci95_low": -0.5680535903251944,
+        "independent_bootstrap_ci95_high": 0.6274175489584777,
+        "welch_p": 0.9267090182952146
+      },
+      "energy": {
+        "mean_difference": 7.230999999999938,
+        "independent_bootstrap_ci95_low": -16.296150000000047,
+        "independent_bootstrap_ci95_high": 30.49702500000001,
+        "welch_p": 0.5533910764406645
+      },
+      "reroutes": {
+        "mean_difference": -0.10000000000000009,
+        "independent_bootstrap_ci95_low": -0.7500000000000001,
+        "independent_bootstrap_ci95_high": 0.55,
+        "welch_p": 0.7699936680693842
+      },
+      "max_queued": {
+        "mean_difference": 0.8500000000000014,
+        "independent_bootstrap_ci95_low": -3.200000000000001,
+        "independent_bootstrap_ci95_high": 4.799999999999999,
+        "welch_p": 0.6837893703262421
+      }
+    }
+  }
+}

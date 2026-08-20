@@ -1,0 +1,3 @@
+simTime,IMSI,CellId,RSRP,RSRQ,SINR,CQI,ThroughputMbps,packetDropRate
+0.0,3,2,-88.0,-10.0,13.0,10,78.0,0.02
+0.1,3,2,-88.4,-10.2,12.6,10,75.0,0.025

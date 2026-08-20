@@ -1,0 +1,51 @@
+{
+  "experiment": "Liquid-OSAHR Experiment 01",
+  "version": "0.1.0",
+  "date": "2026-08-17",
+  "python": "3.13.5",
+  "torch": "2.10.0+cpu",
+  "numpy": "2.3.5",
+  "scipy": "1.17.0",
+  "dataset_seed": 20260817,
+  "osahr_root_seed": 80219,
+  "tests": {
+    "liquid_osahr": 14,
+    "osahr_0_2_upstream": 36
+  },
+  "bridge_audit": {
+    "rows": 240,
+    "unique_arms": 240,
+    "scenarios_by_regime": {
+      "id": 6,
+      "sparse": 6
+    },
+    "bootstrap_replicates": 20000,
+    "independent_unit": "paired fast/robust telemetry scenario",
+    "stochastic_replicates_averaged_within_scenario": true,
+    "common_root_seed_verified": true
+  },
+  "identification_audit": {
+    "bootstrap_replicates": 30000,
+    "identification_independent_unit": "trace",
+    "paired_sparse_reuses_id_physical_event_histories": true,
+    "bridge_safety_cap": 30.0,
+    "clipping_total_above_30": 0,
+    "clipping_total_values": 110970
+  },
+  "key_results": {
+    "cfc_id_nll_per_interval": 0.471743,
+    "gru_param_matched_id_nll_per_interval": 0.478242,
+    "cfc_paired_sparse_nll_per_interval": 1.191971,
+    "gru_param_matched_paired_sparse_nll_per_interval": 1.202906,
+    "cfc_high_mobility_nll_per_interval": 0.805335,
+    "gru_param_matched_high_mobility_nll_per_interval": 0.749029,
+    "cfc_high_congestion_nll_per_interval": 0.711721,
+    "gru_param_matched_high_congestion_nll_per_interval": 0.697209,
+    "oracle_sparse_semantic_advantage": 0.024278,
+    "oracle_sparse_semantic_advantage_ci": [
+      0.013359,
+      0.034541
+    ],
+    "cfc_sparse_policy_effect_mae": 0.024058
+  }
+}

@@ -1,0 +1,2 @@
+{"time_s":0.0,"rnti":42,"pci":7,"CQI":11,"RSRP":-87.5,"RSRQ":-10.1,"SINR":14.2,"DRB.UEThpDl":82.0,"DRB.UEThpUl":7.5,"DRB.RlcPacketDropRateDl":2.5,"DRB.PacketSuccessRateUlgNBUu":98.5,"DRB.RlcSduTransmittedVolumeDL":2048,"DRB.RlcSduTransmittedVolumeUL":512}
+{"time_s":1.0,"rnti":42,"pci":7,"CQI":10,"RSRP":-89.0,"RSRQ":-10.8,"SINR":12.4,"DRB.UEThpDl":73.5,"DRB.UEThpUl":6.9,"DRB.RlcPacketDropRateDl":3.1,"DRB.PacketSuccessRateUlgNBUu":97.8,"DRB.RlcSduTransmittedVolumeDL":4096,"DRB.RlcSduTransmittedVolumeUL":1024}

@@ -1,0 +1,12 @@
+[
+  {
+    "epoch": 1,
+    "train_nll_interval": 1.052520207869701,
+    "val_nll_interval": 1.067585304135182
+  },
+  {
+    "epoch": 2,
+    "train_nll_interval": 1.0316012514452648,
+    "val_nll_interval": 1.0434357690029457
+  }
+]

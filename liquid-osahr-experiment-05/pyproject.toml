@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "liquid-osahr-experiment-05"
+version = "0.1.0"
+description = "Residual-hypothesis claim status over Liquid-OSAHR twins"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = [
+  "numpy>=2.0",
+  "pandas>=2.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["liquid_osahr05*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"

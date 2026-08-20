@@ -1,0 +1,812 @@
+[
+  {
+    "metric": "goal_utility_ratio",
+    "regime": "id",
+    "model": "residual_quarter",
+    "delta_abs_effect_error_vs_mechanistic": -0.03195592428281428,
+    "ci_lo": -0.07359771767051404,
+    "ci_hi": 0.0,
+    "scenario_values": [
+      -0.05567513794482204,
+      0.0,
+      0.0,
+      -0.10410448346924939,
+      0.0
+    ]
+  },
+  {
+    "metric": "goal_utility_ratio",
+    "regime": "id",
+    "model": "residual_idcal",
+    "delta_abs_effect_error_vs_mechanistic": -0.045612528243706915,
+    "ci_lo": -0.10540758824724923,
+    "ci_hi": -0.00305331376864757,
+    "scenario_values": [
+      -0.05567513794482204,
+      -0.015266568843237849,
+      0.0,
+      -0.1571209344304747,
+      0.0
+    ]
+  },
+  {
+    "metric": "goal_utility_ratio",
+    "regime": "id",
+    "model": "residual_predictive",
+    "delta_abs_effect_error_vs_mechanistic": -0.039764946210504956,
+    "ci_lo": -0.09672129653662788,
+    "ci_hi": 0.0058031406203369554,
+    "scenario_values": [
+      -0.05567513794482204,
+      -0.015266568843237849,
+      0.022141135972461312,
+      -0.15002416023692622,
+      0.0
+    ]
+  },
+  {
+    "metric": "goal_utility_ratio",
+    "regime": "high_mobility",
+    "model": "residual_quarter",
+    "delta_abs_effect_error_vs_mechanistic": 0.010793887945670622,
+    "ci_lo": -0.017070967741935505,
+    "ci_hi": 0.04945263157894737,
+    "scenario_values": [
+      0.08242105263157895,
+      0.0,
+      -0.028451612903225842,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "metric": "goal_utility_ratio",
+    "regime": "high_mobility",
+    "model": "residual_idcal",
+    "delta_abs_effect_error_vs_mechanistic": 0.02998745489188397,
+    "ci_lo": -0.01612296804718414,
+    "ci_hi": 0.10418933333333331,
+    "scenario_values": [
+      0.004739998473756835,
+      0.0,
+      -0.028451612903225842,
+      0.17364888888888885,
+      0.0
+    ]
+  },
+  {
+    "metric": "goal_utility_ratio",
+    "regime": "high_mobility",
+    "model": "residual_predictive",
+    "delta_abs_effect_error_vs_mechanistic": 0.016201944206563734,
+    "ci_lo": -0.013058773931898759,
+    "ci_hi": 0.067533709820028,
+    "scenario_values": [
+      -0.006264430685714917,
+      -0.016816654970760347,
+      -0.012698064516129093,
+      0.11678887120542303,
+      0.0
+    ]
+  },
+  {
+    "metric": "goal_utility_ratio",
+    "regime": "high_stress",
+    "model": "residual_quarter",
+    "delta_abs_effect_error_vs_mechanistic": -0.10841572294083512,
+    "ci_lo": -0.20298824604518825,
+    "ci_hi": -0.033729890172646826,
+    "scenario_values": [
+      -0.29116405433646825,
+      -0.04896245862748294,
+      0.0,
+      -0.07072453360826825,
+      -0.13122756813195613
+    ]
+  },
+  {
+    "metric": "goal_utility_ratio",
+    "regime": "high_stress",
+    "model": "residual_idcal",
+    "delta_abs_effect_error_vs_mechanistic": -0.0757320087086728,
+    "ci_lo": -0.17713326449911546,
+    "ci_hi": 0.018352498527355654,
+    "scenario_values": [
+      -0.1721035439662537,
+      -0.021233961895456788,
+      0.08877668189805643,
+      -0.043322947368421016,
+      -0.23077627221128894
+    ]
+  },
+  {
+    "metric": "goal_utility_ratio",
+    "regime": "high_stress",
+    "model": "residual_predictive",
+    "delta_abs_effect_error_vs_mechanistic": -0.055185654837215534,
+    "ci_lo": -0.11815790072154486,
+    "ci_hi": -0.010566091095376118,
+    "scenario_values": [
+      -0.05070534576805552,
+      -0.021233961895456788,
+      0.009247346938775491,
+      -0.04028624814660353,
+      -0.17295006531473733
+    ]
+  },
+  {
+    "metric": "goal_utility_ratio",
+    "regime": "weak_channel",
+    "model": "residual_quarter",
+    "delta_abs_effect_error_vs_mechanistic": 0.026668488056842986,
+    "ci_lo": 0.00036482807017543804,
+    "ci_hi": 0.0740833809169001,
+    "scenario_values": [
+      0.012068997607756371,
+      0.0,
+      0.0018241403508771903,
+      0.0,
+      0.11944930232558137
+    ]
+  },
+  {
+    "metric": "goal_utility_ratio",
+    "regime": "weak_channel",
+    "model": "residual_idcal",
+    "delta_abs_effect_error_vs_mechanistic": 0.006837381978498503,
+    "ci_lo": 0.0,
+    "ci_hi": 0.01637988800483754,
+    "scenario_values": [
+      0.010330644826644919,
+      0.0,
+      0.023856265065847593,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "metric": "goal_utility_ratio",
+    "regime": "weak_channel",
+    "model": "residual_predictive",
+    "delta_abs_effect_error_vs_mechanistic": 0.0357268772989075,
+    "ci_lo": -0.018668614384066695,
+    "ci_hi": 0.12006011422331422,
+    "scenario_values": [
+      0.012619129675129792,
+      0.0,
+      -0.038041822300528605,
+      0.19589381381381377,
+      0.008163265306122547
+    ]
+  },
+  {
+    "metric": "goal_utility_ratio",
+    "regime": "macro",
+    "model": "residual_quarter",
+    "delta_abs_effect_error_vs_mechanistic": -0.025727317805283943,
+    "ci_lo": -0.05421814432153711,
+    "ci_hi": 7.495901414791097e-06,
+    "scenario_values": [
+      0.08242105263157895,
+      0.0,
+      -0.028451612903225842,
+      0.0,
+      0.0,
+      -0.29116405433646825,
+      -0.04896245862748294,
+      0.0,
+      -0.07072453360826825,
+      -0.13122756813195613,
+      -0.05567513794482204,
+      0.0,
+      0.0,
+      -0.10410448346924939,
+      0.0,
+      0.012068997607756371,
+      0.0,
+      0.0018241403508771903,
+      0.0,
+      0.11944930232558137
+    ]
+  },
+  {
+    "metric": "goal_utility_ratio",
+    "regime": "macro",
+    "model": "residual_idcal",
+    "delta_abs_effect_error_vs_mechanistic": -0.02112992502049931,
+    "ci_lo": -0.052959957313892546,
+    "ci_hi": 0.011303394094109223,
+    "scenario_values": [
+      0.004739998473756835,
+      0.0,
+      -0.028451612903225842,
+      0.17364888888888885,
+      0.0,
+      -0.1721035439662537,
+      -0.021233961895456788,
+      0.08877668189805643,
+      -0.043322947368421016,
+      -0.23077627221128894,
+      -0.05567513794482204,
+      -0.015266568843237849,
+      0.0,
+      -0.1571209344304747,
+      0.0,
+      0.010330644826644919,
+      0.0,
+      0.023856265065847593,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "metric": "goal_utility_ratio",
+    "regime": "macro",
+    "model": "residual_predictive",
+    "delta_abs_effect_error_vs_mechanistic": -0.010755444885562316,
+    "ci_lo": -0.03843300708790981,
+    "ci_hi": 0.01815772304289356,
+    "scenario_values": [
+      -0.006264430685714917,
+      -0.016816654970760347,
+      -0.012698064516129093,
+      0.11678887120542303,
+      0.0,
+      -0.05070534576805552,
+      -0.021233961895456788,
+      0.009247346938775491,
+      -0.04028624814660353,
+      -0.17295006531473733,
+      -0.05567513794482204,
+      -0.015266568843237849,
+      0.022141135972461312,
+      -0.15002416023692622,
+      0.0,
+      0.012619129675129792,
+      0.0,
+      -0.038041822300528605,
+      0.19589381381381377,
+      0.008163265306122547
+    ]
+  },
+  {
+    "metric": "critical_success_rate",
+    "regime": "id",
+    "model": "residual_quarter",
+    "delta_abs_effect_error_vs_mechanistic": -0.023333333333333317,
+    "ci_lo": -0.06999999999999995,
+    "ci_hi": 0.0,
+    "scenario_values": [
+      0.0,
+      0.0,
+      0.0,
+      -0.11666666666666659,
+      0.0
+    ]
+  },
+  {
+    "metric": "critical_success_rate",
+    "regime": "id",
+    "model": "residual_idcal",
+    "delta_abs_effect_error_vs_mechanistic": -0.039999999999999994,
+    "ci_lo": -0.11999999999999997,
+    "ci_hi": 0.0,
+    "scenario_values": [
+      0.0,
+      0.0,
+      0.0,
+      -0.19999999999999996,
+      0.0
+    ]
+  },
+  {
+    "metric": "critical_success_rate",
+    "regime": "id",
+    "model": "residual_predictive",
+    "delta_abs_effect_error_vs_mechanistic": -0.039999999999999994,
+    "ci_lo": -0.11999999999999997,
+    "ci_hi": 0.0,
+    "scenario_values": [
+      0.0,
+      0.0,
+      0.0,
+      -0.19999999999999996,
+      0.0
+    ]
+  },
+  {
+    "metric": "critical_success_rate",
+    "regime": "high_mobility",
+    "model": "residual_quarter",
+    "delta_abs_effect_error_vs_mechanistic": 0.025,
+    "ci_lo": 0.0,
+    "ci_hi": 0.075,
+    "scenario_values": [
+      0.125,
+      0.0,
+      0.0,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "metric": "critical_success_rate",
+    "regime": "high_mobility",
+    "model": "residual_idcal",
+    "delta_abs_effect_error_vs_mechanistic": 0.06666666666666665,
+    "ci_lo": 0.0,
+    "ci_hi": 0.16666666666666666,
+    "scenario_values": [
+      0.08333333333333326,
+      0.0,
+      0.0,
+      0.25,
+      0.0
+    ]
+  },
+  {
+    "metric": "critical_success_rate",
+    "regime": "high_mobility",
+    "model": "residual_predictive",
+    "delta_abs_effect_error_vs_mechanistic": 0.04166666666666665,
+    "ci_lo": -0.025000000000000043,
+    "ci_hi": 0.15,
+    "scenario_values": [
+      -0.04166666666666674,
+      0.0,
+      0.0,
+      0.25,
+      0.0
+    ]
+  },
+  {
+    "metric": "critical_success_rate",
+    "regime": "high_stress",
+    "model": "residual_quarter",
+    "delta_abs_effect_error_vs_mechanistic": -0.18333333333333338,
+    "ci_lo": -0.3,
+    "ci_hi": -0.07333333333333339,
+    "scenario_values": [
+      -0.37499999999999994,
+      -0.10000000000000009,
+      0.0,
+      -0.16666666666666674,
+      -0.275
+    ]
+  },
+  {
+    "metric": "critical_success_rate",
+    "regime": "high_stress",
+    "model": "residual_idcal",
+    "delta_abs_effect_error_vs_mechanistic": -0.10333333333333336,
+    "ci_lo": -0.385,
+    "ci_hi": 0.20666666666666664,
+    "scenario_values": [
+      -0.49999999999999994,
+      -0.050000000000000044,
+      0.5,
+      -0.09166666666666679,
+      -0.375
+    ]
+  },
+  {
+    "metric": "critical_success_rate",
+    "regime": "high_stress",
+    "model": "residual_predictive",
+    "delta_abs_effect_error_vs_mechanistic": -0.13619047619047622,
+    "ci_lo": -0.2261904761904762,
+    "ci_hi": -0.046190476190476226,
+    "scenario_values": [
+      -0.25,
+      -0.050000000000000044,
+      0.0,
+      -0.13095238095238104,
+      -0.25
+    ]
+  },
+  {
+    "metric": "critical_success_rate",
+    "regime": "weak_channel",
+    "model": "residual_quarter",
+    "delta_abs_effect_error_vs_mechanistic": 0.05833333333333335,
+    "ci_lo": 0.0,
+    "ci_hi": 0.15833333333333335,
+    "scenario_values": [
+      0.0,
+      0.0,
+      0.04166666666666674,
+      0.0,
+      0.25
+    ]
+  },
+  {
+    "metric": "critical_success_rate",
+    "regime": "weak_channel",
+    "model": "residual_idcal",
+    "delta_abs_effect_error_vs_mechanistic": 0.03333333333333337,
+    "ci_lo": 0.0,
+    "ci_hi": 0.06666666666666676,
+    "scenario_values": [
+      0.08333333333333348,
+      0.0,
+      0.08333333333333337,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "metric": "critical_success_rate",
+    "regime": "weak_channel",
+    "model": "residual_predictive",
+    "delta_abs_effect_error_vs_mechanistic": 0.08833333333333337,
+    "ci_lo": 0.0050000000000000044,
+    "ci_hi": 0.2166666666666667,
+    "scenario_values": [
+      0.08333333333333348,
+      0.0,
+      0.025000000000000022,
+      0.33333333333333337,
+      0.0
+    ]
+  },
+  {
+    "metric": "critical_success_rate",
+    "regime": "macro",
+    "model": "residual_quarter",
+    "delta_abs_effect_error_vs_mechanistic": -0.03083333333333333,
+    "ci_lo": -0.06874999999999999,
+    "ci_hi": 0.007916666666666673,
+    "scenario_values": [
+      0.125,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.37499999999999994,
+      -0.10000000000000009,
+      0.0,
+      -0.16666666666666674,
+      -0.275,
+      0.0,
+      0.0,
+      0.0,
+      -0.11666666666666659,
+      0.0,
+      0.0,
+      0.0,
+      0.04166666666666674,
+      0.0,
+      0.25
+    ]
+  },
+  {
+    "metric": "critical_success_rate",
+    "regime": "macro",
+    "model": "residual_idcal",
+    "delta_abs_effect_error_vs_mechanistic": -0.010833333333333334,
+    "ci_lo": -0.08708333333333333,
+    "ci_hi": 0.07458333333333336,
+    "scenario_values": [
+      0.08333333333333326,
+      0.0,
+      0.0,
+      0.25,
+      0.0,
+      -0.49999999999999994,
+      -0.050000000000000044,
+      0.5,
+      -0.09166666666666679,
+      -0.375,
+      0.0,
+      0.0,
+      0.0,
+      -0.19999999999999996,
+      0.0,
+      0.08333333333333348,
+      0.0,
+      0.08333333333333337,
+      0.0,
+      0.0
+    ]
+  },
+  {
+    "metric": "critical_success_rate",
+    "regime": "macro",
+    "model": "residual_predictive",
+    "delta_abs_effect_error_vs_mechanistic": -0.011547619047619046,
+    "ci_lo": -0.055297619047619054,
+    "ci_hi": 0.035952380952380965,
+    "scenario_values": [
+      -0.04166666666666674,
+      0.0,
+      0.0,
+      0.25,
+      0.0,
+      -0.25,
+      -0.050000000000000044,
+      0.0,
+      -0.13095238095238104,
+      -0.25,
+      0.0,
+      0.0,
+      0.0,
+      -0.19999999999999996,
+      0.0,
+      0.08333333333333348,
+      0.0,
+      0.025000000000000022,
+      0.33333333333333337,
+      0.0
+    ]
+  },
+  {
+    "metric": "mean_latency",
+    "regime": "id",
+    "model": "residual_quarter",
+    "delta_abs_effect_error_vs_mechanistic": -0.009072380449928575,
+    "ci_lo": -0.02484761005761731,
+    "ci_hi": 0.0009527642539387315,
+    "scenario_values": [
+      -0.039438074019221836,
+      0.0,
+      0.002381910634846829,
+      -0.008305738865267864,
+      0.0
+    ]
+  },
+  {
+    "metric": "mean_latency",
+    "regime": "id",
+    "model": "residual_idcal",
+    "delta_abs_effect_error_vs_mechanistic": -0.010424089579734175,
+    "ci_lo": -0.029403777572133104,
+    "ci_hi": 0.007361681023359101,
+    "scenario_values": [
+      -0.039438074019221836,
+      -0.031086576437846847,
+      0.002381910634846829,
+      0.01602229192355087,
+      1.1102230246251565e-16
+    ]
+  },
+  {
+    "metric": "mean_latency",
+    "regime": "id",
+    "model": "residual_predictive",
+    "delta_abs_effect_error_vs_mechanistic": -0.025073403766003977,
+    "ci_lo": -0.052138955831216305,
+    "ci_hi": -0.004759256212803464,
+    "scenario_values": [
+      -0.07613398052858389,
+      -0.031086576437846847,
+      -0.004443558067945164,
+      -0.012496642663160973,
+      -0.0012062611324830108
+    ]
+  },
+  {
+    "metric": "mean_latency",
+    "regime": "high_mobility",
+    "model": "residual_quarter",
+    "delta_abs_effect_error_vs_mechanistic": -0.05671864663074352,
+    "ci_lo": -0.1286295434034593,
+    "ci_hi": -0.005378020099568293,
+    "scenario_values": [
+      -0.026656735304590007,
+      0.0,
+      -0.19316395088239735,
+      -0.06365586437010451,
+      -0.00011668259662572789
+    ]
+  },
+  {
+    "metric": "mean_latency",
+    "regime": "high_mobility",
+    "model": "residual_idcal",
+    "delta_abs_effect_error_vs_mechanistic": -0.025996144455063618,
+    "ci_lo": -0.11448844403981014,
+    "ci_hi": 0.04371669999893696,
+    "scenario_values": [
+      -0.01806553016994228,
+      8.214815746093729e-05,
+      -0.19073628500193307,
+      0.07885562733572204,
+      -0.00011668259662572789
+    ]
+  },
+  {
+    "metric": "mean_latency",
+    "regime": "high_mobility",
+    "model": "residual_predictive",
+    "delta_abs_effect_error_vs_mechanistic": -0.008631136391318333,
+    "ci_lo": -0.026671273346834102,
+    "ci_hi": 0.0060386661555301814,
+    "scenario_values": [
+      -0.017485101285779625,
+      -2.5297730411905084e-05,
+      0.01543867774045904,
+      -0.040450531438415815,
+      -0.0006334292424433619
+    ]
+  },
+  {
+    "metric": "mean_latency",
+    "regime": "high_stress",
+    "model": "residual_quarter",
+    "delta_abs_effect_error_vs_mechanistic": -0.007814524626107645,
+    "ci_lo": -0.06855460651111331,
+    "ci_hi": 0.046838829000432416,
+    "scenario_values": [
+      -0.03823332791071743,
+      0.03358397186676687,
+      -1.2430235847293858e-06,
+      -0.11403652441170714,
+      0.07961450034870421
+    ]
+  },
+  {
+    "metric": "mean_latency",
+    "regime": "high_stress",
+    "model": "residual_idcal",
+    "delta_abs_effect_error_vs_mechanistic": -0.021688660962519292,
+    "ci_lo": -0.06231284283058203,
+    "ci_hi": 0.03274001159326363,
+    "scenario_values": [
+      -0.07278625059231603,
+      -0.013517989849127998,
+      0.08333476613592072,
+      -0.06051788246120493,
+      -0.04495594804586822
+    ]
+  },
+  {
+    "metric": "mean_latency",
+    "regime": "high_stress",
+    "model": "residual_predictive",
+    "delta_abs_effect_error_vs_mechanistic": -0.12437696682943991,
+    "ci_lo": -0.2498754558802568,
+    "ci_hi": -0.03659121039386777,
+    "scenario_values": [
+      -0.0441966370217306,
+      -0.013517989849127998,
+      -0.3696079402517184,
+      -0.1270354687970009,
+      -0.06752679822762164
+    ]
+  },
+  {
+    "metric": "mean_latency",
+    "regime": "weak_channel",
+    "model": "residual_quarter",
+    "delta_abs_effect_error_vs_mechanistic": 0.024103335961062976,
+    "ci_lo": 0.0037667031249857485,
+    "ci_hi": 0.0446641812266404,
+    "scenario_values": [
+      0.0572926312701989,
+      0.0035262397062090223,
+      0.047916772616396264,
+      0.0,
+      0.011781036212510698
+    ]
+  },
+  {
+    "metric": "mean_latency",
+    "regime": "weak_channel",
+    "model": "residual_idcal",
+    "delta_abs_effect_error_vs_mechanistic": -0.004383773052569606,
+    "ci_lo": -0.14473238429447455,
+    "ci_hi": 0.12987376967419767,
+    "scenario_values": [
+      0.21597763641336054,
+      0.0035323198518305565,
+      -0.2428647606589458,
+      0.0,
+      0.0014359391309066716
+    ]
+  },
+  {
+    "metric": "mean_latency",
+    "regime": "weak_channel",
+    "model": "residual_predictive",
+    "delta_abs_effect_error_vs_mechanistic": 0.026545389425634846,
+    "ci_lo": -0.06310252669593608,
+    "ci_hi": 0.12386722289217311,
+    "scenario_values": [
+      0.20481640631895148,
+      0.0024434477520055564,
+      -0.122242923667915,
+      0.048772689772059064,
+      -0.0010626730469268653
+    ]
+  },
+  {
+    "metric": "mean_latency",
+    "regime": "macro",
+    "model": "residual_quarter",
+    "delta_abs_effect_error_vs_mechanistic": -0.01237555393642919,
+    "ci_lo": -0.03570236297719667,
+    "ci_hi": 0.00844442421032568,
+    "scenario_values": [
+      -0.026656735304590007,
+      0.0,
+      -0.19316395088239735,
+      -0.06365586437010451,
+      -0.00011668259662572789,
+      -0.03823332791071743,
+      0.03358397186676687,
+      -1.2430235847293858e-06,
+      -0.11403652441170714,
+      0.07961450034870421,
+      -0.039438074019221836,
+      0.0,
+      0.002381910634846829,
+      -0.008305738865267864,
+      0.0,
+      0.0572926312701989,
+      0.0035262397062090223,
+      0.047916772616396264,
+      0.0,
+      0.011781036212510698
+    ]
+  },
+  {
+    "metric": "mean_latency",
+    "regime": "macro",
+    "model": "residual_idcal",
+    "delta_abs_effect_error_vs_mechanistic": -0.015623167012471673,
+    "ci_lo": -0.055577777786863736,
+    "ci_hi": 0.022832938117693637,
+    "scenario_values": [
+      -0.01806553016994228,
+      8.214815746093729e-05,
+      -0.19073628500193307,
+      0.07885562733572204,
+      -0.00011668259662572789,
+      -0.07278625059231603,
+      -0.013517989849127998,
+      0.08333476613592072,
+      -0.06051788246120493,
+      -0.04495594804586822,
+      -0.039438074019221836,
+      -0.031086576437846847,
+      0.002381910634846829,
+      0.01602229192355087,
+      1.1102230246251565e-16,
+      0.21597763641336054,
+      0.0035323198518305565,
+      -0.2428647606589458,
+      0.0,
+      0.0014359391309066716
+    ]
+  },
+  {
+    "metric": "mean_latency",
+    "regime": "macro",
+    "model": "residual_predictive",
+    "delta_abs_effect_error_vs_mechanistic": -0.032884029390281844,
+    "ci_lo": -0.07242056976433195,
+    "ci_hi": 0.0022104507319251464,
+    "scenario_values": [
+      -0.017485101285779625,
+      -2.5297730411905084e-05,
+      0.01543867774045904,
+      -0.040450531438415815,
+      -0.0006334292424433619,
+      -0.0441966370217306,
+      -0.013517989849127998,
+      -0.3696079402517184,
+      -0.1270354687970009,
+      -0.06752679822762164,
+      -0.07613398052858389,
+      -0.031086576437846847,
+      -0.004443558067945164,
+      -0.012496642663160973,
+      -0.0012062611324830108,
+      0.20481640631895148,
+      0.0024434477520055564,
+      -0.122242923667915,
+      0.048772689772059064,
+      -0.0010626730469268653
+    ]
+  }
+]

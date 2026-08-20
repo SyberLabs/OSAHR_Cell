@@ -1,0 +1,12 @@
+{
+  "rows": 240,
+  "unique_arms": 240,
+  "scenarios_by_regime": {
+    "id": 6,
+    "sparse": 6
+  },
+  "bootstrap_replicates": 20000,
+  "independent_unit": "paired fast/robust telemetry scenario",
+  "stochastic_replicates_averaged_within_scenario": true,
+  "common_root_seed_verified": true
+}

@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "liquid-osahr-experiment-03"
+version = "0.1.0"
+description = "Query-conditioned residual trust over frozen Liquid-OSAHR 02B artifacts"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = [
+  "numpy>=2.0",
+  "pandas>=2.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["liquid_osahr03*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["."]
+addopts = "-q"

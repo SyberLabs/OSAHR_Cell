@@ -1,0 +1,2140 @@
+{
+  "label": "instrument_h3",
+  "horizon": 3.0,
+  "n_rows": 400,
+  "estimands": {
+    "goal_utility_ratio": {
+      "0.00": {
+        "n": 20,
+        "expressed_n": 12,
+        "status_counts": {
+          "admit": 4,
+          "hold_unresolved": 6,
+          "reject": 2,
+          "outcome_unknown": 8
+        },
+        "rates": {
+          "admit": {
+            "macro": {
+              "mean": 0.2,
+              "lo": 0.05,
+              "hi": 0.35,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              }
+            },
+            "count": 4
+          },
+          "hold_unresolved": {
+            "macro": {
+              "mean": 0.3,
+              "lo": 0.1,
+              "hi": 0.5,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              }
+            },
+            "count": 6
+          },
+          "reject": {
+            "macro": {
+              "mean": 0.1,
+              "lo": 0.0,
+              "hi": 0.2,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              }
+            },
+            "count": 2
+          },
+          "outcome_unknown": {
+            "macro": {
+              "mean": 0.4,
+              "lo": 0.2,
+              "hi": 0.6,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.6,
+                "lo": 0.2,
+                "hi": 1.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.6,
+                "lo": 0.2,
+                "hi": 1.0,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              }
+            },
+            "count": 8
+          }
+        },
+        "expressed_rates": {
+          "admit": {
+            "macro": {
+              "mean": 0.3333333333333333,
+              "lo": 0.08333333333333333,
+              "hi": 0.5833333333333334,
+              "n": 12
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 2
+              },
+              "high_stress": {
+                "mean": 0.3333333333333333,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 3
+              },
+              "id": {
+                "mean": 0.5,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 2
+              },
+              "weak_channel": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              }
+            },
+            "count": 4
+          },
+          "hold_unresolved": {
+            "macro": {
+              "mean": 0.5,
+              "lo": 0.25,
+              "hi": 0.75,
+              "n": 12
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 1.0,
+                "lo": 1.0,
+                "hi": 1.0,
+                "n": 2
+              },
+              "high_stress": {
+                "mean": 0.6666666666666666,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 3
+              },
+              "id": {
+                "mean": 0.5,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 2
+              },
+              "weak_channel": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              }
+            },
+            "count": 6
+          },
+          "reject": {
+            "macro": {
+              "mean": 0.16666666666666666,
+              "lo": 0.0,
+              "hi": 0.3333333333333333,
+              "n": 12
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 2
+              },
+              "high_stress": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 3
+              },
+              "id": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 2
+              },
+              "weak_channel": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              }
+            },
+            "count": 2
+          }
+        },
+        "foils": {
+          "T04_strict": {
+            "illegal_count": 1,
+            "all": {
+              "macro": {
+                "mean": 0.05,
+                "lo": 0.0,
+                "hi": 0.15,
+                "n": 20
+              },
+              "regimes": {
+                "high_mobility": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "high_stress": {
+                  "mean": 0.2,
+                  "lo": 0.0,
+                  "hi": 0.6,
+                  "n": 5
+                },
+                "id": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "weak_channel": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                }
+              }
+            },
+            "among_expressed": {
+              "mean": 0.08333333333333333,
+              "lo": 0.0,
+              "hi": 0.25,
+              "n": 12
+            }
+          },
+          "alpha1": {
+            "illegal_count": 2,
+            "all": {
+              "macro": {
+                "mean": 0.1,
+                "lo": 0.0,
+                "hi": 0.25,
+                "n": 20
+              },
+              "regimes": {
+                "high_mobility": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "high_stress": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "id": {
+                  "mean": 0.2,
+                  "lo": 0.0,
+                  "hi": 0.6,
+                  "n": 5
+                },
+                "weak_channel": {
+                  "mean": 0.2,
+                  "lo": 0.0,
+                  "hi": 0.6,
+                  "n": 5
+                }
+              }
+            },
+            "among_expressed": {
+              "mean": 0.16666666666666666,
+              "lo": 0.0,
+              "hi": 0.4166666666666667,
+              "n": 12
+            }
+          }
+        },
+        "activation_without_effect": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 20
+        },
+        "mean_spread": {
+          "mean": 0.05170833367148112,
+          "lo": 0.027964240243396773,
+          "hi": 0.07783467144620873,
+          "n": 20
+        },
+        "primary_estimand": "goal_utility_ratio"
+      },
+      "0.02": {
+        "n": 20,
+        "expressed_n": 11,
+        "status_counts": {
+          "admit": 2,
+          "hold_unresolved": 7,
+          "reject": 2,
+          "outcome_unknown": 9
+        },
+        "rates": {
+          "admit": {
+            "macro": {
+              "mean": 0.1,
+              "lo": 0.0,
+              "hi": 0.25,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              }
+            },
+            "count": 2
+          },
+          "hold_unresolved": {
+            "macro": {
+              "mean": 0.35,
+              "lo": 0.15,
+              "hi": 0.55,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              }
+            },
+            "count": 7
+          },
+          "reject": {
+            "macro": {
+              "mean": 0.1,
+              "lo": 0.0,
+              "hi": 0.2,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              }
+            },
+            "count": 2
+          },
+          "outcome_unknown": {
+            "macro": {
+              "mean": 0.45,
+              "lo": 0.25,
+              "hi": 0.65,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.6,
+                "lo": 0.2,
+                "hi": 1.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.6,
+                "lo": 0.2,
+                "hi": 1.0,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.6,
+                "lo": 0.2,
+                "hi": 1.0,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              }
+            },
+            "count": 9
+          }
+        },
+        "expressed_rates": {
+          "admit": {
+            "macro": {
+              "mean": 0.18181818181818182,
+              "lo": 0.0,
+              "hi": 0.36363636363636365,
+              "n": 11
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 2
+              },
+              "high_stress": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 2
+              },
+              "id": {
+                "mean": 0.5,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 2
+              },
+              "weak_channel": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              }
+            },
+            "count": 2
+          },
+          "hold_unresolved": {
+            "macro": {
+              "mean": 0.6363636363636364,
+              "lo": 0.45454545454545453,
+              "hi": 0.9090909090909091,
+              "n": 11
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 1.0,
+                "lo": 1.0,
+                "hi": 1.0,
+                "n": 2
+              },
+              "high_stress": {
+                "mean": 1.0,
+                "lo": 1.0,
+                "hi": 1.0,
+                "n": 2
+              },
+              "id": {
+                "mean": 0.5,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 2
+              },
+              "weak_channel": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              }
+            },
+            "count": 7
+          },
+          "reject": {
+            "macro": {
+              "mean": 0.18181818181818182,
+              "lo": 0.0,
+              "hi": 0.36363636363636365,
+              "n": 11
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 2
+              },
+              "high_stress": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 2
+              },
+              "id": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 2
+              },
+              "weak_channel": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              }
+            },
+            "count": 2
+          }
+        },
+        "foils": {
+          "T04_strict": {
+            "illegal_count": 1,
+            "all": {
+              "macro": {
+                "mean": 0.05,
+                "lo": 0.0,
+                "hi": 0.15,
+                "n": 20
+              },
+              "regimes": {
+                "high_mobility": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "high_stress": {
+                  "mean": 0.2,
+                  "lo": 0.0,
+                  "hi": 0.6,
+                  "n": 5
+                },
+                "id": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "weak_channel": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                }
+              }
+            },
+            "among_expressed": {
+              "mean": 0.09090909090909091,
+              "lo": 0.0,
+              "hi": 0.2727272727272727,
+              "n": 11
+            }
+          },
+          "alpha1": {
+            "illegal_count": 3,
+            "all": {
+              "macro": {
+                "mean": 0.15,
+                "lo": 0.0,
+                "hi": 0.3,
+                "n": 20
+              },
+              "regimes": {
+                "high_mobility": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "high_stress": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "id": {
+                  "mean": 0.2,
+                  "lo": 0.0,
+                  "hi": 0.6,
+                  "n": 5
+                },
+                "weak_channel": {
+                  "mean": 0.4,
+                  "lo": 0.0,
+                  "hi": 0.8,
+                  "n": 5
+                }
+              }
+            },
+            "among_expressed": {
+              "mean": 0.2727272727272727,
+              "lo": 0.0,
+              "hi": 0.5454545454545454,
+              "n": 11
+            }
+          }
+        },
+        "activation_without_effect": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 20
+        },
+        "mean_spread": {
+          "mean": 0.05170833367148112,
+          "lo": 0.02786558760240356,
+          "hi": 0.07799086198488484,
+          "n": 20
+        },
+        "primary_estimand": "goal_utility_ratio"
+      }
+    },
+    "critical_success_rate": {
+      "0.00": {
+        "n": 20,
+        "expressed_n": 6,
+        "status_counts": {
+          "admit": 0,
+          "hold_unresolved": 3,
+          "reject": 3,
+          "outcome_unknown": 14
+        },
+        "rates": {
+          "admit": {
+            "macro": {
+              "mean": 0.0,
+              "lo": 0.0,
+              "hi": 0.0,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              }
+            },
+            "count": 0
+          },
+          "hold_unresolved": {
+            "macro": {
+              "mean": 0.15,
+              "lo": 0.0,
+              "hi": 0.3,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              }
+            },
+            "count": 3
+          },
+          "reject": {
+            "macro": {
+              "mean": 0.15,
+              "lo": 0.0,
+              "hi": 0.3,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              }
+            },
+            "count": 3
+          },
+          "outcome_unknown": {
+            "macro": {
+              "mean": 0.7,
+              "lo": 0.5,
+              "hi": 0.85,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.8,
+                "lo": 0.4,
+                "hi": 1.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.6,
+                "lo": 0.2,
+                "hi": 1.0,
+                "n": 5
+              },
+              "id": {
+                "mean": 1.0,
+                "lo": 1.0,
+                "hi": 1.0,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              }
+            },
+            "count": 14
+          }
+        },
+        "expressed_rates": {
+          "admit": {
+            "macro": {
+              "mean": 0.0,
+              "lo": 0.0,
+              "hi": 0.0,
+              "n": 6
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 1
+              },
+              "high_stress": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 2
+              },
+              "weak_channel": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 3
+              }
+            },
+            "count": 0
+          },
+          "hold_unresolved": {
+            "macro": {
+              "mean": 0.5,
+              "lo": 0.16666666666666666,
+              "hi": 0.8333333333333334,
+              "n": 6
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 1.0,
+                "lo": 1.0,
+                "hi": 1.0,
+                "n": 1
+              },
+              "high_stress": {
+                "mean": 0.5,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 2
+              },
+              "weak_channel": {
+                "mean": 0.3333333333333333,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 3
+              }
+            },
+            "count": 3
+          },
+          "reject": {
+            "macro": {
+              "mean": 0.5,
+              "lo": 0.16666666666666666,
+              "hi": 0.8333333333333334,
+              "n": 6
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 1
+              },
+              "high_stress": {
+                "mean": 0.5,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 2
+              },
+              "weak_channel": {
+                "mean": 0.6666666666666666,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 3
+              }
+            },
+            "count": 3
+          }
+        },
+        "foils": {
+          "T04_strict": {
+            "illegal_count": 1,
+            "all": {
+              "macro": {
+                "mean": 0.05,
+                "lo": 0.0,
+                "hi": 0.15,
+                "n": 20
+              },
+              "regimes": {
+                "high_mobility": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "high_stress": {
+                  "mean": 0.2,
+                  "lo": 0.0,
+                  "hi": 0.6,
+                  "n": 5
+                },
+                "id": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "weak_channel": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                }
+              }
+            },
+            "among_expressed": {
+              "mean": 0.16666666666666666,
+              "lo": 0.0,
+              "hi": 0.5,
+              "n": 6
+            }
+          },
+          "alpha1": {
+            "illegal_count": 1,
+            "all": {
+              "macro": {
+                "mean": 0.05,
+                "lo": 0.0,
+                "hi": 0.15,
+                "n": 20
+              },
+              "regimes": {
+                "high_mobility": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "high_stress": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "id": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "weak_channel": {
+                  "mean": 0.2,
+                  "lo": 0.0,
+                  "hi": 0.6,
+                  "n": 5
+                }
+              }
+            },
+            "among_expressed": {
+              "mean": 0.16666666666666666,
+              "lo": 0.0,
+              "hi": 0.5,
+              "n": 6
+            }
+          }
+        },
+        "activation_without_effect": {
+          "mean": 0.1,
+          "lo": 0.0,
+          "hi": 0.25,
+          "n": 20
+        },
+        "mean_spread": {
+          "mean": 0.06875,
+          "lo": 0.018750000000000003,
+          "hi": 0.13125,
+          "n": 20
+        },
+        "primary_estimand": "goal_utility_ratio"
+      },
+      "0.02": {
+        "n": 20,
+        "expressed_n": 6,
+        "status_counts": {
+          "admit": 0,
+          "hold_unresolved": 3,
+          "reject": 3,
+          "outcome_unknown": 14
+        },
+        "rates": {
+          "admit": {
+            "macro": {
+              "mean": 0.0,
+              "lo": 0.0,
+              "hi": 0.0,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              }
+            },
+            "count": 0
+          },
+          "hold_unresolved": {
+            "macro": {
+              "mean": 0.15,
+              "lo": 0.0,
+              "hi": 0.3,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              }
+            },
+            "count": 3
+          },
+          "reject": {
+            "macro": {
+              "mean": 0.15,
+              "lo": 0.0,
+              "hi": 0.3,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              }
+            },
+            "count": 3
+          },
+          "outcome_unknown": {
+            "macro": {
+              "mean": 0.7,
+              "lo": 0.5,
+              "hi": 0.85,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.8,
+                "lo": 0.4,
+                "hi": 1.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.6,
+                "lo": 0.2,
+                "hi": 1.0,
+                "n": 5
+              },
+              "id": {
+                "mean": 1.0,
+                "lo": 1.0,
+                "hi": 1.0,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              }
+            },
+            "count": 14
+          }
+        },
+        "expressed_rates": {
+          "admit": {
+            "macro": {
+              "mean": 0.0,
+              "lo": 0.0,
+              "hi": 0.0,
+              "n": 6
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 1
+              },
+              "high_stress": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 2
+              },
+              "weak_channel": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 3
+              }
+            },
+            "count": 0
+          },
+          "hold_unresolved": {
+            "macro": {
+              "mean": 0.5,
+              "lo": 0.16666666666666666,
+              "hi": 0.8333333333333334,
+              "n": 6
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 1.0,
+                "lo": 1.0,
+                "hi": 1.0,
+                "n": 1
+              },
+              "high_stress": {
+                "mean": 0.5,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 2
+              },
+              "weak_channel": {
+                "mean": 0.3333333333333333,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 3
+              }
+            },
+            "count": 3
+          },
+          "reject": {
+            "macro": {
+              "mean": 0.5,
+              "lo": 0.16666666666666666,
+              "hi": 0.8333333333333334,
+              "n": 6
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 1
+              },
+              "high_stress": {
+                "mean": 0.5,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 2
+              },
+              "weak_channel": {
+                "mean": 0.6666666666666666,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 3
+              }
+            },
+            "count": 3
+          }
+        },
+        "foils": {
+          "T04_strict": {
+            "illegal_count": 1,
+            "all": {
+              "macro": {
+                "mean": 0.05,
+                "lo": 0.0,
+                "hi": 0.15,
+                "n": 20
+              },
+              "regimes": {
+                "high_mobility": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "high_stress": {
+                  "mean": 0.2,
+                  "lo": 0.0,
+                  "hi": 0.6,
+                  "n": 5
+                },
+                "id": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "weak_channel": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                }
+              }
+            },
+            "among_expressed": {
+              "mean": 0.16666666666666666,
+              "lo": 0.0,
+              "hi": 0.5,
+              "n": 6
+            }
+          },
+          "alpha1": {
+            "illegal_count": 1,
+            "all": {
+              "macro": {
+                "mean": 0.05,
+                "lo": 0.0,
+                "hi": 0.15,
+                "n": 20
+              },
+              "regimes": {
+                "high_mobility": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "high_stress": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "id": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "weak_channel": {
+                  "mean": 0.2,
+                  "lo": 0.0,
+                  "hi": 0.6,
+                  "n": 5
+                }
+              }
+            },
+            "among_expressed": {
+              "mean": 0.16666666666666666,
+              "lo": 0.0,
+              "hi": 0.5,
+              "n": 6
+            }
+          }
+        },
+        "activation_without_effect": {
+          "mean": 0.1,
+          "lo": 0.0,
+          "hi": 0.25,
+          "n": 20
+        },
+        "mean_spread": {
+          "mean": 0.06875,
+          "lo": 0.02,
+          "hi": 0.13083333333333336,
+          "n": 20
+        },
+        "primary_estimand": "goal_utility_ratio"
+      }
+    },
+    "mean_latency": {
+      "0.00": {
+        "n": 20,
+        "expressed_n": 20,
+        "status_counts": {
+          "admit": 9,
+          "hold_unresolved": 9,
+          "reject": 2,
+          "outcome_unknown": 0
+        },
+        "rates": {
+          "admit": {
+            "macro": {
+              "mean": 0.45,
+              "lo": 0.25,
+              "hi": 0.65,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.8,
+                "lo": 0.4,
+                "hi": 1.0,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              }
+            },
+            "count": 9
+          },
+          "hold_unresolved": {
+            "macro": {
+              "mean": 0.45,
+              "lo": 0.25,
+              "hi": 0.65,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.6,
+                "lo": 0.2,
+                "hi": 1.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.6,
+                "lo": 0.2,
+                "hi": 1.0,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              }
+            },
+            "count": 9
+          },
+          "reject": {
+            "macro": {
+              "mean": 0.1,
+              "lo": 0.0,
+              "hi": 0.2,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              }
+            },
+            "count": 2
+          },
+          "outcome_unknown": {
+            "macro": {
+              "mean": 0.0,
+              "lo": 0.0,
+              "hi": 0.0,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              }
+            },
+            "count": 0
+          }
+        },
+        "expressed_rates": {
+          "admit": {
+            "macro": {
+              "mean": 0.45,
+              "lo": 0.25,
+              "hi": 0.65,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.8,
+                "lo": 0.4,
+                "hi": 1.0,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              }
+            },
+            "count": 9
+          },
+          "hold_unresolved": {
+            "macro": {
+              "mean": 0.45,
+              "lo": 0.25,
+              "hi": 0.65,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.6,
+                "lo": 0.2,
+                "hi": 1.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.6,
+                "lo": 0.2,
+                "hi": 1.0,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              }
+            },
+            "count": 9
+          },
+          "reject": {
+            "macro": {
+              "mean": 0.1,
+              "lo": 0.0,
+              "hi": 0.2,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              }
+            },
+            "count": 2
+          }
+        },
+        "foils": {
+          "T04_strict": {
+            "illegal_count": 3,
+            "all": {
+              "macro": {
+                "mean": 0.15,
+                "lo": 0.0,
+                "hi": 0.3,
+                "n": 20
+              },
+              "regimes": {
+                "high_mobility": {
+                  "mean": 0.2,
+                  "lo": 0.0,
+                  "hi": 0.6,
+                  "n": 5
+                },
+                "high_stress": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "id": {
+                  "mean": 0.2,
+                  "lo": 0.0,
+                  "hi": 0.6,
+                  "n": 5
+                },
+                "weak_channel": {
+                  "mean": 0.2,
+                  "lo": 0.0,
+                  "hi": 0.6,
+                  "n": 5
+                }
+              }
+            },
+            "among_expressed": {
+              "mean": 0.15,
+              "lo": 0.0,
+              "hi": 0.3,
+              "n": 20
+            }
+          },
+          "alpha1": {
+            "illegal_count": 6,
+            "all": {
+              "macro": {
+                "mean": 0.3,
+                "lo": 0.1,
+                "hi": 0.5,
+                "n": 20
+              },
+              "regimes": {
+                "high_mobility": {
+                  "mean": 0.2,
+                  "lo": 0.0,
+                  "hi": 0.6,
+                  "n": 5
+                },
+                "high_stress": {
+                  "mean": 0.6,
+                  "lo": 0.2,
+                  "hi": 1.0,
+                  "n": 5
+                },
+                "id": {
+                  "mean": 0.2,
+                  "lo": 0.0,
+                  "hi": 0.6,
+                  "n": 5
+                },
+                "weak_channel": {
+                  "mean": 0.2,
+                  "lo": 0.0,
+                  "hi": 0.6,
+                  "n": 5
+                }
+              }
+            },
+            "among_expressed": {
+              "mean": 0.3,
+              "lo": 0.1,
+              "hi": 0.5,
+              "n": 20
+            }
+          }
+        },
+        "activation_without_effect": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 20
+        },
+        "mean_spread": {
+          "mean": 0.08113181133912947,
+          "lo": 0.03538584531893939,
+          "hi": 0.13321922078123433,
+          "n": 20
+        },
+        "primary_estimand": "goal_utility_ratio"
+      },
+      "0.02": {
+        "n": 20,
+        "expressed_n": 10,
+        "status_counts": {
+          "admit": 1,
+          "hold_unresolved": 6,
+          "reject": 3,
+          "outcome_unknown": 10
+        },
+        "rates": {
+          "admit": {
+            "macro": {
+              "mean": 0.05,
+              "lo": 0.0,
+              "hi": 0.15,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              }
+            },
+            "count": 1
+          },
+          "hold_unresolved": {
+            "macro": {
+              "mean": 0.3,
+              "lo": 0.1,
+              "hi": 0.5,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              }
+            },
+            "count": 6
+          },
+          "reject": {
+            "macro": {
+              "mean": 0.15,
+              "lo": 0.0,
+              "hi": 0.3,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              }
+            },
+            "count": 3
+          },
+          "outcome_unknown": {
+            "macro": {
+              "mean": 0.5,
+              "lo": 0.3,
+              "hi": 0.7,
+              "n": 20
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.8,
+                "lo": 0.4,
+                "hi": 1.0,
+                "n": 5
+              },
+              "high_stress": {
+                "mean": 0.4,
+                "lo": 0.0,
+                "hi": 0.8,
+                "n": 5
+              },
+              "id": {
+                "mean": 0.6,
+                "lo": 0.2,
+                "hi": 1.0,
+                "n": 5
+              },
+              "weak_channel": {
+                "mean": 0.2,
+                "lo": 0.0,
+                "hi": 0.6,
+                "n": 5
+              }
+            },
+            "count": 10
+          }
+        },
+        "expressed_rates": {
+          "admit": {
+            "macro": {
+              "mean": 0.1,
+              "lo": 0.0,
+              "hi": 0.2,
+              "n": 10
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 1
+              },
+              "high_stress": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 3
+              },
+              "id": {
+                "mean": 0.5,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 2
+              },
+              "weak_channel": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 4
+              }
+            },
+            "count": 1
+          },
+          "hold_unresolved": {
+            "macro": {
+              "mean": 0.6,
+              "lo": 0.3,
+              "hi": 0.9,
+              "n": 10
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 1.0,
+                "lo": 1.0,
+                "hi": 1.0,
+                "n": 1
+              },
+              "high_stress": {
+                "mean": 0.6666666666666666,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 3
+              },
+              "id": {
+                "mean": 0.5,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 2
+              },
+              "weak_channel": {
+                "mean": 0.5,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 4
+              }
+            },
+            "count": 6
+          },
+          "reject": {
+            "macro": {
+              "mean": 0.3,
+              "lo": 0.1,
+              "hi": 0.6,
+              "n": 10
+            },
+            "regimes": {
+              "high_mobility": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 1
+              },
+              "high_stress": {
+                "mean": 0.3333333333333333,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 3
+              },
+              "id": {
+                "mean": 0.0,
+                "lo": 0.0,
+                "hi": 0.0,
+                "n": 2
+              },
+              "weak_channel": {
+                "mean": 0.5,
+                "lo": 0.0,
+                "hi": 1.0,
+                "n": 4
+              }
+            },
+            "count": 3
+          }
+        },
+        "foils": {
+          "T04_strict": {
+            "illegal_count": 2,
+            "all": {
+              "macro": {
+                "mean": 0.1,
+                "lo": 0.0,
+                "hi": 0.25,
+                "n": 20
+              },
+              "regimes": {
+                "high_mobility": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "high_stress": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "id": {
+                  "mean": 0.2,
+                  "lo": 0.0,
+                  "hi": 0.6,
+                  "n": 5
+                },
+                "weak_channel": {
+                  "mean": 0.2,
+                  "lo": 0.0,
+                  "hi": 0.6,
+                  "n": 5
+                }
+              }
+            },
+            "among_expressed": {
+              "mean": 0.2,
+              "lo": 0.0,
+              "hi": 0.5,
+              "n": 10
+            }
+          },
+          "alpha1": {
+            "illegal_count": 2,
+            "all": {
+              "macro": {
+                "mean": 0.1,
+                "lo": 0.0,
+                "hi": 0.25,
+                "n": 20
+              },
+              "regimes": {
+                "high_mobility": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "high_stress": {
+                  "mean": 0.0,
+                  "lo": 0.0,
+                  "hi": 0.0,
+                  "n": 5
+                },
+                "id": {
+                  "mean": 0.2,
+                  "lo": 0.0,
+                  "hi": 0.6,
+                  "n": 5
+                },
+                "weak_channel": {
+                  "mean": 0.2,
+                  "lo": 0.0,
+                  "hi": 0.6,
+                  "n": 5
+                }
+              }
+            },
+            "among_expressed": {
+              "mean": 0.2,
+              "lo": 0.0,
+              "hi": 0.5,
+              "n": 10
+            }
+          }
+        },
+        "activation_without_effect": {
+          "mean": 0.0,
+          "lo": 0.0,
+          "hi": 0.0,
+          "n": 20
+        },
+        "mean_spread": {
+          "mean": 0.08113181133912947,
+          "lo": 0.035301956263042576,
+          "hi": 0.1336558285385119,
+          "n": 20
+        },
+        "primary_estimand": "goal_utility_ratio"
+      }
+    }
+  },
+  "source_csv": "D:\\syberlabs\\osahr_project\\liquid-osahr-experiment-04\\artifacts\\confirmatory_release.csv",
+  "source_sha256": "73227e650d18322b9d5ace7ed04043e2ebf5f094b9c46b6d8a2bfdf51b5b09b2",
+  "labeled": "NOT a 05 confirmation; 04 holdout at h=3 s"
+}

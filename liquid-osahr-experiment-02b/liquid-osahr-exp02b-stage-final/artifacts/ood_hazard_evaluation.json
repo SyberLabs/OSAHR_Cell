@@ -1,0 +1,630 @@
+{
+  "id": {
+    "0": {
+      "nmae": 0.04046722543884684,
+      "log_rmse": 0.48446393609046934,
+      "per_trace": [
+        {
+          "trace_id": "ood-id-0",
+          "nmae": 0.023800813188461986,
+          "log_rmse": 0.38378557562828064
+        },
+        {
+          "trace_id": "ood-id-1",
+          "nmae": 0.03149630073979845,
+          "log_rmse": 0.4305378496646881
+        },
+        {
+          "trace_id": "ood-id-2",
+          "nmae": 0.041787394106133864,
+          "log_rmse": 0.45871612429618835
+        },
+        {
+          "trace_id": "ood-id-3",
+          "nmae": 0.06264179935621929,
+          "log_rmse": 0.6994876861572266
+        },
+        {
+          "trace_id": "ood-id-4",
+          "nmae": 0.04260981980362061,
+          "log_rmse": 0.44979244470596313
+        }
+      ]
+    },
+    "0.25": {
+      "nmae": 0.03720858854660365,
+      "log_rmse": 0.3980986654758453,
+      "per_trace": [
+        {
+          "trace_id": "ood-id-0",
+          "nmae": 0.023817553125934567,
+          "log_rmse": 0.3057154417037964
+        },
+        {
+          "trace_id": "ood-id-1",
+          "nmae": 0.028347568695538505,
+          "log_rmse": 0.3465399742126465
+        },
+        {
+          "trace_id": "ood-id-2",
+          "nmae": 0.039545774060717825,
+          "log_rmse": 0.38412436842918396
+        },
+        {
+          "trace_id": "ood-id-3",
+          "nmae": 0.05519559176019411,
+          "log_rmse": 0.584953248500824
+        },
+        {
+          "trace_id": "ood-id-4",
+          "nmae": 0.039136455090633265,
+          "log_rmse": 0.3691602945327759
+        }
+      ]
+    },
+    "0.5": {
+      "nmae": 0.03491071932489492,
+      "log_rmse": 0.3179667204618454,
+      "per_trace": [
+        {
+          "trace_id": "ood-id-0",
+          "nmae": 0.024687077471688943,
+          "log_rmse": 0.23288632929325104
+        },
+        {
+          "trace_id": "ood-id-1",
+          "nmae": 0.02674266603868716,
+          "log_rmse": 0.2713209390640259
+        },
+        {
+          "trace_id": "ood-id-2",
+          "nmae": 0.03725312600183729,
+          "log_rmse": 0.3126186728477478
+        },
+        {
+          "trace_id": "ood-id-3",
+          "nmae": 0.050458486233147255,
+          "log_rmse": 0.47882965207099915
+        },
+        {
+          "trace_id": "ood-id-4",
+          "nmae": 0.03541224087911395,
+          "log_rmse": 0.2941780090332031
+        }
+      ]
+    },
+    "0.75": {
+      "nmae": 0.03351500244649223,
+      "log_rmse": 0.24933477640151977,
+      "per_trace": [
+        {
+          "trace_id": "ood-id-0",
+          "nmae": 0.025781061598092604,
+          "log_rmse": 0.17075788974761963
+        },
+        {
+          "trace_id": "ood-id-1",
+          "nmae": 0.02555948966222944,
+          "log_rmse": 0.21321570873260498
+        },
+        {
+          "trace_id": "ood-id-2",
+          "nmae": 0.036162698746734674,
+          "log_rmse": 0.24609336256980896
+        },
+        {
+          "trace_id": "ood-id-3",
+          "nmae": 0.04672148215635111,
+          "log_rmse": 0.38693809509277344
+        },
+        {
+          "trace_id": "ood-id-4",
+          "nmae": 0.03335028006905331,
+          "log_rmse": 0.22966882586479187
+        }
+      ]
+    },
+    "1.0": {
+      "nmae": 0.032526022191488195,
+      "log_rmse": 0.2031002938747406,
+      "per_trace": [
+        {
+          "trace_id": "ood-id-0",
+          "nmae": 0.026591334660569146,
+          "log_rmse": 0.13345058262348175
+        },
+        {
+          "trace_id": "ood-id-1",
+          "nmae": 0.02408022820766319,
+          "log_rmse": 0.18739023804664612
+        },
+        {
+          "trace_id": "ood-id-2",
+          "nmae": 0.03608819296697341,
+          "log_rmse": 0.18898838758468628
+        },
+        {
+          "trace_id": "ood-id-3",
+          "nmae": 0.043186249444367435,
+          "log_rmse": 0.31983238458633423
+        },
+        {
+          "trace_id": "ood-id-4",
+          "nmae": 0.03268410567786781,
+          "log_rmse": 0.18583987653255463
+        }
+      ]
+    }
+  },
+  "high_mobility": {
+    "0": {
+      "nmae": 0.03512608260373497,
+      "log_rmse": 0.4342385530471802,
+      "per_trace": [
+        {
+          "trace_id": "ood-high_mobility-0",
+          "nmae": 0.02024481031648915,
+          "log_rmse": 0.23546168208122253
+        },
+        {
+          "trace_id": "ood-high_mobility-1",
+          "nmae": 0.02827417590578176,
+          "log_rmse": 0.4619641602039337
+        },
+        {
+          "trace_id": "ood-high_mobility-2",
+          "nmae": 0.029631506551399275,
+          "log_rmse": 0.4881998598575592
+        },
+        {
+          "trace_id": "ood-high_mobility-3",
+          "nmae": 0.05534422918290755,
+          "log_rmse": 0.5015069246292114
+        },
+        {
+          "trace_id": "ood-high_mobility-4",
+          "nmae": 0.04213569106209709,
+          "log_rmse": 0.484060138463974
+        }
+      ]
+    },
+    "0.25": {
+      "nmae": 0.031205821684080832,
+      "log_rmse": 0.3401471495628357,
+      "per_trace": [
+        {
+          "trace_id": "ood-high_mobility-0",
+          "nmae": 0.01810604907471722,
+          "log_rmse": 0.16960957646369934
+        },
+        {
+          "trace_id": "ood-high_mobility-1",
+          "nmae": 0.02571583510095957,
+          "log_rmse": 0.3790000379085541
+        },
+        {
+          "trace_id": "ood-high_mobility-2",
+          "nmae": 0.026525239095858636,
+          "log_rmse": 0.37124666571617126
+        },
+        {
+          "trace_id": "ood-high_mobility-3",
+          "nmae": 0.05027817959964392,
+          "log_rmse": 0.407547265291214
+        },
+        {
+          "trace_id": "ood-high_mobility-4",
+          "nmae": 0.03540380554922481,
+          "log_rmse": 0.3733322024345398
+        }
+      ]
+    },
+    "0.5": {
+      "nmae": 0.02797356833832415,
+      "log_rmse": 0.2556158363819122,
+      "per_trace": [
+        {
+          "trace_id": "ood-high_mobility-0",
+          "nmae": 0.015884628370157815,
+          "log_rmse": 0.1132081151008606
+        },
+        {
+          "trace_id": "ood-high_mobility-1",
+          "nmae": 0.02358735413763927,
+          "log_rmse": 0.3098384439945221
+        },
+        {
+          "trace_id": "ood-high_mobility-2",
+          "nmae": 0.0234389231270466,
+          "log_rmse": 0.25890740752220154
+        },
+        {
+          "trace_id": "ood-high_mobility-3",
+          "nmae": 0.04626742595334964,
+          "log_rmse": 0.3272988200187683
+        },
+        {
+          "trace_id": "ood-high_mobility-4",
+          "nmae": 0.03068951010342743,
+          "log_rmse": 0.2688263952732086
+        }
+      ]
+    },
+    "0.75": {
+      "nmae": 0.0261340868452958,
+      "log_rmse": 0.19170974493026732,
+      "per_trace": [
+        {
+          "trace_id": "ood-high_mobility-0",
+          "nmae": 0.0144802441047009,
+          "log_rmse": 0.08391286432743073
+        },
+        {
+          "trace_id": "ood-high_mobility-1",
+          "nmae": 0.022349075583973303,
+          "log_rmse": 0.2643226981163025
+        },
+        {
+          "trace_id": "ood-high_mobility-2",
+          "nmae": 0.019859695004174713,
+          "log_rmse": 0.15896396338939667
+        },
+        {
+          "trace_id": "ood-high_mobility-3",
+          "nmae": 0.04578458807643582,
+          "log_rmse": 0.27214547991752625
+        },
+        {
+          "trace_id": "ood-high_mobility-4",
+          "nmae": 0.028196831457194284,
+          "log_rmse": 0.17920371890068054
+        }
+      ]
+    },
+    "1.0": {
+      "nmae": 0.02571071703559754,
+      "log_rmse": 0.171468648314476,
+      "per_trace": [
+        {
+          "trace_id": "ood-high_mobility-0",
+          "nmae": 0.01417720099988778,
+          "log_rmse": 0.10495958477258682
+        },
+        {
+          "trace_id": "ood-high_mobility-1",
+          "nmae": 0.024145266087996883,
+          "log_rmse": 0.25402164459228516
+        },
+        {
+          "trace_id": "ood-high_mobility-2",
+          "nmae": 0.017608144691834197,
+          "log_rmse": 0.10779935866594315
+        },
+        {
+          "trace_id": "ood-high_mobility-3",
+          "nmae": 0.04599076507788473,
+          "log_rmse": 0.25720101594924927
+        },
+        {
+          "trace_id": "ood-high_mobility-4",
+          "nmae": 0.0266322083203841,
+          "log_rmse": 0.13336163759231567
+        }
+      ]
+    }
+  },
+  "high_stress": {
+    "0": {
+      "nmae": 0.047821923082593386,
+      "log_rmse": 0.529717481136322,
+      "per_trace": [
+        {
+          "trace_id": "ood-high_stress-0",
+          "nmae": 0.03334953914350203,
+          "log_rmse": 0.41228678822517395
+        },
+        {
+          "trace_id": "ood-high_stress-1",
+          "nmae": 0.029790951398030063,
+          "log_rmse": 0.3751133680343628
+        },
+        {
+          "trace_id": "ood-high_stress-2",
+          "nmae": 0.05582187022902562,
+          "log_rmse": 0.6305941939353943
+        },
+        {
+          "trace_id": "ood-high_stress-3",
+          "nmae": 0.034887948661153016,
+          "log_rmse": 0.46262577176094055
+        },
+        {
+          "trace_id": "ood-high_stress-4",
+          "nmae": 0.08525930598125621,
+          "log_rmse": 0.7679672837257385
+        }
+      ]
+    },
+    "0.25": {
+      "nmae": 0.04397774498066916,
+      "log_rmse": 0.4459890484809875,
+      "per_trace": [
+        {
+          "trace_id": "ood-high_stress-0",
+          "nmae": 0.034979755197153656,
+          "log_rmse": 0.3550187349319458
+        },
+        {
+          "trace_id": "ood-high_stress-1",
+          "nmae": 0.029078752246456296,
+          "log_rmse": 0.31295400857925415
+        },
+        {
+          "trace_id": "ood-high_stress-2",
+          "nmae": 0.04907178307276365,
+          "log_rmse": 0.5246005654335022
+        },
+        {
+          "trace_id": "ood-high_stress-3",
+          "nmae": 0.03421065472568022,
+          "log_rmse": 0.3971615433692932
+        },
+        {
+          "trace_id": "ood-high_stress-4",
+          "nmae": 0.07254777966129201,
+          "log_rmse": 0.6402103900909424
+        }
+      ]
+    },
+    "0.5": {
+      "nmae": 0.04140312875529794,
+      "log_rmse": 0.36619279980659486,
+      "per_trace": [
+        {
+          "trace_id": "ood-high_stress-0",
+          "nmae": 0.03705257263466989,
+          "log_rmse": 0.3006300628185272
+        },
+        {
+          "trace_id": "ood-high_stress-1",
+          "nmae": 0.028191360332507222,
+          "log_rmse": 0.2529131770133972
+        },
+        {
+          "trace_id": "ood-high_stress-2",
+          "nmae": 0.04519016807925635,
+          "log_rmse": 0.42426732182502747
+        },
+        {
+          "trace_id": "ood-high_stress-3",
+          "nmae": 0.036645302317400034,
+          "log_rmse": 0.3345668613910675
+        },
+        {
+          "trace_id": "ood-high_stress-4",
+          "nmae": 0.059936240412656196,
+          "log_rmse": 0.5185865759849548
+        }
+      ]
+    },
+    "0.75": {
+      "nmae": 0.04012339441982812,
+      "log_rmse": 0.29331272542476655,
+      "per_trace": [
+        {
+          "trace_id": "ood-high_stress-0",
+          "nmae": 0.03901259149119297,
+          "log_rmse": 0.2502140700817108
+        },
+        {
+          "trace_id": "ood-high_stress-1",
+          "nmae": 0.02710695092316429,
+          "log_rmse": 0.19552932679653168
+        },
+        {
+          "trace_id": "ood-high_stress-2",
+          "nmae": 0.041565352186541275,
+          "log_rmse": 0.33567100763320923
+        },
+        {
+          "trace_id": "ood-high_stress-3",
+          "nmae": 0.039416238071982586,
+          "log_rmse": 0.2761036455631256
+        },
+        {
+          "trace_id": "ood-high_stress-4",
+          "nmae": 0.05351583942625951,
+          "log_rmse": 0.40904557704925537
+        }
+      ]
+    },
+    "1.0": {
+      "nmae": 0.040010804089740636,
+      "log_rmse": 0.2336504191160202,
+      "per_trace": [
+        {
+          "trace_id": "ood-high_stress-0",
+          "nmae": 0.04082551298966376,
+          "log_rmse": 0.20605920255184174
+        },
+        {
+          "trace_id": "ood-high_stress-1",
+          "nmae": 0.02580298754131781,
+          "log_rmse": 0.14257435500621796
+        },
+        {
+          "trace_id": "ood-high_stress-2",
+          "nmae": 0.04420331954162888,
+          "log_rmse": 0.2714890241622925
+        },
+        {
+          "trace_id": "ood-high_stress-3",
+          "nmae": 0.042036212151734226,
+          "log_rmse": 0.22441299259662628
+        },
+        {
+          "trace_id": "ood-high_stress-4",
+          "nmae": 0.04718598822435851,
+          "log_rmse": 0.32371652126312256
+        }
+      ]
+    }
+  },
+  "weak_channel": {
+    "0": {
+      "nmae": 0.03858585834133105,
+      "log_rmse": 0.48258607983589175,
+      "per_trace": [
+        {
+          "trace_id": "ood-weak_channel-0",
+          "nmae": 0.024869579862688243,
+          "log_rmse": 0.33561521768569946
+        },
+        {
+          "trace_id": "ood-weak_channel-1",
+          "nmae": 0.06185335272378296,
+          "log_rmse": 0.7086478471755981
+        },
+        {
+          "trace_id": "ood-weak_channel-2",
+          "nmae": 0.04282714950136913,
+          "log_rmse": 0.4818103611469269
+        },
+        {
+          "trace_id": "ood-weak_channel-3",
+          "nmae": 0.022153535526020833,
+          "log_rmse": 0.3626168370246887
+        },
+        {
+          "trace_id": "ood-weak_channel-4",
+          "nmae": 0.04122567409279408,
+          "log_rmse": 0.5242401361465454
+        }
+      ]
+    },
+    "0.25": {
+      "nmae": 0.03400985312063047,
+      "log_rmse": 0.39180390238761903,
+      "per_trace": [
+        {
+          "trace_id": "ood-weak_channel-0",
+          "nmae": 0.023535447525509366,
+          "log_rmse": 0.26471057534217834
+        },
+        {
+          "trace_id": "ood-weak_channel-1",
+          "nmae": 0.05103611671458235,
+          "log_rmse": 0.5803623199462891
+        },
+        {
+          "trace_id": "ood-weak_channel-2",
+          "nmae": 0.04003859876942031,
+          "log_rmse": 0.4056791365146637
+        },
+        {
+          "trace_id": "ood-weak_channel-3",
+          "nmae": 0.019085801788755484,
+          "log_rmse": 0.28533926606178284
+        },
+        {
+          "trace_id": "ood-weak_channel-4",
+          "nmae": 0.036353300804884844,
+          "log_rmse": 0.42292821407318115
+        }
+      ]
+    },
+    "0.5": {
+      "nmae": 0.029907153251864722,
+      "log_rmse": 0.304783433675766,
+      "per_trace": [
+        {
+          "trace_id": "ood-weak_channel-0",
+          "nmae": 0.02221101172448763,
+          "log_rmse": 0.19942975044250488
+        },
+        {
+          "trace_id": "ood-weak_channel-1",
+          "nmae": 0.04081395936853876,
+          "log_rmse": 0.4537869691848755
+        },
+        {
+          "trace_id": "ood-weak_channel-2",
+          "nmae": 0.0370231138587881,
+          "log_rmse": 0.33509641885757446
+        },
+        {
+          "trace_id": "ood-weak_channel-3",
+          "nmae": 0.01589877107077166,
+          "log_rmse": 0.2100880742073059
+        },
+        {
+          "trace_id": "ood-weak_channel-4",
+          "nmae": 0.033588910236737456,
+          "log_rmse": 0.3255159556865692
+        }
+      ]
+    },
+    "0.75": {
+      "nmae": 0.02577122756109882,
+      "log_rmse": 0.22487004101276398,
+      "per_trace": [
+        {
+          "trace_id": "ood-weak_channel-0",
+          "nmae": 0.020693823939756825,
+          "log_rmse": 0.14579467475414276
+        },
+        {
+          "trace_id": "ood-weak_channel-1",
+          "nmae": 0.03099675529307201,
+          "log_rmse": 0.3306698203086853
+        },
+        {
+          "trace_id": "ood-weak_channel-2",
+          "nmae": 0.03374112020401533,
+          "log_rmse": 0.27378442883491516
+        },
+        {
+          "trace_id": "ood-weak_channel-3",
+          "nmae": 0.01327492730194868,
+          "log_rmse": 0.13841165602207184
+        },
+        {
+          "trace_id": "ood-weak_channel-4",
+          "nmae": 0.030149511066701242,
+          "log_rmse": 0.23568962514400482
+        }
+      ]
+    },
+    "1.0": {
+      "nmae": 0.022161243597688125,
+      "log_rmse": 0.16101347506046296,
+      "per_trace": [
+        {
+          "trace_id": "ood-weak_channel-0",
+          "nmae": 0.01978193062383313,
+          "log_rmse": 0.1185799166560173
+        },
+        {
+          "trace_id": "ood-weak_channel-1",
+          "nmae": 0.02331618998256846,
+          "log_rmse": 0.21582764387130737
+        },
+        {
+          "trace_id": "ood-weak_channel-2",
+          "nmae": 0.030767307449549208,
+          "log_rmse": 0.22860567271709442
+        },
+        {
+          "trace_id": "ood-weak_channel-3",
+          "nmae": 0.010950337432059948,
+          "log_rmse": 0.07784070819616318
+        },
+        {
+          "trace_id": "ood-weak_channel-4",
+          "nmae": 0.025990452500429882,
+          "log_rmse": 0.16421343386173248
+        }
+      ]
+    }
+  }
+}

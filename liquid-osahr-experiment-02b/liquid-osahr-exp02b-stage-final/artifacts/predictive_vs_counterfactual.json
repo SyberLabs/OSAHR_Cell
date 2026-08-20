@@ -1,0 +1,114 @@
+{
+  "id": {
+    "points": [
+      {
+        "trust": 0.0,
+        "hazard_nmae": 0.04046722543884684,
+        "policy_effect_mae": 0.09670571046832165
+      },
+      {
+        "trust": 0.25,
+        "hazard_nmae": 0.03720858854660365,
+        "policy_effect_mae": 0.06474978618550736
+      },
+      {
+        "trust": 0.5,
+        "hazard_nmae": 0.03491071932489492,
+        "policy_effect_mae": 0.05109318222461473
+      },
+      {
+        "trust": 1.0,
+        "hazard_nmae": 0.032526022191488195,
+        "policy_effect_mae": 0.05694076425781669
+      }
+    ],
+    "spearman": 0.7999999999999999,
+    "pearson": 0.8805153116520277,
+    "best_predictive_trust": 1.0,
+    "best_counterfactual_trust": 0.5
+  },
+  "high_mobility": {
+    "points": [
+      {
+        "trust": 0.0,
+        "hazard_nmae": 0.03512608260373497,
+        "policy_effect_mae": 0.04032955683150097
+      },
+      {
+        "trust": 0.25,
+        "hazard_nmae": 0.031205821684080832,
+        "policy_effect_mae": 0.05112344477717159
+      },
+      {
+        "trust": 0.5,
+        "hazard_nmae": 0.02797356833832415,
+        "policy_effect_mae": 0.07031701172338493
+      },
+      {
+        "trust": 1.0,
+        "hazard_nmae": 0.02571071703559754,
+        "policy_effect_mae": 0.0565315010380647
+      }
+    ],
+    "spearman": -0.7999999999999999,
+    "pearson": -0.7674183673840198,
+    "best_predictive_trust": 1.0,
+    "best_counterfactual_trust": 0.0
+  },
+  "high_stress": {
+    "points": [
+      {
+        "trust": 0.0,
+        "hazard_nmae": 0.047821923082593386,
+        "policy_effect_mae": 0.1791403207066018
+      },
+      {
+        "trust": 0.25,
+        "hazard_nmae": 0.04397774498066916,
+        "policy_effect_mae": 0.07072459776576669
+      },
+      {
+        "trust": 0.5,
+        "hazard_nmae": 0.04140312875529794,
+        "policy_effect_mae": 0.10340831199792899
+      },
+      {
+        "trust": 1.0,
+        "hazard_nmae": 0.040010804089740636,
+        "policy_effect_mae": 0.12395466586938626
+      }
+    ],
+    "spearman": 0.19999999999999998,
+    "pearson": 0.5389249832121333,
+    "best_predictive_trust": 1.0,
+    "best_counterfactual_trust": 0.25
+  },
+  "weak_channel": {
+    "points": [
+      {
+        "trust": 0.0,
+        "hazard_nmae": 0.03858585834133105,
+        "policy_effect_mae": 0.05586552608879998
+      },
+      {
+        "trust": 0.25,
+        "hazard_nmae": 0.03400985312063047,
+        "policy_effect_mae": 0.08253401414564296
+      },
+      {
+        "trust": 0.5,
+        "hazard_nmae": 0.029907153251864722,
+        "policy_effect_mae": 0.06270290806729847
+      },
+      {
+        "trust": 1.0,
+        "hazard_nmae": 0.022161243597688125,
+        "policy_effect_mae": 0.09159240338770748
+      }
+    ],
+    "spearman": -0.7999999999999999,
+    "pearson": -0.7288426079180049,
+    "best_predictive_trust": 1.0,
+    "best_counterfactual_trust": 0.0
+  }
+}

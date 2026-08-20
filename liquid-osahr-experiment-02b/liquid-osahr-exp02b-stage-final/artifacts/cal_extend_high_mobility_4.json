@@ -1,0 +1,52 @@
+{
+  "regime": "high_mobility",
+  "scenario": 4,
+  "scenario_params": {
+    "mobility": 1.8128049816486131,
+    "stress": 1.234966798701307,
+    "channel": 0.8561752207481697,
+    "demand": 0.9440087215514252
+  },
+  "horizon": 2.0,
+  "oracle": {
+    "throughput": 0.4275862068965517,
+    "semantic": 0.4275862068965517
+  },
+  "grid": {
+    "0.00": {
+      "trust": 0,
+      "throughput": 0.4275862068965517,
+      "semantic": 0.4275862068965517,
+      "effect": 0.0,
+      "error": 0.0
+    },
+    "0.25": {
+      "trust": 0.25,
+      "throughput": 0.4275862068965517,
+      "semantic": 0.4275862068965517,
+      "effect": 0.0,
+      "error": 0.0
+    },
+    "0.50": {
+      "trust": 0.5,
+      "throughput": 0.4275862068965517,
+      "semantic": 0.4275862068965517,
+      "effect": 0.0,
+      "error": 0.0
+    },
+    "0.75": {
+      "trust": 0.75,
+      "throughput": 0.4275862068965517,
+      "semantic": 0.4275862068965517,
+      "effect": 0.0,
+      "error": 0.0
+    },
+    "1.00": {
+      "trust": 1.0,
+      "throughput": 0.4275862068965517,
+      "semantic": 0.4275862068965517,
+      "effect": 0.0,
+      "error": 0.0
+    }
+  }
+}

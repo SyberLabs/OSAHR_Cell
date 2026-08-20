@@ -1,0 +1,222 @@
+{
+  "selected_trust": 0.0,
+  "predictive_weight": 0.1,
+  "horizon": 2.0,
+  "scenarios_per_regime": 6,
+  "regimes": [
+    "id",
+    "high_mobility",
+    "high_stress"
+  ],
+  "grid": [
+    {
+      "trust": 0.0,
+      "intervention_effect_mae": 0.048133645607962385,
+      "predictive_nmae": 0.024671549358144515,
+      "objective": 0.05060080054377684,
+      "worst_regime_mae": 0.07126436781609195,
+      "regime_mae": {
+        "id": 0.004633646740355287,
+        "high_mobility": 0.07126436781609195,
+        "high_stress": 0.06850292226743993
+      },
+      "scenario_errors_by_regime": {
+        "id": [
+          0.0,
+          0.0,
+          0.02780188044213172,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "high_mobility": [
+          0.4275862068965517,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "high_stress": [
+          0.11289077010644721,
+          0.0,
+          0.0,
+          0.0,
+          0.29812676349819234,
+          0.0
+        ]
+      }
+    },
+    {
+      "trust": 0.25,
+      "intervention_effect_mae": 0.08711118156307059,
+      "predictive_nmae": 0.02266872164742453,
+      "objective": 0.08937805372781304,
+      "worst_regime_mae": 0.18275669457021537,
+      "regime_mae": {
+        "id": 0.004633646740355287,
+        "high_mobility": 0.07394320337864113,
+        "high_stress": 0.18275669457021537
+      },
+      "scenario_errors_by_regime": {
+        "id": [
+          0.0,
+          0.0,
+          0.02780188044213172,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "high_mobility": [
+          0.4275862068965517,
+          0.0,
+          0.0,
+          0.016073013375295098,
+          0.0,
+          0.0
+        ],
+        "high_stress": [
+          0.11387736731222492,
+          0.0,
+          0.0,
+          0.0422737576285962,
+          0.5695040607954895,
+          0.3708849816849816
+        ]
+      }
+    },
+    {
+      "trust": 0.5,
+      "intervention_effect_mae": 0.07499376532974705,
+      "predictive_nmae": 0.02056418028934808,
+      "objective": 0.07705018335868186,
+      "worst_regime_mae": 0.1469930847372786,
+      "regime_mae": {
+        "id": 0.004633646740355287,
+        "high_mobility": 0.07335456451160728,
+        "high_stress": 0.1469930847372786
+      },
+      "scenario_errors_by_regime": {
+        "id": [
+          0.0,
+          0.0,
+          0.02780188044213172,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "high_mobility": [
+          0.4275862068965517,
+          0.0,
+          0.0,
+          0.012541180173092026,
+          0.0,
+          0.0
+        ],
+        "high_stress": [
+          0.17370183333164246,
+          0.0,
+          0.0,
+          0.0,
+          0.7082566750920292,
+          0.0
+        ]
+      }
+    },
+    {
+      "trust": 0.75,
+      "intervention_effect_mae": 0.10344730591140607,
+      "predictive_nmae": 0.018451240216769693,
+      "objective": 0.10529242993308303,
+      "worst_regime_mae": 0.19323395906368726,
+      "regime_mae": {
+        "id": 0.031461929568638115,
+        "high_mobility": 0.08564602910189278,
+        "high_stress": 0.19323395906368726
+      },
+      "scenario_errors_by_regime": {
+        "id": [
+          0.0,
+          0.0,
+          0.02780188044213172,
+          0.16096969696969698,
+          0.0,
+          0.0
+        ],
+        "high_mobility": [
+          0.4275862068965517,
+          0.0,
+          0.0,
+          0.08628996771480502,
+          0.0,
+          0.0
+        ],
+        "high_stress": [
+          0.1679356197394094,
+          0.0,
+          0.0,
+          0.0,
+          0.9914681346427143,
+          0.0
+        ]
+      }
+    },
+    {
+      "trust": 1.0,
+      "intervention_effect_mae": 0.10514666122276257,
+      "predictive_nmae": 0.017398808258020794,
+      "objective": 0.10688654204856465,
+      "worst_regime_mae": 0.21905579520744475,
+      "regime_mae": {
+        "id": 0.008750054056762602,
+        "high_mobility": 0.08763413440408041,
+        "high_stress": 0.21905579520744475
+      },
+      "scenario_errors_by_regime": {
+        "id": [
+          0.0,
+          0.0,
+          0.02780188044213172,
+          0.02469844389844389,
+          0.0,
+          0.0
+        ],
+        "high_mobility": [
+          0.4275862068965517,
+          0.0,
+          0.0,
+          0.09821859952793077,
+          0.0,
+          0.0
+        ],
+        "high_stress": [
+          0.3228666366019542,
+          0.0,
+          0.0,
+          0.0,
+          0.9914681346427143,
+          0.0
+        ]
+      }
+    }
+  ],
+  "selection_stability": {
+    "leave_one_scenario_out": {
+      "folds": 18,
+      "selected_counts": {
+        "0.0": 18
+      }
+    },
+    "stratified_bootstrap": {
+      "replicates": 20000,
+      "selected_frequency": {
+        "0.0": 0.9667,
+        "0.25": 0.00415,
+        "0.5": 0.01815,
+        "1.0": 0.011
+      }
+    }
+  },
+  "alpha_zero_semantics": "exact mechanistic field recomputation after enforcing alpha=0 identity",
+  "protocol_status": "FROZEN before confirmatory root seed 920218 was analyzed"
+}

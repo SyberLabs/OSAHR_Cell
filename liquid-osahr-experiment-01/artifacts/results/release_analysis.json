@@ -1,0 +1,26 @@
+{
+  "rows": 96,
+  "regimes": [
+    "id",
+    "sparse"
+  ],
+  "models": [
+    "cfc",
+    "constant",
+    "gru_dt",
+    "oracle"
+  ],
+  "policies": [
+    "semantic",
+    "throughput"
+  ],
+  "units_per_regime": 6,
+  "common_random_numbers_verified": true,
+  "bootstrap_replicates": 20000,
+  "bootstrap_unit": "scenario x stochastic replicate",
+  "notes": [
+    "Common root PRNG seeds are matched across hazard-model and policy arms within each regime/scenario/replicate unit.",
+    "Because policy/model changes alter event consumption and subsequent state, CRN reduces but does not eliminate pathwise Monte Carlo divergence.",
+    "Oracle-fidelity metrics describe this declared synthetic teacher/twin system, not a real 6G network."
+  ]
+}

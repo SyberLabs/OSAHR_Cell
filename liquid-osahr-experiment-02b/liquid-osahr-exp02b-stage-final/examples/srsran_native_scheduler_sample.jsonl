@@ -1,0 +1,2 @@
+{"timestamp":"2026-08-18T10:00:00Z","cells":[{"cell_metrics":{"pci":17},"ue_list":[{"rnti":17921,"cqi":12,"dl_brate":42000,"ul_brate":6500,"pusch_snr_db":16.5,"pusch_rsrp_db":-91.0,"dl_nof_ok":98,"dl_nof_nok":2,"ul_nof_ok":49,"ul_nof_nok":1}]}]}
+{"timestamp":"2026-08-18T10:00:00.5Z","cells":[{"cell_metrics":{"pci":17},"ue_list":[{"rnti":17921,"cqi":11,"dl_brate":38500,"ul_brate":6100,"pusch_snr_db":14.9,"pusch_rsrp_db":-92.3,"dl_nof_ok":96,"dl_nof_nok":4,"ul_nof_ok":48,"ul_nof_nok":2}]}]}

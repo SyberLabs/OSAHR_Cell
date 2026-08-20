@@ -1,0 +1,17 @@
+{
+  "experiment": "liquid-osahr-experiment-03",
+  "version": "0.1.0",
+  "date": "2026-08-18",
+  "simulation": "none",
+  "calibration_artifact": "D:\\syberlabs\\osahr_project\\liquid-osahr-experiment-02b\\liquid-osahr-exp02b-stage-final\\artifacts\\intervention_calibration_multi.json",
+  "calibration_sha256": "e594769cc203dcf5f8ea4a605690adca8e10fdb2f73e3741364d264d4b9e538d",
+  "confirmatory_artifact": "D:\\syberlabs\\osahr_project\\liquid-osahr-experiment-02b\\liquid-osahr-exp02b-stage-final\\artifacts\\confirmatory_release.csv",
+  "confirmatory_sha256": "5d74329918491a21b023c7623228d90ea76dbf73097f9dbcd5bbcbb5e59aebe4",
+  "bootstrap_resamples": 50000,
+  "independent_unit": "physical scenario",
+  "protocols": [
+    "T_strict",
+    "T_primary_share",
+    "T_intervention_only"
+  ]
+}

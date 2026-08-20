@@ -1,0 +1,37 @@
+protocol,estimand,regime,alpha,source,notes
+T_strict,goal_utility_ratio,id,0.5,calibrated_cell,
+T_strict,goal_utility_ratio,high_mobility,0.0,calibrated_cell,
+T_strict,goal_utility_ratio,high_stress,0.0,calibrated_cell,
+T_strict,goal_utility_ratio,weak_channel,0.0,default_mechanistic,unknown_regime
+T_strict,critical_success_rate,id,0.0,default_mechanistic,unknown_estimand
+T_strict,critical_success_rate,high_mobility,0.0,default_mechanistic,unknown_estimand
+T_strict,critical_success_rate,high_stress,0.0,default_mechanistic,unknown_estimand
+T_strict,critical_success_rate,weak_channel,0.0,default_mechanistic,unknown_estimand
+T_strict,mean_latency,id,0.0,default_mechanistic,unknown_estimand
+T_strict,mean_latency,high_mobility,0.0,default_mechanistic,unknown_estimand
+T_strict,mean_latency,high_stress,0.0,default_mechanistic,unknown_estimand
+T_strict,mean_latency,weak_channel,0.0,default_mechanistic,unknown_estimand
+T_primary_share,goal_utility_ratio,id,0.5,calibrated_cell,
+T_primary_share,goal_utility_ratio,high_mobility,0.0,calibrated_cell,
+T_primary_share,goal_utility_ratio,high_stress,0.0,calibrated_cell,
+T_primary_share,goal_utility_ratio,weak_channel,0.0,default_mechanistic,unknown_regime
+T_primary_share,critical_success_rate,id,0.5,inherit_primary_estimand,uncalibrated query inherits goal_utility_ratio
+T_primary_share,critical_success_rate,high_mobility,0.0,inherit_primary_estimand,uncalibrated query inherits goal_utility_ratio
+T_primary_share,critical_success_rate,high_stress,0.0,inherit_primary_estimand,uncalibrated query inherits goal_utility_ratio
+T_primary_share,critical_success_rate,weak_channel,0.0,default_mechanistic,unknown_estimand
+T_primary_share,mean_latency,id,0.5,inherit_primary_estimand,uncalibrated query inherits goal_utility_ratio
+T_primary_share,mean_latency,high_mobility,0.0,inherit_primary_estimand,uncalibrated query inherits goal_utility_ratio
+T_primary_share,mean_latency,high_stress,0.0,inherit_primary_estimand,uncalibrated query inherits goal_utility_ratio
+T_primary_share,mean_latency,weak_channel,0.0,default_mechanistic,unknown_estimand
+T_intervention_only,goal_utility_ratio,id,0.0,calibrated_cell,
+T_intervention_only,goal_utility_ratio,high_mobility,0.0,calibrated_cell,
+T_intervention_only,goal_utility_ratio,high_stress,0.0,calibrated_cell,
+T_intervention_only,goal_utility_ratio,weak_channel,0.0,default_mechanistic,unknown_regime
+T_intervention_only,critical_success_rate,id,0.0,default_mechanistic,unknown_estimand
+T_intervention_only,critical_success_rate,high_mobility,0.0,default_mechanistic,unknown_estimand
+T_intervention_only,critical_success_rate,high_stress,0.0,default_mechanistic,unknown_estimand
+T_intervention_only,critical_success_rate,weak_channel,0.0,default_mechanistic,unknown_estimand
+T_intervention_only,mean_latency,id,0.0,default_mechanistic,unknown_estimand
+T_intervention_only,mean_latency,high_mobility,0.0,default_mechanistic,unknown_estimand
+T_intervention_only,mean_latency,high_stress,0.0,default_mechanistic,unknown_estimand
+T_intervention_only,mean_latency,weak_channel,0.0,default_mechanistic,unknown_estimand

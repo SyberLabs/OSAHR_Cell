@@ -1,0 +1,8 @@
+{
+  "bootstrap_replicates": 30000,
+  "identification_independent_unit": "trace",
+  "paired_sparse_reuses_id_physical_event_histories": true,
+  "bridge_safety_cap": 30.0,
+  "clipping_total_above_30": 0,
+  "clipping_total_values": 110970
+}

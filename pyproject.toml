@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=75", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "osahr"
+version = "0.2.0"
+description = "Exact open stochastic adaptive hypergraph-rewrite kernel"
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "Reference implementation"}]
+keywords = ["stochastic processes", "hypergraph", "graph rewriting", "adaptive networks", "gillespie"]
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Programming Language :: Python :: 3",
+  "Typing :: Typed",
+]
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["osahr*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q"
+pythonpath = ["."]
+
+[tool.setuptools.package-data]
+osahr = ["py.typed"]

@@ -1,0 +1,106 @@
+{
+  "protocol": "T_strict",
+  "grid": [
+    0.0,
+    0.25,
+    0.5,
+    1.0
+  ],
+  "default_alpha": 0.0,
+  "lam": 0.1,
+  "primary_estimand": "goal_utility_ratio",
+  "share_primary": false,
+  "calibration_horizon": 2.0,
+  "notes": {
+    "calibration_regimes": [
+      "id",
+      "high_mobility",
+      "high_stress"
+    ],
+    "predictive_weight_source": "02b_intervention_calibration_multi",
+    "excluded_alpha_0.75": true
+  },
+  "cells": [
+    {
+      "estimand": "goal_utility_ratio",
+      "intervention": "semantic_vs_throughput",
+      "regime": "high_mobility",
+      "alpha": 0.0,
+      "objective_by_alpha": {
+        "0.00": 0.0737315227519064,
+        "0.25": 0.07621007554338359,
+        "0.50": 0.07541098254054208,
+        "1.00": 0.08937401522988249
+      },
+      "mae_by_alpha": {
+        "0.00": 0.07126436781609195,
+        "0.25": 0.07394320337864113,
+        "0.50": 0.07335456451160728,
+        "1.00": 0.08763413440408041
+      },
+      "predictive_nmae_by_alpha": {
+        "0.00": 0.024671549358144515,
+        "0.25": 0.02266872164742453,
+        "0.50": 0.02056418028934808,
+        "1.00": 0.017398808258020794
+      },
+      "inadequacy": false,
+      "n_scenarios": 6,
+      "calibration_horizon": 2.0
+    },
+    {
+      "estimand": "goal_utility_ratio",
+      "intervention": "semantic_vs_throughput",
+      "regime": "high_stress",
+      "alpha": 0.0,
+      "objective_by_alpha": {
+        "0.00": 0.07097007720325438,
+        "0.25": 0.18502356673495782,
+        "0.50": 0.1490495027662134,
+        "1.00": 0.22079567603324685
+      },
+      "mae_by_alpha": {
+        "0.00": 0.06850292226743993,
+        "0.25": 0.18275669457021537,
+        "0.50": 0.1469930847372786,
+        "1.00": 0.21905579520744475
+      },
+      "predictive_nmae_by_alpha": {
+        "0.00": 0.024671549358144515,
+        "0.25": 0.02266872164742453,
+        "0.50": 0.02056418028934808,
+        "1.00": 0.017398808258020794
+      },
+      "inadequacy": false,
+      "n_scenarios": 6,
+      "calibration_horizon": 2.0
+    },
+    {
+      "estimand": "goal_utility_ratio",
+      "intervention": "semantic_vs_throughput",
+      "regime": "id",
+      "alpha": 0.5,
+      "objective_by_alpha": {
+        "0.00": 0.007100801676169739,
+        "0.25": 0.006900518905097739,
+        "0.50": 0.006690064769290094,
+        "1.00": 0.01048993488256468
+      },
+      "mae_by_alpha": {
+        "0.00": 0.004633646740355287,
+        "0.25": 0.004633646740355287,
+        "0.50": 0.004633646740355287,
+        "1.00": 0.008750054056762602
+      },
+      "predictive_nmae_by_alpha": {
+        "0.00": 0.024671549358144515,
+        "0.25": 0.02266872164742453,
+        "0.50": 0.02056418028934808,
+        "1.00": 0.017398808258020794
+      },
+      "inadequacy": false,
+      "n_scenarios": 6,
+      "calibration_horizon": 2.0
+    }
+  ]
+}
