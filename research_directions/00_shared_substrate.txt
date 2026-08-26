@@ -1,0 +1,53 @@
+00  SHARED SUBSTRATE
+====================
+Grade: PROPOSED (architecture). Kernel contracts KNOWN from OSAHR 0.2.
+
+These are the structures we can advance once, for many directions.
+They are not a license to collapse domains into one schema.
+
+1. Two twins, one park
+   Mechanism twin  = OSAHR. State X = (G, B, R, Theta, Z, t, n).
+                     Only DPO + clocks may rewrite G. alpha=0 is identity.
+   Process twin    = SyberRuntime. Operations are source of truth;
+                     artifacts are projections; verification debt is
+                     the budget. See 01_digital_model.txt.
+   Park / Stabilize = the same social act: low-reversibility commit.
+                     Chat is not the database.
+
+2. Junction law, not a chat answer
+   Experiment 05 grammar: admit | hold_unresolved | reject | outcome_unknown.
+   SyberRuntime analogue: discharged | undischarged | false-discharge | unknown.
+   A Brain or generator may REQUEST a rewrite / stabilize only at hold
+   (or while discharging budgeted debt). It may not promote a point
+   predictor that matches oracle while the ensemble withholds.
+
+3. Meaning in a vault, queried only at declared junctions
+   PKG dual projection (markdown + YAML concept_id). Not SPARQL.
+   Not a second CTMC. Promotion of a run into ontology needs a freeze.
+
+4. Perception on the boundary
+   AnLF-style tools emit BoundaryHandle payloads. They do not call
+   Runtime rewrite APIs. Training / MTLF is off the event clock.
+
+5. MCP is recon, not routing
+   Tool ports are control-plane skills. They are not radio links and
+   not occurrence types. One mouth. No specialist-bot swarm.
+
+6. Freeze before confirmatory
+   Checksum the grammar, vault, and analytics versions. Declare the
+   seed before the run. Label claims KNOWN / MEASURED / INFERRED /
+   PROPOSED.
+
+7. Comprehension is the scarce channel
+   SyberRuntime thesis: as generation cost collapses, understanding
+   is the bottleneck. OSAHR thesis: predictive fidelity is not
+   intervention fidelity. Same product rule: withhold-and-act.
+
+Do not
+------
+- Put an LLM inside OSAHR hazards or SyberRuntime oracles that
+  discharge debt.
+- Elect alpha-star.
+- Let software-dev verbs become 6G occurrence types.
+- Let a training loop rewrite G.
+- Treat Research_Directions.txt scores as measurements.

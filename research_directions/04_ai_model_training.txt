@@ -1,0 +1,48 @@
+04  AI MODEL TRAINING
+=====================
+Grade: PROPOSED. MTLF stays off the OSAHR event clock.
+Training is a Digital Model Feature with a checkable evaluation.
+
+What this direction is
+----------------------
+Use the platform to *govern* training, not to *be* PyTorch.
+A training job is an operation: data snapshot, code snapshot,
+hparams, compute budget, evaluation protocol, declared seed.
+Artifacts (checkpoints, metrics, cards) are projections of that
+log. Residual CfC in 02B remains a hypothesis in H; this
+direction does not elect alpha-star and does not train a new
+CfC inside route-task hazards.
+
+Facilitation (end to end)
+-------------------------
+1. Vault concepts: train_split, held_out_split, safety_eval,
+   license_constraint. requires_fidelity analogue: a production
+   checkpoint may not train on excluded data concepts.
+2. AnLF-like tools on the cluster boundary: loss, GPU util,
+   gradient-norm spikes. Payloads only. They may pause a job
+   via park.disable-rule (stop-arrivals analogue). They may not
+   rewrite the dataset graph.
+3. Feature: launch training. Debt: undischarged eval on the
+   held-out suite + a mutation/perturbation campaign on data
+   order / seed where the protocol says so.
+4. Claim: do(this recipe) vs do(baseline) on a declared estimand.
+   Independent unit = physical/data scenario. Incomplete ensemble
+   is an error.
+5. admit: promote checkpoint to a named artifact (Stabilize).
+   hold_unresolved: Brain may request a *legal* recipe tweak
+   among vault-legal hparams (load-penalty analogue: cheaper
+   run, not a silent data leak).
+   reject / unknown: do not ship. Note in the vault.
+
+Shared structures this pays for
+-------------------------------
+Freeze before confirmatory (already 02B/05/06). Off-clock MTLF
+(already 06). Boundary handles for exogenous telemetry. Claim
+status as shipping law. One mouth for "ship this checkpoint."
+
+Do not
+------
+- Put SGD steps in the CTMC.
+- Let AnLF merge weights onto a vertex as if they were load.
+- Use the training loss as an intervention claim (association
+  is not do(.)).

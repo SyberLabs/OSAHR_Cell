@@ -1,0 +1,41 @@
+05  ML BRANCHING PIPELINES
+==========================
+Grade: PROPOSED. This is where Digital Model threads and OSAHR
+topology meet without becoming one kernel.
+
+What this direction is
+----------------------
+ML work is not a linear DAG. Splits appear: data versions, code
+versions, hparam branches, adapter heads, eval regimes, rollback.
+Git branches are a projection. The living structure is a typed
+graph of Pipeline, Split, Dataset, Model, Eval, Promotion edges
+that *rewrites* when a branch is cut, merged, or abandoned.
+
+OSAHR's job here: legal rewrites of pipeline topology
+  (fork-eval, merge-when-dominated, abandon-stale, promote-to-prod).
+SyberRuntime's job: the operation log of why a fork exists,
+  debt on each head, Stabilize of a merge.
+
+Branching as a junction
+-----------------------
+Declared junction: promote-or-merge. Vault: prod_data excludes
+leaky features; critical_eval requires_fidelity (no degraded
+proxy task). Claim: ensemble over residual training-noise
+hypotheses (seeds as H, not a new CfC). Brain at hold picks
+among vault-legal heads by a frozen scalar (eval cost / load).
+Park refuses to merge if status is unknown.
+
+Why this advances the substrate once
+------------------------------------
+Fork/merge/abandon are the same algebraic objects as
+handover/reroute/disable-rule. If we get junction-only vault
+queries and park-on-hold right for RAN, the pipeline graph
+reuses them. If we get operation identity and patch-theoretic
+merge right in SyberRuntime, the ML heads reuse them. Neither
+schema is copied onto the other.
+
+Do not
+------
+- Encode Airflow as OSAHR occurrence types on day one.
+- Let an LLM invent a new pipeline edge that skips DPO.
+- Treat DVC/MLflow as the ledger. They are projections.

@@ -1,0 +1,43 @@
+03  SOFTWARE DEVELOPMENT
+========================
+Grade: PROPOSED. Uses Digital Model as the process twin.
+Does not put an IDE inside OSAHR.
+
+What this direction is
+----------------------
+A development environment whose source of truth is operations,
+not files. The human remains load-bearing. Generative coding is
+allowed only as Feature operations that automatically incur Test /
+Verify debt. Discharge is scheduled under budget. Cross-family
+verifier. Held-out tests. Mutation campaigns. Stabilize is the
+commit.
+
+How someone would use it
+------------------------
+1. create-thread with an intent note in the vault (concept_id on
+   the feature, not a prompt dump).
+2. Feature: a model adapter proposes a patch. Debt opens.
+3. Test: harness-held suite runs; model cannot see the cases.
+4. Verify: second family, fresh context. Partial evidence only.
+5. mutation-campaign: AST operators; kills must be behavioral.
+6. If status is hold_unresolved (suite pass, mutants mixed, or
+   residual hypotheses on "does this patch preserve the API"
+   disagree): Brain may request Stabilize among vault-legal
+   patches (e.g. exclude files the vault marks critical).
+7. If outcome_unknown / reject: park refuses. Note in vault/claims.
+8. Compress: the surviving rationale is the PKG note, not the chat.
+
+Shared structures this pays for
+-------------------------------
+Same park, same claim grammar, same fail-closed oracles, same
+"chat is not the database." An OSAHR graph of the *codebase
+topology* (modules, tests, APIs, permissions) can sit beside
+this later. The first slice does not need it: SyberRuntime
+already has the operation graph.
+
+Do not
+------
+- Discharge debt with the generator's own "looks good."
+- Let the model supply python_tests that the runtime will execute
+  as an oracle (SyberRuntime already fences this).
+- Treat git as the cognition log. Git is a projection.
