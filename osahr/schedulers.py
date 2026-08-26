@@ -9,14 +9,15 @@
 
 from __future__ import annotations
 
+import copy
 import heapq
 import math
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Mapping
 
-from .errors import SchedulerError
-from .occurrence import Occurrence, OccurrenceKey
+from .errors import HazardBoundError, ResourceLimitError, SchedulerError
+from .occurrence import Occurrence, OccurrenceIndex, OccurrenceKey
 from .rng import RandomDraw, RandomStreams
 
 
@@ -206,8 +207,6 @@ class NextReactionScheduler:
         return draws
 
     def snapshot(self) -> NextReactionSnapshot:
-        import copy
-
         return NextReactionSnapshot(
             channels=copy.deepcopy(self.channels),
             heap=copy.deepcopy(self._heap),
@@ -215,8 +214,6 @@ class NextReactionScheduler:
         )
 
     def restore(self, snapshot: NextReactionSnapshot) -> None:
-        import copy
-
         self.channels = copy.deepcopy(snapshot.channels)
         self._heap = copy.deepcopy(snapshot.heap)
         heapq.heapify(self._heap)
@@ -279,3 +276,136 @@ class ThinningAudit:
         result = self.draws
         self.draws = []
         return result
+
+
+def plan_thinning_event(
+    audit: ThinningAudit,
+    *,
+    index: OccurrenceIndex,
+    graph: Any,
+    parameters: dict[str, Any],
+    memory: dict[str, Any],
+    now: float,
+    thinning_window: float,
+    max_windows: int,
+    max_total_activity: float,
+    max_simulation_time: float,
+    random: RandomStreams,
+    next_deterministic_time: float,
+    search_limit: float | None,
+) -> tuple[float, Occurrence, list[RandomDraw], float, bool, float | None] | None:
+    """Propose the next thinning event, or None if a horizon is hit first."""
+
+    def accumulate(start: float, end: float) -> None:
+        audit.add_survival(
+            index.integrated_activity(
+                graph=graph,
+                parameters=parameters,
+                memory=memory,
+                start_time=start,
+                end_time=end,
+            )
+        )
+
+    def skip_window(
+        cursor: float, window_end: float, discarded: RandomDraw | None = None
+    ) -> bool:
+        if discarded is not None:
+            audit.draws.append(
+                RandomDraw(
+                    discarded.domain,
+                    discarded.purpose,
+                    discarded.raw_uint64,
+                    discarded.uniform,
+                    True,
+                )
+            )
+        accumulate(cursor, window_end)
+        audit.advance_cursor(window_end)
+        audit.windows_crossed += 1
+        return window_end == next_deterministic_time or (
+            search_limit is not None and window_end == search_limit
+        )
+
+    if not index.occurrences:
+        return None
+
+    for _ in range(max_windows):
+        cursor = audit.cursor(now)
+        window_end = min(
+            cursor + thinning_window,
+            next_deterministic_time,
+            search_limit if search_limit is not None else math.inf,
+            max_simulation_time,
+        )
+        if window_end < cursor:
+            raise SchedulerError("Thinning window moved backwards")
+        if window_end == cursor:
+            return None
+
+        bounds: dict[OccurrenceKey, float] = {
+            key: index.bound_at(
+                occurrence,
+                graph=graph,
+                parameters=parameters,
+                memory=memory,
+                time=cursor,
+                horizon=window_end,
+            )
+            for key, occurrence in index.occurrences.items()
+        }
+        bound_total = math.fsum(bounds.values())
+        if not math.isfinite(bound_total) or bound_total > max_total_activity:
+            raise ResourceLimitError(
+                f"Thinning bound activity {bound_total!r} exceeds configured limit"
+            )
+
+        if bound_total <= 0.0:
+            if skip_window(cursor, window_end):
+                return None
+            continue
+
+        wait = random.draw("thinning_wait", "dominating_process_wait")
+        candidate_time = cursor - math.log(wait.uniform) / bound_total
+        if candidate_time >= window_end:
+            if skip_window(cursor, window_end, discarded=wait):
+                return None
+            continue
+
+        accumulate(cursor, candidate_time)
+        audit.advance_cursor(candidate_time)
+        hazards = index.hazards_at(
+            graph=graph,
+            parameters=parameters,
+            memory=memory,
+            time=candidate_time,
+        )
+        for key, actual in hazards.items():
+            bound = bounds[key]
+            tolerance = 1e-12 * max(1.0, abs(actual), abs(bound))
+            if actual > bound + tolerance:
+                raise HazardBoundError(
+                    f"Thinning bound contract violated at t={candidate_time}: "
+                    f"{key} actual={actual!r} bound={bound!r}"
+                )
+        actual_total = math.fsum(hazards.values())
+        accept = random.draw("thinning_accept", "candidate_acceptance")
+        audit.draws.extend([wait, accept])
+        if actual_total <= 0.0 or accept.uniform * bound_total >= actual_total:
+            audit.rejected_candidates += 1
+            continue
+
+        selection = random.draw("thinning_selection", "accepted_occurrence")
+        audit.draws.append(selection)
+        chosen = index.select_from_hazards(hazards, selection.uniform)
+        survival_integral = audit.drain_survival()
+        return (
+            candidate_time,
+            chosen,
+            audit.drain(),
+            actual_total,
+            survival_integral is not None,
+            survival_integral,
+        )
+
+    raise ResourceLimitError("Maximum thinning windows per plan exceeded")

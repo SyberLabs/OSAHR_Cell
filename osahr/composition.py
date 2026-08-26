@@ -11,7 +11,7 @@ from .errors import ValidationError
 from .graph import Hypergraph
 from .ids import EntityId
 from .pattern import BoundaryEffect, OutputSpec
-from .runtime import Model
+from .model import Model
 
 
 @dataclass(frozen=True, slots=True)

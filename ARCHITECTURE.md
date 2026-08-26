@@ -28,17 +28,19 @@ Dynamic rule hashes are part of the canonical state identity. A meta-transition 
 |---|---|
 | `schema.py` | Types, subtype closure, attributes, hyperedge port signatures, invariants |
 | `graph.py` | Stable entity store, explicit incidences, typed indices, canonical graph state, deltas |
+| `model.py` | Model identity, canonical hash, runtime resource contracts |
 | `pattern.py` | LHS patterns, RHS templates, graph conditions, rules, hazard contracts |
 | `expr.py` | Restricted deterministic expression language |
 | `matcher.py` | Exhaustive injective typed matching oracle |
 | `incremental.py` | Exact dependency-indexed localized match maintenance |
 | `rewrite.py` | Atomic DPO applicability and rewrite transaction execution |
 | `occurrence.py` | DPO-valid stochastic channels, hazards, bounds/integrals, weighted activity indices |
-| `weighted.py` | Deterministic dynamic weighted order-statistics tree; Fenwick reference structure |
-| `schedulers.py` | Modified-next-reaction clocks and thinning audit state |
+| `weighted.py` | Deterministic dynamic weighted order-statistics tree and one-shot inverse-CDF selection |
+| `schedulers.py` | Modified-next-reaction clocks, thinning planner, thinning audit state |
 | `adaptive.py` | Adaptive parameter contracts and reusable sufficient-statistic updates |
 | `meta.py` | Typed finite precompiled rule-template instantiation and repertoire mutation |
 | `runtime.py` | Authoritative event loop, scheduler selection, queues, state hashes, snapshots/replay |
+| `commit.py` | Atomic committed event publication (internal, external, adaptation, meta) |
 | `analysis.py` | Path likelihood, deterministic ensembles, first passage |
 | `boundary.py` | Typed handles and external/output events |
 | `composition.py` | Structural open-model composition |

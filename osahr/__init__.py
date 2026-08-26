@@ -40,6 +40,7 @@ from .meta import (
     MetaValueKind,
     RuleTemplate,
 )
+from .model import Model, RuntimeConfig
 from .observables import AttributeSum, EdgeCount, EntityCount
 from .occurrence import Occurrence, OccurrenceDelta, OccurrenceIndex, OccurrenceKey
 from .pattern import (
@@ -61,9 +62,7 @@ from .pattern import (
 )
 from .persistence import export_audit_log, load_checkpoint, save_checkpoint
 from .runtime import (
-    Model,
     Runtime,
-    RuntimeConfig,
     RuntimeSnapshot,
     ScheduledAdaptation,
 )
@@ -76,7 +75,7 @@ from .schema import (
     VertexType,
 )
 from .schedulers import NextReactionScheduler, SchedulerKind
-from .weighted import FenwickTree, WeightedIndex, WeightedSelection
+from .weighted import WeightedIndex, WeightedSelection
 
 __all__ = [
     "ANY",
@@ -105,7 +104,6 @@ __all__ = [
     "Expr",
     "ExponentialTrace",
     "ExternalEvent",
-    "FenwickTree",
     "GraphCondition",
     "GraphDelta",
     "Hyperedge",

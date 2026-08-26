@@ -44,7 +44,6 @@ class StepStatus(str, Enum):
     FIRED = "fired"
     PROCESSED_EXTERNAL = "processed_external"
     ABSORBED = "absorbed"
-    PAUSED = "paused"
 
 
 @dataclass(slots=True)

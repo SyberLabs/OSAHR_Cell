@@ -8,8 +8,9 @@ from dataclasses import dataclass, field
 from typing import Any, Callable, Iterable, Mapping
 
 from .events import EventKind, EventRecord
+from .model import Model, RuntimeConfig
 from .rng import derive_seed
-from .runtime import Model, Runtime, RuntimeConfig
+from .runtime import Runtime
 
 
 @dataclass(frozen=True, slots=True)
