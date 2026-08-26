@@ -40,7 +40,7 @@ Dynamic rule hashes are part of the canonical state identity. A meta-transition 
 | `adaptive.py` | Adaptive parameter contracts and reusable sufficient-statistic updates |
 | `meta.py` | Typed finite precompiled rule-template instantiation and repertoire mutation |
 | `runtime.py` | Authoritative event loop, scheduler selection, queues, state hashes, snapshots/replay |
-| `commit.py` | Atomic committed event publication (internal, external, adaptation, meta) |
+| `commit.py` | Committed event publication invoked from Runtime (internal, external, adaptation, meta) |
 | `analysis.py` | Path likelihood, deterministic ensembles, first passage |
 | `boundary.py` | Typed handles and external/output events |
 | `composition.py` | Structural open-model composition |

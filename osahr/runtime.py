@@ -26,7 +26,12 @@ from .boundary import (
     OutputEvent,
 )
 from .canonical import stable_hash
-from .commit import RuntimeCommitMixin
+from .commit import (
+    fire_internal,
+    process_external,
+    process_meta,
+    process_scheduled_adaptation,
+)
 from .errors import ReplayError, ResourceLimitError, SchedulerError, ValidationError
 from .events import EventKind, EventRecord, StepResult, StepStatus
 from .graph import GraphDelta, Hypergraph
@@ -99,7 +104,7 @@ class RuntimeSnapshot:
     thinning_audit: ThinningAudit = field(default_factory=ThinningAudit)
 
 
-class Runtime(RuntimeCommitMixin):
+class Runtime:
     RUNTIME_VERSION = "osahr-python-0.2.0"
 
     def __init__(
@@ -701,6 +706,33 @@ class Runtime(RuntimeCommitMixin):
             )
             return self.next_reaction.drain_audit_draws()
         return []
+
+    def _fire_internal(self, pending: PendingInternalEvent) -> EventRecord:
+        return fire_internal(self, pending)
+
+    def _process_external(
+        self,
+        event: ExternalEvent,
+        draws: list[RandomDraw],
+        survival_integral: float | None,
+    ) -> EventRecord:
+        return process_external(self, event, draws, survival_integral)
+
+    def _process_scheduled_adaptation(
+        self,
+        update: ScheduledAdaptation,
+        draws: list[RandomDraw],
+        survival_integral: float | None,
+    ) -> EventRecord:
+        return process_scheduled_adaptation(self, update, draws, survival_integral)
+
+    def _process_meta(
+        self,
+        event: MetaRuleEvent,
+        draws: list[RandomDraw],
+        survival_integral: float | None,
+    ) -> EventRecord:
+        return process_meta(self, event, draws, survival_integral)
 
     # ------------------------------------------------------------------
     # Persistence and replay

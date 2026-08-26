@@ -12,11 +12,12 @@ from __future__ import annotations
 import copy
 import heapq
 import math
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 from enum import Enum
 from typing import Any, Mapping
 
 from .errors import HazardBoundError, ResourceLimitError, SchedulerError
+from .graph import Hypergraph
 from .occurrence import Occurrence, OccurrenceIndex, OccurrenceKey
 from .rng import RandomDraw, RandomStreams
 
@@ -282,7 +283,7 @@ def plan_thinning_event(
     audit: ThinningAudit,
     *,
     index: OccurrenceIndex,
-    graph: Any,
+    graph: Hypergraph,
     parameters: dict[str, Any],
     memory: dict[str, Any],
     now: float,
@@ -311,15 +312,7 @@ def plan_thinning_event(
         cursor: float, window_end: float, discarded: RandomDraw | None = None
     ) -> bool:
         if discarded is not None:
-            audit.draws.append(
-                RandomDraw(
-                    discarded.domain,
-                    discarded.purpose,
-                    discarded.raw_uint64,
-                    discarded.uniform,
-                    True,
-                )
-            )
+            audit.draws.append(replace(discarded, discarded=True))
         accumulate(cursor, window_end)
         audit.advance_cursor(window_end)
         audit.windows_crossed += 1
