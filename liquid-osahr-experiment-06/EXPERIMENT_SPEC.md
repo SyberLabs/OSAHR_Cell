@@ -34,6 +34,7 @@ Can a 6G control twin keep **meaning** in a file-backed vault, **observations** 
 | AnLF | `anlf.load.ema_v1`, `anlf.outage.threshold_cusum_v1` |
 | Brain | `osahr06_brain_v1_deterministic` (no LLM import) |
 | Park | `park.request_rewrite` refused unless `hold_unresolved` **and** currently matched **and** vault-legal |
+| Runtime seed mixing | `(root_seed, scenario, replicate)` — not policy or \(\alpha\) |
 
 ## Decision rule at a junction
 

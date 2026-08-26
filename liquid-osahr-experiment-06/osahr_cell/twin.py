@@ -721,6 +721,7 @@ def run_arm(
     *,
     residual_alpha: float = 0.0,
     claim_status: str | None = None,
+    scenario: int = 0,
 ) -> dict[str, Any]:
     withhold = claim_status in ("reject", "outcome_unknown") and policy == "brain_at_hold"
     brain_hold = claim_status == "hold_unresolved" and policy == "brain_at_hold"
@@ -734,7 +735,7 @@ def run_arm(
         brain_hold=brain_hold,
         withhold_route=withhold,
     )
-    seed = derive_seed(root_seed, f"6g06:{policy}:{replicate}")
+    seed = derive_seed(root_seed, f"6g06:{int(scenario)}:{int(replicate)}")
     runtime = Runtime(
         model,
         root_seed=seed,

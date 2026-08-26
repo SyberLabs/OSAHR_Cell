@@ -128,6 +128,7 @@ def _run_grid(root_seed: int) -> list[dict]:
                     cfg,
                     vault if policy in ("vault_gated", "oracle_vault_greedy") else None,
                     residual_alpha=alpha,
+                    scenario=scenario,
                 )
                 row["regime"] = regime
                 row["scenario"] = scenario
@@ -145,6 +146,7 @@ def _run_grid(root_seed: int) -> list[dict]:
                 cfg,
                 vault,
                 claim_status=status,
+                scenario=scenario,
             )
             row["regime"] = regime
             row["scenario"] = scenario

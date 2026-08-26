@@ -1,0 +1,38 @@
+{
+  "protocol_status": "FROZEN before confirmatory root seed 260826 was executed",
+  "claim_grammar_version": "osahr05_claim_v0",
+  "junction_grammar_version": "osahr06_junction_v0",
+  "anlf_load_version": "anlf.load.ema_v1",
+  "anlf_outage_version": "anlf.outage.threshold_cusum_v1",
+  "brain_version": "osahr06_brain_v1_deterministic",
+  "mcp_schema_version": "osahr06_mcp_v0",
+  "confirmatory_seed_declared": 260826,
+  "horizon": 60.0,
+  "grid": [
+    0.0,
+    0.25,
+    0.5,
+    1.0
+  ],
+  "n_scenarios": 3,
+  "replicates": 2,
+  "vault_files": [
+    "liquid-osahr-experiment-06/vault/concepts/background.md",
+    "liquid-osahr-experiment-06/vault/concepts/critical.md",
+    "liquid-osahr-experiment-06/vault/concepts/load.md",
+    "liquid-osahr-experiment-06/vault/concepts/outage.md"
+  ],
+  "vault_sha256": "b9d029e1365bb8715843c06d63628daa96f91aa3327bfc4cea16bb10a3465b40",
+  "grammar_files": [
+    "liquid-osahr-experiment-06/osahr_cell/protocol.py",
+    "liquid-osahr-experiment-06/osahr_cell/vault.py",
+    "liquid-osahr-experiment-06/osahr_cell/junction.py",
+    "liquid-osahr-experiment-06/osahr_cell/anlf.py",
+    "liquid-osahr-experiment-06/osahr_cell/brain.py",
+    "liquid-osahr-experiment-06/osahr_cell/mcp_tools.py",
+    "liquid-osahr-experiment-05/liquid_osahr05/claims.py"
+  ],
+  "grammar_sha256": "0ee1a3a71ff0d55e2ea670ee31851f8c84fe090d57528b2f50ee136affc9ee91",
+  "selects_alpha": false,
+  "llm_in_confirmatory": false
+}

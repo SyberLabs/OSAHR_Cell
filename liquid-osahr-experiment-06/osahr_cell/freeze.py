@@ -22,7 +22,15 @@ from .protocol import (
     MCP_SCHEMA_VERSION,
     N_SCENARIOS,
     REPLICATES,
+    REPO_ROOT,
 )
+
+
+def _rel(path: Path) -> str:
+    try:
+        return str(path.resolve().relative_to(REPO_ROOT.resolve()))
+    except ValueError:
+        return str(path)
 
 
 def sha256_bytes(data: bytes) -> str:
@@ -61,9 +69,9 @@ def freeze_payload() -> dict[str, Any]:
         "grid": list(HYPOTHESES),
         "n_scenarios": N_SCENARIOS,
         "replicates": REPLICATES,
-        "vault_files": [str(path) for path in sorted(CONCEPTS_DIR.glob("*.md"))],
+        "vault_files": [_rel(path) for path in sorted(CONCEPTS_DIR.glob("*.md"))],
         "vault_sha256": vault_checksum(),
-        "grammar_files": [str(path) for path in GRAMMAR_FILES],
+        "grammar_files": [_rel(path) for path in GRAMMAR_FILES],
         "grammar_sha256": grammar_checksum(),
         "selects_alpha": False,
         "llm_in_confirmatory": False,

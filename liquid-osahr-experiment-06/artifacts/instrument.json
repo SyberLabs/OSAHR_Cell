@@ -1,0 +1,12 @@
+{
+  "seed": 260825,
+  "horizon": 1.0,
+  "label": "instrument_1s_stub",
+  "final_time": 1.0,
+  "state_hash": "9824e097e65155ff11547bed0e64568fc55c8ec6afde169f564ee5ef334290bf",
+  "anlf_load_payload": {
+    "load": 1
+  },
+  "claim_status": "outcome_unknown",
+  "note": "Instrument check only. Confirmatory seed 260826 was not used."
+}
