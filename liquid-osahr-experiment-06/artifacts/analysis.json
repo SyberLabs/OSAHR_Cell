@@ -1,0 +1,227 @@
+{
+  "seed": 260826,
+  "horizon": 60.0,
+  "primary_estimand": "goal_utility_ratio",
+  "mean_mae_vs_oracle": {
+    "scalar_semantic": 0.05647463002995923,
+    "vault_gated": 0.07665537976789245,
+    "brain_at_hold": 0.06890503882727401
+  },
+  "illegal_promotion_rate": {
+    "scalar_semantic": 0.3333333333333333,
+    "vault_gated": 0.3333333333333333,
+    "brain_at_hold": 0.3333333333333333
+  },
+  "scenarios": [
+    {
+      "regime": "id",
+      "scenario": 1,
+      "status": "admit",
+      "oracle_delta": -0.018163139955528762,
+      "arm_deltas": {
+        "scalar_semantic": -0.0812255725019767,
+        "vault_gated": -0.014770151564377665,
+        "brain_at_hold": -0.014770151564377665
+      },
+      "mae": {
+        "scalar_semantic": 0.06306243254644794,
+        "vault_gated": 0.003392988391151097,
+        "brain_at_hold": 0.003392988391151097
+      },
+      "claim": {
+        "grammar": "osahr05_claim_v0",
+        "estimand": "goal_utility_ratio",
+        "intervention": "semantic_vs_throughput",
+        "regime": "id",
+        "scenario": 1,
+        "horizon": 60.0,
+        "eps": 0.0,
+        "oracle_effect": -0.018163139955528762,
+        "effects_by_alpha": {
+          "0.00": -0.0812255725019767,
+          "0.25": -0.08687539289851909,
+          "0.50": -0.07179708246671057,
+          "1.00": -0.07179708246671057
+        },
+        "oracle_sign": -1,
+        "signs_by_alpha": {
+          "0.00": -1,
+          "0.25": -1,
+          "0.50": -1,
+          "1.00": -1
+        },
+        "response_activation": true,
+        "effect_expressed": true,
+        "activation_without_effect": false,
+        "status": "admit",
+        "notes": "all hypotheses and oracle agree",
+        "spread": 0.015078310431808517
+      }
+    },
+    {
+      "regime": "high_stress",
+      "scenario": 2,
+      "status": "admit",
+      "oracle_delta": 0.07648393167380263,
+      "arm_deltas": {
+        "scalar_semantic": 0.0026588829258642477,
+        "vault_gated": 0.14662603300832644,
+        "brain_at_hold": 0.14662603300832644
+      },
+      "mae": {
+        "scalar_semantic": 0.07382504874793838,
+        "vault_gated": 0.07014210133452381,
+        "brain_at_hold": 0.07014210133452381
+      },
+      "claim": {
+        "grammar": "osahr05_claim_v0",
+        "estimand": "goal_utility_ratio",
+        "intervention": "semantic_vs_throughput",
+        "regime": "high_stress",
+        "scenario": 2,
+        "horizon": 60.0,
+        "eps": 0.0,
+        "oracle_effect": 0.07648393167380263,
+        "effects_by_alpha": {
+          "0.00": 0.0026588829258642477,
+          "0.25": 0.07874860541625395,
+          "0.50": 0.009157407324133171,
+          "1.00": 0.12228481398494184
+        },
+        "oracle_sign": 1,
+        "signs_by_alpha": {
+          "0.00": 1,
+          "0.25": 1,
+          "0.50": 1,
+          "1.00": 1
+        },
+        "response_activation": true,
+        "effect_expressed": true,
+        "activation_without_effect": false,
+        "status": "admit",
+        "notes": "all hypotheses and oracle agree",
+        "spread": 0.1196259310590776
+      }
+    },
+    {
+      "regime": "long_outage",
+      "scenario": 3,
+      "status": "hold_unresolved",
+      "oracle_delta": -0.014322731926443288,
+      "arm_deltas": {
+        "scalar_semantic": -0.046859140721934645,
+        "vault_gated": -0.17075378150444576,
+        "brain_at_hold": -0.14750275868259044
+      },
+      "mae": {
+        "scalar_semantic": 0.032536408795491356,
+        "vault_gated": 0.15643104957800247,
+        "brain_at_hold": 0.13318002675614715
+      },
+      "claim": {
+        "grammar": "osahr05_claim_v0",
+        "estimand": "goal_utility_ratio",
+        "intervention": "semantic_vs_throughput",
+        "regime": "long_outage",
+        "scenario": 3,
+        "horizon": 60.0,
+        "eps": 0.0,
+        "oracle_effect": -0.014322731926443288,
+        "effects_by_alpha": {
+          "0.00": -0.046859140721934645,
+          "0.25": -0.04300514874219019,
+          "0.50": -0.03456999696252705,
+          "1.00": 0.1561057350075038
+        },
+        "oracle_sign": -1,
+        "signs_by_alpha": {
+          "0.00": -1,
+          "0.25": -1,
+          "0.50": -1,
+          "1.00": 1
+        },
+        "response_activation": true,
+        "effect_expressed": true,
+        "activation_without_effect": false,
+        "status": "hold_unresolved",
+        "notes": "residual signs disagree",
+        "spread": 0.20296487572943844
+      }
+    }
+  ],
+  "promotions": [
+    {
+      "regime": "id",
+      "scenario": 1,
+      "arm": "scalar_semantic",
+      "illegal_promotion": false,
+      "direction": "match",
+      "status": "admit"
+    },
+    {
+      "regime": "id",
+      "scenario": 1,
+      "arm": "vault_gated",
+      "illegal_promotion": false,
+      "direction": "match",
+      "status": "admit"
+    },
+    {
+      "regime": "id",
+      "scenario": 1,
+      "arm": "brain_at_hold",
+      "illegal_promotion": false,
+      "direction": "match",
+      "status": "admit"
+    },
+    {
+      "regime": "high_stress",
+      "scenario": 2,
+      "arm": "scalar_semantic",
+      "illegal_promotion": false,
+      "direction": "match",
+      "status": "admit"
+    },
+    {
+      "regime": "high_stress",
+      "scenario": 2,
+      "arm": "vault_gated",
+      "illegal_promotion": false,
+      "direction": "match",
+      "status": "admit"
+    },
+    {
+      "regime": "high_stress",
+      "scenario": 2,
+      "arm": "brain_at_hold",
+      "illegal_promotion": false,
+      "direction": "match",
+      "status": "admit"
+    },
+    {
+      "regime": "long_outage",
+      "scenario": 3,
+      "arm": "scalar_semantic",
+      "illegal_promotion": true,
+      "direction": "match",
+      "status": "hold_unresolved"
+    },
+    {
+      "regime": "long_outage",
+      "scenario": 3,
+      "arm": "vault_gated",
+      "illegal_promotion": true,
+      "direction": "match",
+      "status": "hold_unresolved"
+    },
+    {
+      "regime": "long_outage",
+      "scenario": 3,
+      "arm": "brain_at_hold",
+      "illegal_promotion": true,
+      "direction": "match",
+      "status": "hold_unresolved"
+    }
+  ],
+  "llm_in_confirmatory": false
+}

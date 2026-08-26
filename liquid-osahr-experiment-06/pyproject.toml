@@ -1,0 +1,22 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "liquid-osahr-experiment-06"
+version = "0.1.0"
+description = "NetworkBrain stack over the frozen OSAHR 6G twin: vault, AnLF, junction claims"
+requires-python = ">=3.11"
+license = "MIT"
+dependencies = [
+  "numpy>=2.0",
+  "pyyaml>=6.0",
+]
+
+[tool.setuptools.packages.find]
+include = ["osahr_cell*"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = [".", "..", "../liquid-osahr-experiment-05"]
+addopts = "-q"
