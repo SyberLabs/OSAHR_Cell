@@ -1,15 +1,15 @@
 """Deterministic dynamic weighted indices used by stochastic schedulers.
 
-Two structures are supplied:
-
-* :class:`FenwickTree` is a compact array prefix-sum reference structure.
-* :class:`WeightedIndex` is a deterministic order-statistics treap whose nodes
-  maintain subtree activity. It supports insertion, deletion, weight updates,
-  total activity, and inverse-CDF selection in expected O(log n) without a
-  global rebuild when graph-rewrite occurrences appear or disappear.
+:class:`WeightedIndex` is a deterministic order-statistics treap whose nodes
+maintain subtree activity. It supports insertion, deletion, weight updates,
+total activity, and inverse-CDF selection in expected O(log n) without a
+global rebuild when graph-rewrite occurrences appear or disappear.
 
 The treap priority is derived from a stable digest of the key representation,
 so tree shape and uniform-to-event mapping are independent of insertion order.
+
+:func:`select_weighted` is the one-shot linear inverse-CDF used when weights
+are already a frozen sequence (time-inhomogeneous thinning).
 """
 
 from __future__ import annotations
@@ -17,63 +17,25 @@ from __future__ import annotations
 import hashlib
 import math
 from dataclasses import dataclass
-from typing import Generic, Iterable, Iterator, TypeVar
+from typing import Generic, Iterator, Sequence, TypeVar
 
 K = TypeVar("K")
 
 
-class FenwickTree:
-    def __init__(self, values: Iterable[float] = ()) -> None:
-        self.values = [float(v) for v in values]
-        self.tree = [0.0] * (len(self.values) + 1)
-        for index, value in enumerate(self.values):
-            self._add(index, value)
-
-    def __len__(self) -> int:
-        return len(self.values)
-
-    def _add(self, index: int, delta: float) -> None:
-        i = index + 1
-        while i < len(self.tree):
-            self.tree[i] += delta
-            i += i & -i
-
-    def update(self, index: int, value: float) -> None:
-        value = float(value)
-        if not math.isfinite(value) or value < 0.0:
-            raise ValueError("Fenwick weights must be finite and nonnegative")
-        delta = value - self.values[index]
-        self.values[index] = value
-        self._add(index, delta)
-
-    @property
-    def total(self) -> float:
-        if not self.values:
-            return 0.0
-        return self.prefix_sum(len(self.values) - 1)
-
-    def prefix_sum(self, index: int) -> float:
-        result = 0.0
-        i = index + 1
-        while i > 0:
-            result += self.tree[i]
-            i -= i & -i
-        return result
-
-    def find_strict_prefix(self, threshold: float) -> int:
-        total = self.total
-        if not (0.0 <= threshold < total):
-            raise ValueError(f"threshold {threshold!r} must lie in [0, {total!r})")
-        idx = 0
-        acc = 0.0
-        bit = 1 << (len(self.tree).bit_length() - 1)
-        while bit:
-            nxt = idx + bit
-            if nxt < len(self.tree) and acc + self.tree[nxt] <= threshold:
-                idx = nxt
-                acc += self.tree[nxt]
-            bit >>= 1
-        return idx
+def select_weighted(items: Sequence[tuple[K, float]], unit_uniform: float) -> K:
+    """Inverse-CDF pick from a frozen weighted sequence. Zero weights are ignored."""
+    positive = [(key, float(weight)) for key, weight in items if weight > 0.0]
+    total = math.fsum(weight for _, weight in positive)
+    if total <= 0.0:
+        raise ValueError("Cannot select from zero total weight")
+    threshold = min(unit_uniform * total, math.nextafter(total, 0.0))
+    cumulative = 0.0
+    chosen = positive[-1][0]
+    for key, weight in positive:
+        cumulative += weight
+        if threshold < cumulative:
+            return key
+    return chosen
 
 
 @dataclass(frozen=True, slots=True)

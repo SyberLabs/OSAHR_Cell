@@ -12,14 +12,14 @@ import math
 from dataclasses import dataclass, field
 from typing import Any
 
-from .errors import HazardBoundError, HazardError, ResourceLimitError
+from .boundary import BoundaryState
+from .errors import HazardBoundError, HazardError, ResourceLimitError, SchedulerError
 from .graph import GraphDelta, Hypergraph
 from .incremental import IncrementalMatcher, RuleDependencySignature, delta_types
 from .matcher import Match, Matcher, build_expression_context
 from .pattern import Rule
 from .rewrite import RewriteEngine
-from .weighted import WeightedIndex
-from .boundary import BoundaryState
+from .weighted import WeightedIndex, select_weighted
 
 
 @dataclass(frozen=True, slots=True)
@@ -491,6 +491,7 @@ class OccurrenceIndex:
             self._rebuild_weights()
         else:
             self._apply_weight_delta(occurrence_delta)
+        self._check_activity()
         return occurrence_delta
 
     def _apply_weight_delta(self, delta: OccurrenceDelta) -> None:
@@ -515,10 +516,6 @@ class OccurrenceIndex:
                 self.rule_weights.set(rule_id, index.total)
             else:
                 self.rule_weights.remove(rule_id)
-        if not math.isfinite(self.total_activity) or self.total_activity > self.max_total_activity:
-            raise ResourceLimitError(
-                f"Total activity {self.total_activity!r} exceeds configured limit"
-            )
 
     def _rebuild_weights(self) -> None:
         self.rule_match_weights = {}
@@ -533,6 +530,8 @@ class OccurrenceIndex:
             self.rule_match_weights[rule_id] = index
             if index.total > 0.0:
                 self.rule_weights.set(rule_id, index.total)
+
+    def _check_activity(self) -> None:
         if not math.isfinite(self.total_activity) or self.total_activity > self.max_total_activity:
             raise ResourceLimitError(
                 f"Total activity {self.total_activity!r} exceeds configured limit"
@@ -568,3 +567,40 @@ class OccurrenceIndex:
             )
             for key, occurrence in self.occurrences.items()
         }
+
+    def integrated_activity(
+        self,
+        *,
+        graph: Hypergraph,
+        parameters: dict[str, Any],
+        memory: dict[str, Any],
+        start_time: float,
+        end_time: float,
+    ) -> float | None:
+        if end_time <= start_time:
+            return 0.0
+        exact_total = 0.0
+        for occurrence in self.occurrences.values():
+            value = self.integrated_hazard(
+                occurrence,
+                graph=graph,
+                parameters=parameters,
+                memory=memory,
+                start_time=start_time,
+                end_time=end_time,
+            )
+            if value is None:
+                return None
+            exact_total += value
+        return exact_total
+
+    def select_from_hazards(
+        self, hazards: dict[OccurrenceKey, float], unit_uniform: float
+    ) -> Occurrence:
+        items = sorted(hazards.items(), key=lambda pair: (pair[0].rule_id, pair[0].match_id))
+        try:
+            chosen_key = select_weighted(items, unit_uniform)
+        except ValueError as exc:
+            raise SchedulerError("Cannot select thinning event from zero activity") from exc
+        base = self.occurrences[chosen_key]
+        return Occurrence(chosen_key, base.rule, base.match, hazards[chosen_key])

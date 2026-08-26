@@ -16,31 +16,23 @@ import copy
 import heapq
 import math
 from collections import deque
-from dataclasses import dataclass, field, replace
+from dataclasses import dataclass, field
 from typing import Any, Callable, Iterable
 
-from .adaptive import AdaptiveParameter, AdaptiveRegistry
+from .adaptive import AdaptiveRegistry
 from .boundary import (
-    BoundaryDelta,
-    BoundaryDirection,
     BoundaryState,
     ExternalEvent,
-    InputMode,
     OutputEvent,
 )
 from .canonical import stable_hash
-from .errors import (
-    HazardBoundError,
-    ReplayError,
-    ResourceLimitError,
-    SchedulerError,
-    ValidationError,
-)
+from .commit import RuntimeCommitMixin
+from .errors import ReplayError, ResourceLimitError, SchedulerError, ValidationError
 from .events import EventKind, EventRecord, StepResult, StepStatus
-from .expr import evaluate_value, set_path
 from .graph import GraphDelta, Hypergraph
 from .matcher import Match, Matcher
-from .meta import MetaRuleAction, MetaRuleEvent, RuleTemplate
+from .meta import MetaRuleAction, MetaRuleEvent
+from .model import Model, RuntimeConfig
 from .observables import Observable
 from .occurrence import Occurrence, OccurrenceDelta, OccurrenceIndex, OccurrenceKey
 from .pattern import Rule, StateAssignment
@@ -51,48 +43,8 @@ from .schedulers import (
     NextReactionSnapshot,
     SchedulerKind,
     ThinningAudit,
+    plan_thinning_event,
 )
-
-
-@dataclass(frozen=True, slots=True)
-class RuntimeConfig:
-    max_events: int = 10_000_000
-    max_vertices: int = 1_000_000
-    max_edges: int = 1_000_000
-    max_incidences: int = 10_000_000
-    max_matches_per_rule: int = 5_000_000
-    max_total_activity: float = 1e300
-    max_simulation_time: float = math.inf
-    max_events_per_time_window: int = 100_000
-    explosion_window: float = 1e-12
-    invalid_hazard_policy: str = "raise"  # raise | disable_occurrence
-
-    scheduler: SchedulerKind | str = SchedulerKind.DIRECT_SSA
-    matcher_backend: str = "incremental"  # incremental | reference
-    incremental_verify: bool = False
-
-    thinning_window: float = 1.0
-    max_thinning_windows_per_plan: int = 100_000
-
-    def __post_init__(self) -> None:
-        if self.invalid_hazard_policy not in {"raise", "disable_occurrence"}:
-            raise ValueError("invalid_hazard_policy must be raise or disable_occurrence")
-        if self.max_events <= 0:
-            raise ValueError("max_events must be positive")
-        if self.matcher_backend not in {"incremental", "reference"}:
-            raise ValueError("matcher_backend must be incremental or reference")
-        try:
-            SchedulerKind(self.scheduler)
-        except ValueError as exc:
-            raise ValueError(f"Unknown scheduler {self.scheduler!r}") from exc
-        if not math.isfinite(self.thinning_window) or self.thinning_window <= 0.0:
-            raise ValueError("thinning_window must be finite and positive")
-        if self.max_thinning_windows_per_plan <= 0:
-            raise ValueError("max_thinning_windows_per_plan must be positive")
-
-    @property
-    def scheduler_kind(self) -> SchedulerKind:
-        return SchedulerKind(self.scheduler)
 
 
 @dataclass(frozen=True, slots=True, order=True)
@@ -147,63 +99,7 @@ class RuntimeSnapshot:
     thinning_audit: ThinningAudit = field(default_factory=ThinningAudit)
 
 
-@dataclass(slots=True)
-class Model:
-    graph: Hypergraph
-    boundary: BoundaryState
-    rules: tuple[Rule, ...]
-    parameters: dict[str, Any] = field(default_factory=dict)
-    memory: dict[str, Any] = field(default_factory=dict)
-    model_id: str = "model"
-    version: str = "1.0.0"
-    adaptive_parameters: tuple[AdaptiveParameter, ...] = ()
-    rule_templates: tuple[RuleTemplate, ...] = ()
-    hash: str = field(init=False, repr=False, compare=False)
-
-    def __post_init__(self) -> None:
-        rule_ids = [rule.rule_id for rule in self.rules]
-        if len(rule_ids) != len(set(rule_ids)):
-            raise ValidationError("Duplicate rule IDs")
-        template_ids = [template.template_id for template in self.rule_templates]
-        if len(template_ids) != len(set(template_ids)):
-            raise ValidationError("Duplicate rule template IDs")
-        self.boundary.validate(set(self.graph.vertices))
-        for handle in self.boundary.handles.values():
-            if handle.binding is not None:
-                vertex_type = self.graph.vertices[handle.binding].type_id
-                if not self.graph.schema.is_vertex_compatible(vertex_type, handle.interface_type):
-                    raise ValidationError(
-                        f"Boundary {handle.handle_id!r} expects {handle.interface_type}, "
-                        f"got {vertex_type}"
-                    )
-        AdaptiveRegistry(self.adaptive_parameters).validate(self.parameters)
-        object.__setattr__(self, "hash", stable_hash(self.to_canonical()))
-
-    def to_canonical(self) -> dict[str, Any]:
-        return {
-            "model_id": self.model_id,
-            "version": self.version,
-            "schema_hash": self.graph.schema.hash,
-            "graph": self.graph.to_canonical(),
-            "boundary": self.boundary.to_canonical(),
-            "rules": [rule.hash for rule in sorted(self.rules, key=lambda item: item.rule_id)],
-            "parameters": self.parameters,
-            "memory": self.memory,
-            "adaptive_parameters": self.adaptive_parameters,
-            "rule_templates": [
-                {
-                    "template_id": template.template_id,
-                    "version": template.version,
-                    "prototype_hash": template.prototype.hash,
-                    "parameters": template.parameters,
-                    "max_instances": template.max_instances,
-                }
-                for template in sorted(self.rule_templates, key=lambda item: item.template_id)
-            ],
-        }
-
-
-class Runtime:
+class Runtime(RuntimeCommitMixin):
     RUNTIME_VERSION = "osahr-python-0.2.0"
 
     def __init__(
@@ -429,6 +325,13 @@ class Runtime:
             graph_epoch=self.graph.epoch,
         )
 
+    def _enabled(self, occurrence: Occurrence, hazard: float | None = None) -> EnabledOccurrence:
+        return EnabledOccurrence(
+            occurrence.rule,
+            self._fresh_match(occurrence.match),
+            occurrence.hazard if hazard is None else hazard,
+        )
+
     def enabled_occurrences(self) -> list[EnabledOccurrence]:
         self._ensure_occurrences()
         if self.scheduler_kind is SchedulerKind.THINNING:
@@ -439,17 +342,13 @@ class Runtime:
                 time=self.time,
             )
             items = [
-                EnabledOccurrence(
-                    self.occurrence_index.occurrences[key].rule,
-                    self._fresh_match(self.occurrence_index.occurrences[key].match),
-                    hazard,
-                )
+                self._enabled(self.occurrence_index.occurrences[key], hazard)
                 for key, hazard in hazards.items()
                 if hazard > 0.0
             ]
         else:
             items = [
-                EnabledOccurrence(item.rule, self._fresh_match(item.match), item.hazard)
+                self._enabled(item)
                 for item in self.occurrence_index.all()
                 if item.hazard > 0.0
             ]
@@ -527,9 +426,7 @@ class Runtime:
         chosen = self.occurrence_index.select(select_rule.uniform, select_match.uniform)
         self.pending_internal = PendingInternalEvent(
             absolute_time=self.time + delta_time,
-            occurrence=EnabledOccurrence(
-                chosen.rule, self._fresh_match(chosen.match), chosen.hazard
-            ),
+            occurrence=self._enabled(chosen),
             draws=[waiting, select_rule, select_match],
             planned_at_time=self.time,
             planned_state_hash=self.state_hash,
@@ -564,9 +461,7 @@ class Runtime:
             raise SchedulerError(f"Next-reaction scheduler references missing occurrence {key}")
         return PendingInternalEvent(
             absolute_time=absolute_time,
-            occurrence=EnabledOccurrence(
-                occurrence.rule, self._fresh_match(occurrence.match), occurrence.hazard
-            ),
+            occurrence=self._enabled(occurrence),
             draws=[],
             planned_at_time=self.time,
             planned_state_hash=self.state_hash,
@@ -579,163 +474,43 @@ class Runtime:
     # Time-inhomogeneous thinning
     # ------------------------------------------------------------------
 
-    def _thinning_select(
-        self, hazards: dict[OccurrenceKey, float], draw: RandomDraw
-    ) -> Occurrence:
-        positive = [
-            (key, value)
-            for key, value in sorted(
-                hazards.items(), key=lambda pair: (pair[0].rule_id, pair[0].match_id)
-            )
-            if value > 0.0
-        ]
-        total = math.fsum(value for _, value in positive)
-        if total <= 0.0:
-            raise SchedulerError("Cannot select thinning event from zero activity")
-        threshold = min(draw.uniform * total, math.nextafter(total, 0.0))
-        cumulative = 0.0
-        chosen_key = positive[-1][0]
-        for key, value in positive:
-            cumulative += value
-            if threshold < cumulative:
-                chosen_key = key
-                break
-        base = self.occurrence_index.occurrences[chosen_key]
-        return Occurrence(chosen_key, base.rule, base.match, hazards[chosen_key])
-
-    def _thinning_survival_between(
-        self, start_time: float, end_time: float
-    ) -> float | None:
-        if end_time <= start_time:
-            return 0.0
-        exact_total = 0.0
-        for occurrence in self.occurrence_index.occurrences.values():
-            value = self.occurrence_index.integrated_hazard(
-                occurrence,
-                graph=self.graph,
-                parameters=self.parameters,
-                memory=self.memory,
-                start_time=start_time,
-                end_time=end_time,
-            )
-            if value is None:
-                return None
-            exact_total += value
-        return exact_total
-
-    def _accumulate_thinning_survival(self, start_time: float, end_time: float) -> None:
-        self.thinning_audit.add_survival(
-            self._thinning_survival_between(start_time, end_time)
-        )
-
     def _plan_thinning(self, *, search_limit: float | None = None) -> PendingInternalEvent | None:
         if self.pending_internal is not None:
             return self.pending_internal
         self._ensure_occurrences()
-        if not self.occurrence_index.occurrences:
-            return None
-
-        for _ in range(self.config.max_thinning_windows_per_plan):
-            cursor = self.thinning_audit.cursor(self.time)
-            deterministic = self._next_deterministic_kind()
-            deterministic_time = (
+        deterministic = self._next_deterministic_kind()
+        planned = plan_thinning_event(
+            self.thinning_audit,
+            index=self.occurrence_index,
+            graph=self.graph,
+            parameters=self.parameters,
+            memory=self.memory,
+            now=self.time,
+            thinning_window=self.config.thinning_window,
+            max_windows=self.config.max_thinning_windows_per_plan,
+            max_total_activity=self.config.max_total_activity,
+            max_simulation_time=self.config.max_simulation_time,
+            random=self.random,
+            next_deterministic_time=(
                 deterministic[1].simulation_time if deterministic is not None else math.inf
-            )
-            window_end = min(
-                cursor + self.config.thinning_window,
-                deterministic_time,
-                search_limit if search_limit is not None else math.inf,
-                self.config.max_simulation_time,
-            )
-            if window_end < cursor:
-                raise SchedulerError("Thinning window moved backwards")
-            if window_end == cursor:
-                return None
-
-            bounds: dict[OccurrenceKey, float] = {}
-            for key, occurrence in self.occurrence_index.occurrences.items():
-                bounds[key] = self.occurrence_index.bound_at(
-                    occurrence,
-                    graph=self.graph,
-                    parameters=self.parameters,
-                    memory=self.memory,
-                    time=cursor,
-                    horizon=window_end,
-                )
-            bound_total = math.fsum(bounds.values())
-            if not math.isfinite(bound_total) or bound_total > self.config.max_total_activity:
-                raise ResourceLimitError(
-                    f"Thinning bound activity {bound_total!r} exceeds configured limit"
-                )
-
-            if bound_total <= 0.0:
-                self._accumulate_thinning_survival(cursor, window_end)
-                self.thinning_audit.advance_cursor(window_end)
-                self.thinning_audit.windows_crossed += 1
-                if window_end == deterministic_time or (
-                    search_limit is not None and window_end == search_limit
-                ):
-                    return None
-                continue
-
-            wait = self.random.draw("thinning_wait", "dominating_process_wait")
-            candidate_time = cursor - math.log(wait.uniform) / bound_total
-            if candidate_time >= window_end:
-                self.thinning_audit.draws.append(
-                    RandomDraw(wait.domain, wait.purpose, wait.raw_uint64, wait.uniform, True)
-                )
-                self._accumulate_thinning_survival(cursor, window_end)
-                self.thinning_audit.advance_cursor(window_end)
-                self.thinning_audit.windows_crossed += 1
-                if window_end == deterministic_time or (
-                    search_limit is not None and window_end == search_limit
-                ):
-                    return None
-                continue
-
-            self._accumulate_thinning_survival(cursor, candidate_time)
-            self.thinning_audit.advance_cursor(candidate_time)
-            hazards = self.occurrence_index.hazards_at(
-                graph=self.graph,
-                parameters=self.parameters,
-                memory=self.memory,
-                time=candidate_time,
-            )
-            for key, actual in hazards.items():
-                bound = bounds[key]
-                tolerance = 1e-12 * max(1.0, abs(actual), abs(bound))
-                if actual > bound + tolerance:
-                    raise HazardBoundError(
-                        f"Thinning bound contract violated at t={candidate_time}: "
-                        f"{key} actual={actual!r} bound={bound!r}"
-                    )
-            actual_total = math.fsum(hazards.values())
-            accept = self.random.draw("thinning_accept", "candidate_acceptance")
-            self.thinning_audit.draws.extend([wait, accept])
-            if actual_total <= 0.0 or accept.uniform * bound_total >= actual_total:
-                self.thinning_audit.rejected_candidates += 1
-                continue
-
-            selection = self.random.draw("thinning_selection", "accepted_occurrence")
-            self.thinning_audit.draws.append(selection)
-            chosen = self._thinning_select(hazards, selection)
-            survival_integral = self.thinning_audit.drain_survival()
-            self.pending_internal = PendingInternalEvent(
-                absolute_time=candidate_time,
-                occurrence=EnabledOccurrence(
-                    chosen.rule, self._fresh_match(chosen.match), chosen.hazard
-                ),
-                draws=self.thinning_audit.drain(),
-                planned_at_time=self.last_event_time,
-                planned_state_hash=self._state_hash_at(self.last_event_time),
-                total_activity=actual_total,
-                scheduler_kind=SchedulerKind.THINNING,
-                survival_integral_exact=survival_integral is not None,
-                survival_integral=survival_integral,
-            )
-            return self.pending_internal
-
-        raise ResourceLimitError("Maximum thinning windows per plan exceeded")
+            ),
+            search_limit=search_limit,
+        )
+        if planned is None:
+            return None
+        absolute_time, chosen, draws, activity, exact, survival = planned
+        self.pending_internal = PendingInternalEvent(
+            absolute_time=absolute_time,
+            occurrence=self._enabled(chosen),
+            draws=draws,
+            planned_at_time=self.last_event_time,
+            planned_state_hash=self._state_hash_at(self.last_event_time),
+            total_activity=activity,
+            scheduler_kind=SchedulerKind.THINNING,
+            survival_integral_exact=exact,
+            survival_integral=survival,
+        )
+        return self.pending_internal
 
     def _plan_internal(self, *, search_limit: float | None = None) -> PendingInternalEvent | None:
         if self.scheduler_kind is SchedulerKind.DIRECT_SSA:
@@ -782,8 +557,12 @@ class Runtime:
         # survival term is recomputed only to the preemption time.
         if pending is not None:
             draws = self._discard(pending.draws)
-            survival = self._thinning_survival_between(
-                self.last_event_time, deterministic_time
+            survival = self.occurrence_index.integrated_activity(
+                graph=self.graph,
+                parameters=self.parameters,
+                memory=self.memory,
+                start_time=self.last_event_time,
+                end_time=deterministic_time,
             )
             self.thinning_audit.reset_after_commit(self.time)
             return draws, survival
@@ -843,35 +622,20 @@ class Runtime:
         if target_time < self.time:
             raise ValueError("target_time cannot be in the past")
         records: list[EventRecord] = []
-
-        if self.scheduler_kind is SchedulerKind.THINNING:
-            while self.time < target_time:
+        while self.time < target_time:
+            if self.scheduler_kind is SchedulerKind.THINNING:
                 pending = self._plan_internal(search_limit=target_time)
                 deterministic = self._next_deterministic_kind()
                 deterministic_time = (
                     deterministic[1].simulation_time if deterministic is not None else math.inf
                 )
                 internal_time = pending.absolute_time if pending is not None else math.inf
-                next_time = min(internal_time, deterministic_time)
-                if next_time > target_time or math.isinf(next_time):
-                    self.time = target_time
-                    break
-                result = self.step()
-                if result.event is not None:
-                    records.append(result.event)
-                if result.status is StepStatus.ABSORBED:
-                    self.time = target_time
-                    break
-            return records
-
-        while self.time < target_time:
-            next_time = self.peek_next_event_time()
-            if next_time is None:
-                self.time = target_time
-                break
-            if next_time > target_time:
-                # Direct SSA retains its sampled proposal. Next-reaction retains
-                # internal clocks; merely advancing the observation clock is safe.
+                next_time: float | None = min(internal_time, deterministic_time)
+                if math.isinf(next_time):
+                    next_time = None
+            else:
+                next_time = self.peek_next_event_time()
+            if next_time is None or next_time > target_time:
                 self.time = target_time
                 break
             result = self.step()
@@ -937,401 +701,6 @@ class Runtime:
             )
             return self.next_reaction.drain_audit_draws()
         return []
-
-    # ------------------------------------------------------------------
-    # State-changing event implementations
-    # ------------------------------------------------------------------
-
-    def _fire_internal(self, pending: PendingInternalEvent) -> EventRecord:
-        occurrence = pending.occurrence
-        if any(
-            entity_id not in self.graph.vertices
-            for entity_id in occurrence.match.vertex_map.values()
-        ):
-            raise ReplayError("Pending internal event became invalid without a state transition")
-        pre_time = self.last_event_time
-        pre_hash = self._state_hash_at(pre_time)
-        post_time = pending.absolute_time
-        if post_time < pre_time:
-            raise ReplayError("Pending internal event lies in the past")
-        next_index = self.event_index + 1
-        event_id = stable_hash(
-            {
-                "run_id": self.run_id,
-                "event_index": next_index,
-                "kind": EventKind.INTERNAL_REWRITE.value,
-                "rule": occurrence.rule.rule_id,
-                "match": occurrence.match.match_id,
-            }
-        )
-
-        result = self.rewrite_engine.apply(
-            graph=self.graph,
-            boundary=self.boundary,
-            parameters=self.parameters,
-            memory=self.memory,
-            rule=occurrence.rule,
-            match=occurrence.match,
-            time=post_time,
-            delta_time=post_time - pre_time,
-            event_index=next_index,
-            event_id=event_id,
-        )
-        result = self._normalize_rewrite_result(result)
-        state_changed = (
-            result.parameter_before != result.parameter_after
-            or result.memory_before != result.memory_after
-        )
-        boundary_changed = not result.boundary_delta.is_empty()
-
-        self.graph = result.graph
-        self.boundary = result.boundary
-        self.parameters = result.parameters
-        self.memory = result.memory
-        self.time = post_time
-        self.last_event_time = post_time
-        self.event_index = next_index
-        self.output_events.extend(result.outputs)
-        self._validate_limits()
-        self._record_event_time()
-
-        fired_key = OccurrenceKey(occurrence.rule.rule_id, occurrence.match.match_id)
-        extra_draws = self._post_commit_refresh(
-            delta=result.graph_delta,
-            state_changed=state_changed,
-            boundary_changed=boundary_changed,
-            fired_key=fired_key if self.scheduler_kind is SchedulerKind.NEXT_REACTION else None,
-        )
-
-        if pending.scheduler_kind is SchedulerKind.NEXT_REACTION:
-            random_draws = self.next_reaction.drain_audit_draws()
-            # _post_commit_refresh already drained; include any threshold draws that
-            # existed before commit plus post-event draws captured in extra_draws.
-            random_draws = pending.draws + random_draws + extra_draws
-        else:
-            random_draws = pending.draws + extra_draws
-
-        post_hash = self.state_hash
-        cause: dict[str, Any] = {
-            "rule_id": occurrence.rule.rule_id,
-            "rule_version": occurrence.rule.version,
-            "rule_hash": occurrence.rule.hash,
-            "match_id": occurrence.match.match_id,
-            "vertex_map": occurrence.match.vertex_map,
-            "edge_map": occurrence.match.edge_map,
-            "hazard": occurrence.hazard,
-            "pre_total_activity": pending.total_activity,
-            "scheduler": pending.scheduler_kind.value,
-            "post_graph_epoch": self.graph.epoch,
-        }
-        if pending.survival_integral_exact:
-            survival = (
-                pending.survival_integral
-                if pending.survival_integral is not None
-                else pending.total_activity * (post_time - pre_time)
-            )
-            cause["survival_integral"] = survival
-            cause["survival_integral_exact"] = True
-        else:
-            cause["survival_integral_exact"] = False
-
-        record = EventRecord(
-            event_id=event_id,
-            event_index=next_index,
-            kind=EventKind.INTERNAL_REWRITE,
-            pre_time=pre_time,
-            post_time=post_time,
-            delta_time=post_time - pre_time,
-            cause=cause,
-            random_draws=random_draws,
-            graph_delta=result.graph_delta,
-            boundary_delta=result.boundary_delta,
-            parameter_before=result.parameter_before,
-            parameter_after=result.parameter_after,
-            memory_before=result.memory_before,
-            memory_after=result.memory_after,
-            pre_state_hash=pre_hash,
-            post_state_hash=post_hash,
-            outputs=result.outputs,
-        )
-        self.event_log.append(record)
-        return record
-
-    def _process_external(
-        self,
-        event: ExternalEvent,
-        draws: list[RandomDraw],
-        survival_integral: float | None,
-    ) -> EventRecord:
-        handle = self.boundary.handles[event.handle_id]
-        if handle.direction not in {BoundaryDirection.INPUT, BoundaryDirection.BIDIRECTIONAL}:
-            raise ValidationError(f"Boundary handle {event.handle_id!r} does not accept input")
-        handle.validate_payload(event.payload)
-        pre_time = self.last_event_time
-        pre_hash = self._state_hash_at(pre_time)
-        parameter_before = copy.deepcopy(self.parameters)
-        memory_before = copy.deepcopy(self.memory)
-        delta = GraphDelta()
-
-        if handle.input_mode is not InputMode.SIGNAL_ONLY:
-            if handle.binding is None:
-                raise ValidationError(f"Input handle {event.handle_id!r} is unbound")
-            before, after = self.graph.set_vertex_attributes(
-                handle.binding,
-                event.payload,
-                replace=handle.input_mode is InputMode.REPLACE_BOUND_VERTEX_ATTRIBUTES,
-                increment_epoch=False,
-            )
-            if before != after:
-                delta.updated_vertices_before[handle.binding] = before
-                delta.updated_vertices_after[handle.binding] = after
-                self.graph.epoch += 1
-
-        self.time = event.simulation_time
-        self.last_event_time = self.time
-        self.event_index += 1
-        self._validate_limits()
-        self._record_event_time()
-        extra_draws = self._post_commit_refresh(
-            delta=delta,
-            state_changed=False,
-            force=delta.is_empty(),
-        )
-        event_id = stable_hash(
-            {
-                "run_id": self.run_id,
-                "event_index": self.event_index,
-                "kind": EventKind.EXTERNAL_INPUT.value,
-                "external_event_id": event.event_id,
-            }
-        )
-        post_hash = self.state_hash
-        cause: dict[str, Any] = {
-            "external_event_id": event.event_id,
-            "source_namespace": event.source_namespace,
-            "source_sequence": event.source_sequence,
-            "handle_id": event.handle_id,
-            "payload": event.payload,
-            "bound_vertex": handle.binding,
-            "post_graph_epoch": self.graph.epoch,
-            "scheduler": self.scheduler_kind.value,
-            "survival_integral_exact": survival_integral is not None,
-        }
-        if survival_integral is not None:
-            cause["survival_integral"] = survival_integral
-        record = EventRecord(
-            event_id=event_id,
-            event_index=self.event_index,
-            kind=EventKind.EXTERNAL_INPUT,
-            pre_time=pre_time,
-            post_time=self.time,
-            delta_time=self.time - pre_time,
-            cause=cause,
-            random_draws=draws + extra_draws,
-            graph_delta=delta,
-            boundary_delta=BoundaryDelta(),
-            parameter_before=parameter_before,
-            parameter_after=copy.deepcopy(self.parameters),
-            memory_before=memory_before,
-            memory_after=copy.deepcopy(self.memory),
-            pre_state_hash=pre_hash,
-            post_state_hash=post_hash,
-        )
-        self.event_log.append(record)
-        return record
-
-    def _process_scheduled_adaptation(
-        self,
-        update: ScheduledAdaptation,
-        draws: list[RandomDraw],
-        survival_integral: float | None,
-    ) -> EventRecord:
-        pre_time = self.last_event_time
-        pre_hash = self._state_hash_at(pre_time)
-        parameter_before = copy.deepcopy(self.parameters)
-        memory_before = copy.deepcopy(self.memory)
-        context = {
-            "p": self.parameters,
-            "parameters": self.parameters,
-            "z": self.memory,
-            "memory": self.memory,
-            "time": update.simulation_time,
-            "delta_time": update.simulation_time - pre_time,
-            "payload": {},
-        }
-        evaluated = [
-            (assignment.target, evaluate_value(assignment.value, context))
-            for assignment in update.assignments
-        ]
-        next_parameters = copy.deepcopy(self.parameters)
-        next_memory = copy.deepcopy(self.memory)
-        for target, value in evaluated:
-            root, path = target.split(".", 1)
-            set_path(next_parameters if root == "parameters" else next_memory, path, value)
-        next_parameters = self.adaptive_registry.normalize(next_parameters)
-
-        self.parameters = next_parameters
-        self.memory = next_memory
-        self.time = update.simulation_time
-        self.last_event_time = self.time
-        self.event_index += 1
-        self._validate_limits()
-        self._record_event_time()
-        extra_draws = self._post_commit_refresh(
-            delta=GraphDelta(),
-            state_changed=True,
-            force=True,
-        )
-        event_id = stable_hash(
-            {
-                "run_id": self.run_id,
-                "event_index": self.event_index,
-                "kind": EventKind.SCHEDULED_ADAPTATION.value,
-                "update_id": update.update_id,
-            }
-        )
-        post_hash = self.state_hash
-        cause: dict[str, Any] = {
-            "update_id": update.update_id,
-            "post_graph_epoch": self.graph.epoch,
-            "scheduler": self.scheduler_kind.value,
-            "survival_integral_exact": survival_integral is not None,
-        }
-        if survival_integral is not None:
-            cause["survival_integral"] = survival_integral
-        record = EventRecord(
-            event_id=event_id,
-            event_index=self.event_index,
-            kind=EventKind.SCHEDULED_ADAPTATION,
-            pre_time=pre_time,
-            post_time=self.time,
-            delta_time=self.time - pre_time,
-            cause=cause,
-            random_draws=draws + extra_draws,
-            graph_delta=GraphDelta(),
-            boundary_delta=BoundaryDelta(),
-            parameter_before=parameter_before,
-            parameter_after=copy.deepcopy(self.parameters),
-            memory_before=memory_before,
-            memory_after=copy.deepcopy(self.memory),
-            pre_state_hash=pre_hash,
-            post_state_hash=post_hash,
-        )
-        self.event_log.append(record)
-        return record
-
-    def _process_meta(
-        self,
-        event: MetaRuleEvent,
-        draws: list[RandomDraw],
-        survival_integral: float | None,
-    ) -> EventRecord:
-        pre_time = self.last_event_time
-        pre_hash = self._state_hash_at(pre_time)
-        parameter_before = copy.deepcopy(self.parameters)
-        memory_before = copy.deepcopy(self.memory)
-        before_rules = self._rule_state_canonical()
-        rule_after: Rule | None = None
-
-        if event.action is MetaRuleAction.INSTANTIATE:
-            assert event.template_id is not None
-            try:
-                template = self.rule_templates[event.template_id]
-            except KeyError as exc:
-                raise ValidationError(f"Unknown rule template {event.template_id!r}") from exc
-            if event.rule_id in self.rules:
-                raise ValidationError(f"Rule {event.rule_id!r} already exists")
-            instance_count = sum(
-                1
-                for rule in self.rules.values()
-                if rule.meta.get("__osahr_template_id") == template.template_id
-            )
-            if instance_count >= template.max_instances:
-                raise ResourceLimitError(
-                    f"Template {template.template_id!r} reached max_instances"
-                )
-            rule_after = template.instantiate(event.rule_id, event.bindings)
-            rule_after = replace(
-                rule_after,
-                meta={
-                    **rule_after.meta,
-                    "__osahr_template_id": template.template_id,
-                },
-            )
-            self.rules[event.rule_id] = rule_after
-        elif event.action is MetaRuleAction.ENABLE:
-            if event.rule_id not in self.rules:
-                raise ValidationError(f"Unknown rule {event.rule_id!r}")
-            rule_after = replace(self.rules[event.rule_id], enabled=True)
-            self.rules[event.rule_id] = rule_after
-        elif event.action is MetaRuleAction.DISABLE:
-            if event.rule_id not in self.rules:
-                raise ValidationError(f"Unknown rule {event.rule_id!r}")
-            rule_after = replace(self.rules[event.rule_id], enabled=False)
-            self.rules[event.rule_id] = rule_after
-        elif event.action is MetaRuleAction.REMOVE:
-            if event.rule_id not in self.rules:
-                raise ValidationError(f"Unknown rule {event.rule_id!r}")
-            self.rules.pop(event.rule_id)
-            self.occurrence_index.invalidate_rule(event.rule_id)
-        else:  # pragma: no cover
-            raise ValidationError(f"Unsupported meta action {event.action}")
-
-        self._validate_scheduler_contract()
-        self.time = event.simulation_time
-        self.last_event_time = self.time
-        self.event_index += 1
-        self._validate_limits()
-        self._record_event_time()
-        extra_draws = self._post_commit_refresh(
-            delta=GraphDelta(),
-            state_changed=True,
-            force=True,
-        )
-        event_record_id = stable_hash(
-            {
-                "run_id": self.run_id,
-                "event_index": self.event_index,
-                "kind": EventKind.META_RULE_UPDATE.value,
-                "meta_event_id": event.event_id,
-            }
-        )
-        post_hash = self.state_hash
-        cause: dict[str, Any] = {
-            "meta_event_id": event.event_id,
-            "action": event.action.value,
-            "rule_id": event.rule_id,
-            "template_id": event.template_id,
-            "bindings": dict(event.bindings),
-            "rules_before": before_rules,
-            "rules_after": self._rule_state_canonical(),
-            "rule_after": rule_after,
-            "post_graph_epoch": self.graph.epoch,
-            "scheduler": self.scheduler_kind.value,
-            "survival_integral_exact": survival_integral is not None,
-        }
-        if survival_integral is not None:
-            cause["survival_integral"] = survival_integral
-        record = EventRecord(
-            event_id=event_record_id,
-            event_index=self.event_index,
-            kind=EventKind.META_RULE_UPDATE,
-            pre_time=pre_time,
-            post_time=self.time,
-            delta_time=self.time - pre_time,
-            cause=cause,
-            random_draws=draws + extra_draws,
-            graph_delta=GraphDelta(),
-            boundary_delta=BoundaryDelta(),
-            parameter_before=parameter_before,
-            parameter_after=copy.deepcopy(self.parameters),
-            memory_before=memory_before,
-            memory_after=copy.deepcopy(self.memory),
-            pre_state_hash=pre_hash,
-            post_state_hash=post_hash,
-        )
-        self.event_log.append(record)
-        return record
 
     # ------------------------------------------------------------------
     # Persistence and replay
