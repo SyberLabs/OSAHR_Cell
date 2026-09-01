@@ -1,4 +1,7 @@
 
+> Living research-direction notes (separate files, not science): `research_directions/INDEX.txt`.
+> This file is an older application-attractiveness ranking. Do not cite the scores as MEASURED.
+
 > **OSAHR is an event-native digital-twin and decision-simulation substrate for systems whose state, topology, interaction rules, and stochastic behavior co-evolve.**
 
 That distinction matters. A graph database stores relations. A GNN learns on relations. A discrete-event simulator schedules events. An agent-based simulator gives entities behaviors. A conventional digital twin mirrors a physical system.

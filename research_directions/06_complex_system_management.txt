@@ -1,0 +1,51 @@
+06  COMPLEX SYSTEM MANAGEMENT
+=============================
+Grade: PROPOSED. This is the horizontal platform in
+Research_Directions.txt ("network of networks") restated as a
+direction that must stay compositional.
+
+What this direction is
+----------------------
+Manage systems whose topology, rules, and stochastic clocks
+co-evolve: RAN + cloud + training cluster + supply of models;
+or grid + telecom + logistics. Each subsystem keeps its own
+schema. They couple only through typed BoundaryHandles.
+OSAHR was built for this composition. GrokCell is one mouth
+over the *composite* claim, not a swarm of subsystem bots.
+
+Facilitation
+------------
+- Digital Model (SyberRuntime) is how change-control is
+  accounted: every intervention is an operation with an
+  evaluation. Incident chat is not the RCA database.
+- Licensed Network Twin is the first domain pack.
+- Training and ML pipelines are domain packs that inject
+  payloads (job state, branch heads) into the composite twin.
+- Software development is how the packs themselves are
+  evolved under debt.
+
+A manager's day
+---------------
+Open a composite scenario (hurricane / outage / checkpoint
+regression). AnLF ports on each boundary. Vault concepts that
+are allowed to cross subsystems are few and declared
+(critical, outage, prod_data). Junctions are rare and named.
+Claim status is scored per physical scenario, not per chat
+turn. admit: local legal matches fire. hold: one Brain may
+request a vault-legal rewrite in one subsystem at a time.
+unknown: withhold, park a note, do not "coordinate via more
+agents."
+
+Shared structures this pays for
+-------------------------------
+Open composition, boundary handles, one mouth, junction-only
+semantics, freeze, park. This is the payoff of keeping the
+other directions separate: the composite only works if the
+kernels were not fused.
+
+Do not
+------
+- A universal ontology.
+- LLM-to-LLM graphs as the safety object (interaction topology
+  is the safety object; densify it and you get cascades).
+- One residual alpha for the whole composite.

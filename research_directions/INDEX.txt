@@ -1,0 +1,28 @@
+RESEARCH DIRECTIONS LEDGER
+==========================
+
+Status: PROPOSED notes. Not confirmatory science. Experiment 06
+(seed 260826) is a separate record. Do not cite these notes as
+MEASURED. Do not merge them into osahr/ kernel legality.
+
+Rule
+----
+Keep directions SEPARATE in intent, schemas, and claims.
+Build SHARED capabilities only when they advance the same
+underlying structures (see 00_shared_substrate.txt).
+
+A direction may use another direction's component. It may not
+absorb that component's kernel.
+
+Ledger (one file each)
+----------------------
+00_shared_substrate.txt
+01_digital_model.txt          SyberRuntime as process-twin component
+02_licensed_network_twin.txt  GrokCell / 6G control plane (current vertical)
+03_software_development.txt
+04_ai_model_training.txt
+05_ml_branching_pipelines.txt
+06_complex_system_management.txt
+
+Older ranking of OSAHR application attractiveness (not this
+ledger): ../Research_Directions.txt

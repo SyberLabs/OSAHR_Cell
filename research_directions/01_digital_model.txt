@@ -1,0 +1,75 @@
+01  DIGITAL MODEL
+=================
+Grade: PROPOSED. Component exists (abandoned-as-product, implemented
+as kernel): SyberRuntime.
+
+Local path (PI machine): D:\syberlabs\syber_runtime
+Git: https://github.com/sykosyber/syber_runtime  (private)
+HEAD inspected: 5251df52 (2026-08-20) "post-cfda286 hardening"
+Not vendored into osahr_project. Do not copy-rewrite the kernel here.
+
+What this direction is
+----------------------
+A digital model of *work*: how artifacts, tests, models, and claims
+come to be. The living object is the trajectory
+
+  intent -> attempt -> failure -> branch -> test -> revision
+        -> insight -> compress -> stabilize
+
+not the file that remains. SyberRuntime's one-sentence thesis:
+as generation cost collapses, the scarce resource is understanding.
+No unverified generation. Verification debt is bounded accounting.
+
+What it is not
+--------------
+It is not OSAHR. It does not own graph rewrite, stochastic clocks,
+or 6G semantics. Durable threads (LangGraph, Temporal) are commodity;
+SyberRuntime's contribution is the accounting layer above them:
+operation-with-evaluation, debt grammar, organizational closure,
+re-comprehension provenance.
+
+What was actually built (KNOWN of that repo, not of Experiment 06)
+------------------------------------------------------------------
+- Operation-primary kernel: hash-chained log, projections as folds,
+  blob store, snapshots, Merkle inclusion/consistency proofs.
+- Verbs: Feature, Test, Refactor, Research, Verify, Compress,
+  Simulate, Stabilize. Stabilize is deliberately low-reversibility.
+- plan -> generate -> verify -> stabilize loop behind MCP adapters.
+- Fail-closed evidence harness: held-out python_tests oracles (models
+  cannot echo the suite), AST mutation campaigns, residual debt 0
+  required to stabilize. Cross-family generator/verifier. Hint
+  injection in prompts was a recorded failure mode and was removed.
+- First hard live evidence (agentic-live-code-002): merge_intervals
+  against a held-out 7-case suite; 11/11 AST mutants killed; model
+  verifier recorded as partial evidence only.
+
+Where it sits in GrokCell
+-------------------------
+Digital Model = SyberRuntime process twin + OSAHR mechanism twin,
+composed at park.
+
+  OSAHR Simulate   <->  SyberRuntime Simulate
+  OSAHR claim note <->  SyberRuntime undischarged evaluation
+  OSAHR park.request_rewrite  <->  SyberRuntime Stabilize
+  OSAHR vault      <->  SyberRuntime intent / concept notes
+  OSAHR AnLF       <->  SyberRuntime deterministic oracles
+                        (python_tests, mutation, never model-discharged)
+
+A 6G twin run is a Simulate operation. Its claim status is the
+evaluation. Publishing a pattern into the vault is Compress +
+Stabilize, and needs a freeze (Experiment 04: a point T does not
+transport).
+
+Shared structures this direction pays for
+-----------------------------------------
+Operation log as lossless source; artifacts as lossy projections.
+Park = Stabilize. MCP as adapter ports. Freeze/checksum. Fail-closed
+oracles. False discharge = soundness violation (same family as
+illegal promotion).
+
+Next capability (does not merge kernels)
+----------------------------------------
+An adapter: SyberRuntime Simulate may *invoke* an OSAHR Runtime as
+a worker. The worker returns a claim-status payload. The operation
+log records the call. OSAHR never sees SyberRuntime verbs as
+hyperedge types.

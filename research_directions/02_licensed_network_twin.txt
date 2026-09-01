@@ -1,0 +1,33 @@
+02  LICENSED NETWORK TWIN
+=========================
+Grade: current vertical. Experiment 06 confirmatory is MEASURED
+elsewhere (liquid-osahr-experiment-06/). This note is the product
+direction, not a re-analysis of that table.
+
+What this direction is
+----------------------
+GrokCell as the operator's licensed mouth over a semantic network
+twin. Meaning in a vault, observations on the boundary, rewrites
+only in OSAHR, no action without a claim status. Sits above
+ns-3 / srsRAN / a RIC. Matches 3GPP NDT jobs (scenario, start/stop,
+reports). Does not replace RF.
+
+Workflow (finished product)
+---------------------------
+Open twin job -> AnLF load/outage payloads -> route-task junction
+queries vault -> 05 claim status. admit: kernel fires, Brain idle.
+hold_unresolved: one Brain may park.request_rewrite among
+vault-legal matches. reject / outcome_unknown: refuse, write a note.
+
+What it borrows from Digital Model without absorbing it
+-------------------------------------------------------
+Park menu is SyberRuntime's Stabilize/Feature/Test vocabulary
+applied to a RAN slice: commit, disable-rule, publish-claim,
+delete-note, sign-report. The 6G schema does not grow Feature
+verbs. SyberRuntime does not grow MEC-fast edges.
+
+Do not
+------
+LLM on every hyperedge. Elect alpha-star. Retune confirmatory
+until Brain wins MAE. Scalar semantic winning MAE is KP2, not a
+product failure.
