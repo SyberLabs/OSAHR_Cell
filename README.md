@@ -6,6 +6,65 @@ Version 0.2 moves the project beyond a reference Gillespie simulator into a mult
 
 The implementation is dependency-free at runtime and targets Python 3.11+.
 
+## Experiments
+
+The kernel is the substrate. Everything below is built on it and lives in this repository.
+Two lines of work run over the same 0.2 kernel: a **6G semantic-control twin**, and the
+**Liquid-OSAHR** series pairing continuous-time neural state with exact stochastic
+rewriting. Experiment 06 joins them.
+
+Every report grades its public claims **KNOWN**, **MEASURED**, **INFERRED**, or
+**PROPOSED**. Confirmatory seeds are declared in the spec before execution, and artifacts
+are frozen with checksums before the run.
+
+Start with the 6G experiment for a result, or with 02B for the methodology argument.
+
+| Experiment | Question | Status |
+|---|---|---|
+| [6G 01](osahr-6g/osahr_6g_experiment_release/EXPERIMENT_REPORT.md) — Goal-aware semantic control over a RAN/MEC twin | Does routing by what a task is *for* preserve application value under disruption? | Executed; 30 trajectories per policy, plus no-outage and severe-outage controls |
+| [01](liquid-osahr-experiment-01/EXPERIMENT_REPORT.md) — Liquid hazards over OSAHR | Can an irregular-time recurrent model supply event intensities that OSAHR consumes as an exact piecewise-constant stochastic law? | Executed; three training seeds, approximately parameter-matched GRU check |
+| [02A](liquid-osahr-experiment-02a/liquid-osahr-experiment-02a/EXPERIMENT_REPORT.md) — Closed-loop topology-coupled neural state | Does closing the neural feedback loop improve counterfactual fidelity? | Executed |
+| [02B](liquid-osahr-experiment-02b/liquid-osahr-exp02b-stage-final/EXPERIMENT_REPORT.md) — Intervention-calibrated standards-informed RAN twin | Can a mechanistically anchored liquid residual improve a twin without sacrificing intervention fidelity? | Executed; 400-run untouched confirmatory holdout |
+| [03](liquid-osahr-experiment-03/EXPERIMENT_REPORT.md) — Query-conditioned trust | Is trust in a learned residual a property of the query rather than of the model? | Reanalysis of frozen 02B artifacts; no new simulation |
+| [04](liquid-osahr-experiment-04/EXPERIMENT_REPORT.md) — Same-horizon multi-query calibration | Does one calibrated trust coefficient survive across estimands at a shared horizon? | Executed; calibration seed 440318, confirmatory seed 880419 |
+| [05](liquid-osahr-experiment-05/EXPERIMENT_REPORT.md) — Residual-hypothesis claim status | What can be *claimed*, not merely estimated, about a residual effect? | Formulation and instrument check only; 22 s confirmatory declared on seed 110518, **not executed** |
+| [06](liquid-osahr-experiment-06/EXPERIMENT_REPORT.md) — NetworkBrain stack | Can a semantic vault and a deterministic controller gate rewrites without licensing claims they cannot support? | Executed; seed 260826, 60 s horizon, no language model in confirmatory |
+
+### Selected results
+
+**Semantic routing pays only when capacity must be triaged.** In the 6G experiment, a
+policy conditioned on task utility and urgency beat task-agnostic QoS on timely goal
+utility by +0.0369 (95% bootstrap CI +0.0071 to +0.0677) and on critical-task deadline
+success by +0.0531 (CI +0.0142 to +0.0930), over a 15 s edge outage with 30 independent
+trajectories per policy. The no-outage control shows essentially no advantage: 0.8778
+versus 0.8783 goal utility. The mechanism is conditional, and that control is why the
+first number is worth reporting.
+
+**Predictive trust and intervention trust are different quantities.** In 02B, full
+residual trust improved factual hazard identification on validation and on every OOD
+hazard set, yet intervention calibration over 18 independent scenarios still selected the
+mechanistic fallback, stable across 18/18 leave-one-scenario-out folds and 96.67% of
+20,000 stratified bootstrap recalibrations. On an untouched 400-run confirmatory holdout
+no single trust coefficient dominated. One global scalar trust coefficient is not enough.
+
+**Closing a neural feedback loop is not automatically better.** In 02A, no-jump and
+frozen-open-loop ablations recovered oracle intervention effects better than the fully
+closed learned jump model in several regimes. Learned feedback can recursively amplify
+small hazard misspecification while the process stays mathematically well defined.
+
+**Acting on an effect and claiming it are separate licenses.** In 06 scenario 3, ensemble
+signs disagree while every arm's point estimate comes out negative. The controller was
+allowed to act at that junction; it was not licensed to report the sign as a directed
+effect. Doing so would have been an illegal promotion.
+
+### Scope of the experiment models
+
+These models are abstractions for exploring mechanism, not calibrated models of any real
+deployment. 02B is a standards-informed FR1 system-level surrogate whose propagation
+follows the 3GPP TR 38.901 UMi-Street-Canyon form; it is not a 3GPP-conformance simulator.
+None of this replaces ns-3/5G-LENA, srsRAN, Sionna RT, or a commercial RF twin. OSAHR sits
+above the PHY/RF layer as an adaptive semantic and control twin.
+
 ## What is implemented
 
 ### Structural semantics
