@@ -43,6 +43,10 @@ They are not a license to collapse domains into one schema.
    is the bottleneck. OSAHR thesis: predictive fidelity is not
    intervention fidelity. Same product rule: withhold-and-act.
 
+8. Bayesian update is perception
+   Hyperedges may carry factors (07). The posterior feeds claim
+   status. It does not rewrite G and it does not enter clocks.
+
 Do not
 ------
 - Put an LLM inside OSAHR hazards or SyberRuntime oracles that

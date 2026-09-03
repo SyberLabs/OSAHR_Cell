@@ -1,0 +1,42 @@
+07  BAYESIAN EDGE SENSORS
+=========================
+Grade: PROPOSED. Perception module, not a kernel and not the company.
+
+What this direction is
+----------------------
+Hyperedges are sensors (factors). Vertices (and a small set of
+global hypotheses H) are what is inferred. When an edge changes,
+the *posterior* moves, not G.
+
+Usual twins put sensors on nodes. The quantities that matter here
+already live on relations: Path.link_quality, Transit, Association,
+AuthorizedBy, Exposure. A likelihood on those hyperedges is AnLF
+done properly: typed, relational, off the rewrite engine.
+
+Layers (in order)
+-----------------
+1. Observation. The hyperedge emits a BoundaryHandle payload.
+   It does not call DPO.
+2. Inference. A declared factor graph. Evidence e on edge e
+   updates p(H | e) over a frozen hypothesis set (residual mix,
+   outage, "this patch preserves the API", claim sign). Shared
+   vertices make the update global.
+3. License. The posterior feeds Experiment 05 claim status.
+   Tight, one sign: admit or reject. Split: hold_unresolved.
+   Uninformative: outcome_unknown. Park still gates the rewrite.
+
+Pearl stays in force. p(Y | sensors) is not p(Y | do(route)).
+
+Do not
+------
+- MCMC or a variational net inside CTMC hazards.
+- Let the posterior rewrite G.
+- Structure-learn a new BN on every event. Topology change is
+  OSAHR; Bayesian update is a fold over a declared factor graph.
+- Call a weighted average of alpha a posterior.
+
+Viability
+---------
+High as AnLF-v2 on small typed twins. Medium as a standalone
+"Bayesian analytics" SKU (crowded unless joined to park).
+Not the company. Without withhold-and-act it is another fusion UI.
