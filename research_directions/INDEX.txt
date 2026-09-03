@@ -23,6 +23,9 @@ Ledger (one file each)
 04_ai_model_training.txt
 05_ml_branching_pipelines.txt
 06_complex_system_management.txt
+07_bayesian_edge_sensors.txt  factors on hyperedges; posterior, not rewrite
+08_next_steps.txt             apex: close park on one checkable world
 
+Canonical GitHub: https://github.com/SyberLabs/OSAHR_Cell
 Older ranking of OSAHR application attractiveness (not this
 ledger): ../Research_Directions.txt
