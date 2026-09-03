@@ -47,6 +47,17 @@ They are not a license to collapse domains into one schema.
    Hyperedges may carry factors (07). The posterior feeds claim
    status. It does not rewrite G and it does not enter clocks.
 
+9. Two embeddings, one kernel
+   Inhabitant (09): neural dynamics live in a descendant field H
+   on a typed twin. Envelope (10): F is an exogenous operator;
+   z lives in Theta/Z; F does not enter lambda. Do not mix. Do
+   not put H in osahr/ hashes. Do not compile a Transformer into
+   hyperedges.
+
+10. Frozen F is a Feature, not a clock
+    A foundation model may propose. Park licenses. Tests kill.
+    Online degrees of freedom are a small z, not W.
+
 Do not
 ------
 - Put an LLM inside OSAHR hazards or SyberRuntime oracles that
@@ -55,3 +66,6 @@ Do not
 - Let software-dev verbs become 6G occurrence types.
 - Let a training loop rewrite G.
 - Treat Research_Directions.txt scores as measurements.
+- Put an LLM or z-update inside occurrence hazards.
+- Represent neurons, layers, or residual streams as 6G
+  occurrence types.

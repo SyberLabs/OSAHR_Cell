@@ -25,6 +25,8 @@ Ledger (one file each)
 06_complex_system_management.txt
 07_bayesian_edge_sensors.txt  factors on hyperedges; posterior, not rewrite
 08_next_steps.txt             apex: close park on one checkable world
+09_hybrid_substrate.txt       inhabitant PDMP; taxonomy, not a new CfC
+10_frozen_operator_controller.txt  envelope: frozen F + licensed z
 
 Canonical GitHub: https://github.com/SyberLabs/OSAHR_Cell
 Older ranking of OSAHR application attractiveness (not this

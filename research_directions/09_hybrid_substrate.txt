@@ -1,0 +1,89 @@
+09  HYBRID SUBSTRATE (INHABITANT EMBEDDING)
+==========================================
+Grade: PROPOSED mathematical program. Not a kernel change, not a
+SKU, not confirmatory science. Frozen 02A/02B remain the evidence.
+
+What this direction is
+----------------------
+OSAHR 0.2 is already a typed stochastic rewrite engine. Liquid-OSAHR
+02A is already a piecewise-deterministic Markov process over a
+typed graph plus a continuous field H. The interesting theoretical
+object is that hybrid class, not "a graph engine with an LNN
+attached."
+
+Canonical kernel state stays
+
+    X = (G, B, R, Theta, Z, t, n)
+
+H is not first-class in osahr/. Liquid-OSAHR extends the descendant
+state to (G, H, B, R, Theta, Z, t, n). That extension is a named
+semantic mode. It is not a silent seventh coordinate in the kernel.
+
+02A already wrote the generator (conceptual, finite G, declared
+bounds):
+
+    L f(G,H) = nabla_H f · F_G(H)
+             + sum_e lambda_e(G,H) [f(T_e G, J_e H) - f(G,H)]
+
+and MEASURED that closing the loop is not automatically better
+counterfactually. The recursion
+
+    delta lambda -> delta e -> delta G -> delta H -> delta lambda
+
+is the model-risk channel. A math program starts there.
+
+Two embeddings (do not mix)
+---------------------------
+Inhabitant: the neural system *is* (G, H, flow, jumps). 02A is
+this, with H attached to existing twin entities, not with neurons
+as vertices.
+
+Envelope: the neural system is an exogenous operator F. OSAHR
+holds G, z, R and licenses modulation. That is 10, and it is
+closer to 06 / GrokCell than to 02A.
+
+A neuron/synapse hypergraph of an LNN is a *third* schema. 02A
+did not do it. Kernel meta-rewriting is finite precompiled
+templates, DPO-valid, no runtime codegen. Do not pretend 0.2
+already simulates arbitrary architecture search.
+
+What to prove (paper track)
+---------------------------
+1. Expressivity taxonomy, as a table of kernel configurations
+   to process classes (CTMC, PDMP, nonhomogeneous jump, learned
+   PDMP, hybrid graph dynamical system, adaptive process,
+   evolving transition system). This is a characterization of
+   what 0.2 plus named modes already are. No new experiment.
+
+2. Representation theorem, finite case: a finite-dimensional
+   continuous-time recurrent system whose flow meets the
+   kernel's Lipschitz / dominating-bound contracts embeds into
+   a Liquid-OSAHR model with *fixed* typed graph and continuous
+   field. Topology change is a separate theorem and requires
+   the 0.2 meta-rewrite envelope (templates, max_instances).
+
+3. Stability / jump sensitivity as bounds on Phi and J under
+   a frozen topology, then under a declared finite rewrite
+   class. Cite 02A as the empirical warning, not as a new run.
+
+4. Interpretability only as intervention on *defined*
+   occurrences or boundary events: P(Y | do(e)) vs P(Y).
+   Activation attribution is not do(neuron). 02B already
+   separated predictive trust from intervention trust.
+
+Do not
+------
+- Put H into osahr/ state hashes.
+- Compile an LNN into neuron-vertices and call that 0.2.
+- Treat Transformer residual streams as DPO rewrites.
+- Elect alpha-star because a representation theorem exists.
+- Retune 02A/02B. Frozen artifacts only.
+- Let this replace 08. Park is still the product loop.
+- Call a weighted CfC a universal neural simulator.
+
+Viability
+---------
+High as a theory spine for the Cell (one paper, frozen evidence).
+Low as a product. Without withhold-and-act it is another hybrid-
+systems manifesto. The platform gain is the taxonomy: it tells
+us which named mode we are in before we write a new experiment.
