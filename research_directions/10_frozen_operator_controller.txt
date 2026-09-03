@@ -1,0 +1,98 @@
+10  FROZEN OPERATOR + LICENSED z (ENVELOPE EMBEDDING)
+====================================================
+Grade: PROPOSED platform pattern. Not "OSAHR makes LLMs learn."
+Not confirmatory. Depends on 08: no envelope SKU before park is
+boring on one checkable world.
+
+What this direction is
+----------------------
+A frozen foundation model is a large nonlinear operator F_W0.
+Do not attempt W_t in R^{|W0|}. Introduce a small adaptive state
+
+    z_t in R^d,    d << |W0|
+
+and (optionally) a typed graph G_t of *task/semantic* structure,
+not of Transformer layers. The effective map is
+
+    y_t = F_W0(x_t, z_t)
+
+with z evolving as a hybrid process that OSAHR can audit:
+
+    z-dot = G(z, F_W0(x,z), G_t)     between licensed events
+    z+    = J_e(z)                   at a declared occurrence
+
+Training (off clock, 04) may learn a manifold {A_i} so that a
+projective modulation
+
+    W_t ~ W0 + sum_i z_i(t) A_i
+
+is a low-rank adapter. At deployment only z moves. The A_i stay
+frozen. That is the only computationally honest continuous-
+learning claim.
+
+This is envelope embedding (09): F is exogenous. F does not
+enter hazards. F is not a hyperedge. F is an AnLF-class operator
+on the boundary, or a SyberRuntime Feature, depending on the
+artifact.
+
+What OSAHR actually owns
+------------------------
+    X = (G, B, R, Theta, Z, t, n)
+
+z lives in Theta/Z (constrained AdaptiveParameter / memory),
+or in a Liquid descendant field that is *not* the Transformer.
+G is vault-legal semantic state (goals, constraints, uncertainty,
+memory nodes) as in 06. R enable/disable of *modulation ports*
+is legal meta-rewriting. Chat is not G.
+
+Junction law (05) licenses a z-update the same way it licenses
+a rewrite: admit / hold_unresolved / reject / outcome_unknown.
+A chat preference is not an estimand. Without a held-out suite
+that can kill a mutant, status is outcome_unknown and park
+refuses.
+
+Why 02A is the warning, not the demo
+------------------------------------
+The loop z -> F -> consequences -> z is the same recursion 02A
+MEASURED on (H, lambda, G). Closing it can amplify misspecification
+while remaining well-defined. Therefore:
+
+- no LLM inside lambda
+- no silent z-update on every token
+- intervention claims on F(x,z) vs F(x,z0) need a declared
+  estimand and an ensemble, as in 02B/05
+- "the agent is the frozen model plus a liquid organism" is
+  allowed as architecture only if Stabilize of z is park, not
+  context stuffing
+
+Capacity question worth asking later
+------------------------------------
+How much behavioral class B_d is reachable by dim(z)=d around a
+frozen F, on a *checkable* artifact (patch, routing-policy file,
+claim text with a verifier). Not on open chat. This is a research
+question for after 08 gate 3, not a reason to start an LLM SKU.
+
+Relation to other directions
+----------------------------
+04 already said: govern training, do not be PyTorch; SGD is off
+clock. 03 already said: Feature incurs Test debt; the generator
+does not discharge it. 08 already said: one artifact type until
+dull. 10 is those three with F_W0 as the generator and z as the
+only online degree of freedom. It is not a fourth kernel.
+
+Do not
+------
+- Pitch "continual retraining of the LLM."
+- Put tokens, layers, or attention heads in the 6G schema.
+- Let z rewrite G.
+- Use next-token loss as do(.).
+- Activate adapters as if they were route-task matches.
+- Start this before park is boring on python_tests (08).
+
+Viability
+---------
+High as the *envelope* pattern once a checkable world exists
+(same park as 03/04). Rejected as an LLM product. Crowded, and
+02A already showed the closed loop is the hazard. The system
+around the Transformer may become liquid. The Transformer does
+not. The Cell does not become a chat engine.
