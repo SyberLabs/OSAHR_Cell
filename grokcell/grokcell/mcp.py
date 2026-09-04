@@ -44,7 +44,15 @@ class McpServer:
         if not method:
             return _error(msg_id, -32600, "Invalid Request")
         if method == "initialize":
-            return _ok(msg_id, self._initialize(message.get("params") or {}))
+            params = message.get("params") or {}
+            owner = str(params.get("owner") or "").strip()
+            if owner:
+                bound = self.tools.bind(owner)
+                if bound["decision"] != "accepted":
+                    return _error(msg_id, -32602, f"Unknown owner: {owner}")
+            result = self._initialize(params)
+            result["session"] = {"owner": self.tools.bound_owner}
+            return _ok(msg_id, result)
         if method == "ping":
             return _ok(msg_id, {})
         if method == "tools/list":
@@ -111,7 +119,7 @@ class McpServer:
 
 
 def main() -> None:
-    server = McpServer(ToolRegistry(GrokCellSurface.open()))
+    server = McpServer(ToolRegistry(GrokCellSurface.open(), bound_owner=None))
     server.serve_stdio(sys.stdin, sys.stdout)
 
 
