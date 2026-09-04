@@ -6,3 +6,4 @@ Experiment 06 (seed 260826) is the last executed confirmatory record.
 Do not merge these notes into osahr/ kernel legality.
 
 Canonical GitHub: https://github.com/SyberLabs/OSAHR_Cell
+Vision mock (not a product): ../vision/barn/index.html

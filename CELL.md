@@ -13,6 +13,7 @@ Ledger          research_directions/INDEX.txt  not science
 GrokCell skills .cursor/skills/
 GrokCell surface grokcell/                     prototype host grokbots run
 Workbench       workbench/                     licensed decision packets over exp 06
+Vision mock     vision/barn/                   PROPOSED picture of the raise
 
 Do not cite research_directions as MEASURED. Experiment 06 (seed 260826)
 is the last executed confirmatory record. Do not put an LLM in hazards.
