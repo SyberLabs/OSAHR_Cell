@@ -1,0 +1,111 @@
+12  GROKCELL PRODUCTION GATES
+=============================
+Grade: PROPOSED operating note. Not confirmatory. Not a new kernel.
+Experiment 06 (seed 260826) remains the last executed confirmatory
+record. Owner of this note: PI asked 2026-09-04 to review v1
+and name what grokbot production requires.
+
+Verdict
+-------
+v1 is a legal prototype of the control plane. It is not a grokbot
+host. A grokbot that called it today could lie about fidelity,
+spoof an owner, and lose all state when the process dies.
+Park licenses G. Nothing yet licenses the bot.
+
+What v1 actually is (keep)
+--------------------------
+Typed bus. Vault classify. 05 grammar. Sequential Component
+assembly through DPO. Spawn registers owners in memory; it does
+not rewrite G. Skills are name tokens on owners. Deterministic.
+No LLM. That geometry is correct. Do not replace it.
+
+What is broken for grokbot use (fix, in this order)
+---------------------------------------------------
+1. verified is a client boolean.
+   A bot sets payload.verified=True and critical_module admits.
+   Experiment 05/06 scored claims from an ensemble. Here the
+   product law is hollow. Production: a runner the bot does not
+   control sets verified. Fail-closed if the runner is absent.
+
+2. Chat is still the database.
+   Surface, hold queue, and owners live in process memory.
+   Claims notes are gitignored files with no reload. Restart
+   = empty cell. Production: snapshot X + bus + owners to
+   files; inspect/open reloads them. Kernel already snapshots.
+
+3. Tools are a Python dict, not a host.
+   mcp_manifest() exists. There is no MCP stdio/HTTP server, no
+   Cursor MCP bind, no grok function-calling loop. Production:
+   one stdio MCP process wrapping ToolRegistry.call. Same
+   schemas. Do not invent a second API.
+
+4. source_owner is a string the caller picks.
+   Ghosts can bus.post. Spawn does not bind a session. Production:
+   connect as an owner; post rejected unless source_owner is in
+   the registry (MOUTH or spawned). Spawn itself is how a new
+   name enters.
+
+5. admit writes a name, not an artifact.
+   Component vertices hold a string. No module, no test, no
+   mutant. Park cannot send/publish/delete/sign a real object.
+   Production: one artifact type (generated module + tests).
+   admit writes files. Tests can kill a mutant. That is 08.3.
+   Without it, grokbots are a guestbook.
+
+6. Skills do not run.
+   oda.attach_skill stores "grokcell-forge". It does not load
+   .cursor/skills or constrain tools. Production: a skill rail
+   is a declared tool allow-list on that owner, not a sticker.
+
+Smaller holes (after 1-5)
+-------------------------
+- Dual spawn path (bus vs oda.spawn tool) with no single audit.
+  One path: tool posts on the bus.
+- rail argument is dropped; only skill name is kept.
+- job is returned, not stored.
+- bus.drain claims every admit hits the kernel; spawn does not.
+- No detach/dissolve. Spawn without death fills the registry.
+- No idempotency key. Retry double-spawns or double-admits.
+- Nested grokcell/grokcell package. Fine until install is real.
+
+Advancements that wait (do not start)
+-------------------------------------
+- Multi-owner routing as a CTMC / "intelligent mesh"
+- LLM in lambda or as the classifier
+- Unfreezing foundation weights (10)
+- Specialist swarm to carry messages
+- 6G / cyber SKU
+- Putting owners on the construction graph as vertices
+- A second kernel fused with SyberRuntime
+
+Ordered production gates
+------------------------
+Stop at each. A later gate without an earlier one is theater.
+
+A. Honest verified. python_tests (or the 06 twin as Simulate)
+   writes the fidelity bit. Bot cannot set it. Fail-closed.
+
+B. File snapshot of surface + kernel. open() resumes. Chat is
+   not the database.
+
+C. One MCP stdio server. Grokbot host (Cursor MCP or grok
+   function-calling) talks only through existing tool names.
+
+D. Session bind. source_owner must be a registered owner.
+
+E. One artifact type on admit. Files on disk. Mutants die.
+   Park send/publish/delete/sign those files, still via DPO
+   for G and via the filesystem for the artifact.
+
+Done when a grokbot, across two process lives, can propose a
+module, be held, get a runner-scored admit, and leave a
+checkable Component plus tests in the cell tree — without
+setting verified itself and without rewriting G except
+through park/DPO.
+
+Do not
+------
+- Call v1 production.
+- Add owners to make the missing evaluator unnecessary.
+- Build a message fabric before A.
+- Put this note forward as MEASURED.
