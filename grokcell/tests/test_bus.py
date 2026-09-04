@@ -24,11 +24,11 @@ def test_constraints_outrank_priority():
         {
             "source_owner": "MOUTH",
             "kind": "forge.propose",
-            "priority": 1,
+            "priority": 99,
             "payload": {
                 "name": "core.api",
                 "constraint": "critical_module",
-                "verified": True,
+                "verified": False,
                 "depends_on": [],
             },
         },
@@ -38,22 +38,20 @@ def test_constraints_outrank_priority():
         {
             "source_owner": "MOUTH",
             "kind": "oda.spawn",
-            "priority": 99,
-            "payload": {"bot_name": "swarm"},
+            "priority": 1,
+            "payload": {"bot_name": "edge-sensor"},
         },
     )
     drained = tools.call("bus.drain", {})
-    statuses = [item["status"] for item in drained["results"]]
-    kinds = [item["kind"] for item in drained["results"]]
     spawn = next(item for item in drained["results"] if item["kind"] == "oda.spawn")
     propose = next(item for item in drained["results"] if item["kind"] == "forge.propose")
-    assert spawn["status"] == "reject"
-    assert propose["status"] == "admit"
-    assert kinds.count("oda.spawn") == 1
+    assert spawn["status"] == "admit"
+    assert propose["status"] == "reject"
+    assert propose["reason"] == "unverified_critical"
     inspect = tools.call("surface.inspect", {})
-    assert "core.api" in inspect["components"]
-    assert inspect["bots_spawned"] == 0
-    assert statuses
+    assert inspect["components"] == []
+    assert "edge-sensor" in inspect["owners"]
+    assert inspect["bots_spawned"] == 1
 
 
 def test_missing_dependency_holds():
