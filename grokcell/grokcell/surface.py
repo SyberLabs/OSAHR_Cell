@@ -4,6 +4,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from pathlib import Path
 
+from .artifact import ArtifactStore, resolve_artifact
 from .bus import as_item, classify, drain_order
 from .construction import (
     build_runtime,
@@ -24,6 +25,7 @@ class GrokCellSurface:
     runtime: object
     fidelity: FidelityStore
     snapshots: SnapshotStore
+    artifacts: ArtifactStore
     queued: list[Message] = field(default_factory=list)
     held: dict[str, Message] = field(default_factory=dict)
     seq: int = 0
@@ -39,6 +41,7 @@ class GrokCellSurface:
         loaded = vault if vault is not None else ConstraintVault.load()
         scores = fidelity if fidelity is not None else FidelityStore.load()
         store = SnapshotStore.load(state)
+        artifacts = ArtifactStore(store.root / "artifacts")
         pair = store.load_pair()
         if pair is None:
             return cls(
@@ -46,6 +49,7 @@ class GrokCellSurface:
                 runtime=build_runtime(),
                 fidelity=scores,
                 snapshots=store,
+                artifacts=artifacts,
             )
         kernel, surface = pair
         return cls(
@@ -53,6 +57,7 @@ class GrokCellSurface:
             runtime=runtime_from_snapshot(kernel),
             fidelity=scores,
             snapshots=store,
+            artifacts=artifacts,
             queued=list(surface.queued),
             held=dict(surface.held),
             seq=surface.seq,
@@ -121,6 +126,9 @@ class GrokCellSurface:
 
     def _commit_propose(self, message: Message) -> None:
         payload = message.payload
+        artifact = resolve_artifact(payload)
+        if artifact is not None:
+            self.artifacts.materialize(artifact)
         self.inject_seq += 1
         licensed_assemble(
             self.runtime,
@@ -169,7 +177,17 @@ class GrokCellSurface:
             "new_bot": True,
         }
 
-    def park_request(self, *, status: str, message_id: str) -> dict:
+    def park_request(
+        self,
+        *,
+        status: str = "",
+        message_id: str = "",
+        act: str = "",
+        name: str = "",
+    ) -> dict:
+        verb = str(act or "").strip()
+        if verb:
+            return self.artifacts.act(act=verb, name=name)
         if status != "hold_unresolved":
             return {
                 "decision": "refused",
@@ -257,4 +275,5 @@ class GrokCellSurface:
             "hold_queue": len(self.held),
             "queued": len(self.queued),
             "held": held,
+            "artifacts": self.artifacts.list(),
         }

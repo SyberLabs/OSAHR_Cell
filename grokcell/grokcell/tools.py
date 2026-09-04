@@ -47,9 +47,8 @@ TOOL_SCHEMAS: dict[str, dict[str, Any]] = {
     "park.request": {
         "name": "park.request",
         "description": (
-            "Request commit of a held propose. Refused unless status is "
-            "hold_unresolved and dependencies are now present. Does not "
-            "bypass DPO."
+            "License a held propose onto G, or send/publish/delete/sign "
+            "admitted artifact files. Does not bypass DPO."
         ),
         "inputSchema": {
             "type": "object",
@@ -59,8 +58,12 @@ TOOL_SCHEMAS: dict[str, dict[str, Any]] = {
                     "enum": ["admit", "hold_unresolved", "reject", "outcome_unknown"],
                 },
                 "message_id": {"type": "string"},
+                "act": {
+                    "type": "string",
+                    "enum": ["send", "publish", "delete", "sign"],
+                },
+                "name": {"type": "string"},
             },
-            "required": ["status", "message_id"],
         },
     },
     "oda.spawn": {
@@ -181,8 +184,10 @@ class ToolRegistry:
 
     def _park(self, arguments: dict[str, Any]) -> dict[str, Any]:
         return self.surface.park_request(
-            status=str(arguments["status"]),
-            message_id=str(arguments["message_id"]),
+            status=str(arguments.get("status") or ""),
+            message_id=str(arguments.get("message_id") or ""),
+            act=str(arguments.get("act") or ""),
+            name=str(arguments.get("name") or ""),
         )
 
     def _spawn(self, arguments: dict[str, Any]) -> dict[str, Any]:
