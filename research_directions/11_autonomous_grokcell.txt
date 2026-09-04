@@ -1,0 +1,53 @@
+11  AUTONOMOUS GROKCELL
+=======================
+Grade: PROTOTYPE surface. Not confirmatory. Not a kernel change.
+Experiment 06 (seed 260826) remains the last executed confirmatory
+record.
+
+What this direction is
+----------------------
+A stateful agentic surface grokbots can run, with intelligent
+message passing as a *control plane above them*. OSAHR is the
+model-tooling infrastructural layer: the construction twin, DPO
+legality, and park. Agents interact through tool ports. They do
+not become occurrence types.
+
+This is 08 made concrete as GrokCell, not a specialist swarm.
+
+    Agent -> bus.post(priority, constraints)
+          -> admit | hold | reject | unknown
+          -> OSAHR assemble-component on admit
+          -> sequential Component graph
+
+ODA locks stay in force. Solo is the default. New rail = skill
+on MOUTH. oda.spawn is refused in v0 regardless of priority.
+Chat is not the database. Park send/publish/delete/sign.
+
+What v0 already does
+--------------------
+Deterministic bus. Vault-gated classify. Sequential construction
+of named components through the kernel. Hold until dependencies
+exist. park.request refused unless hold_unresolved and deps are
+present. No LLM.
+
+What v0 does not do
+-------------------
+- Multi-agent routing as a CTMC
+- LLM in lambda
+- Unfreezing foundation weights (10)
+- A confirmatory seed
+- python_tests as the checkable world (next slice toward 08.3)
+
+Do not
+------
+- Invent grokbots to carry messages
+- Put bus.kind values into osahr-6g
+- Let priority admit an illegal propose
+- Call this MEASURED
+
+Viability
+---------
+This is the right host for grokbots if park stays the join.
+It becomes a toy if we spawn a swarm to "orchestrate." The next
+honest slice is one checkable artifact type (generated module
+plus tests that can kill a mutant), not more owners.

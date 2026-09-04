@@ -58,6 +58,11 @@ They are not a license to collapse domains into one schema.
     A foundation model may propose. Park licenses. Tests kill.
     Online degrees of freedom are a small z, not W.
 
+11. GrokCell surface is the agent host
+    Messages are control-plane records. They are not occurrence
+    types. One mouth. oda.spawn is refused. Construction rewrites
+    G only through park. See 11_autonomous_grokcell.txt.
+
 Do not
 ------
 - Put an LLM inside OSAHR hazards or SyberRuntime oracles that
@@ -69,3 +74,4 @@ Do not
 - Put an LLM or z-update inside occurrence hazards.
 - Represent neurons, layers, or residual streams as 6G
   occurrence types.
+- Spawn specialist bots to carry control-plane messages.
