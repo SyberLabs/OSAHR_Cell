@@ -53,6 +53,7 @@ Do not
 Viability
 ---------
 This is the right host for grokbots if park stays the join.
-It becomes a toy if spawn rewrites G. The next honest slice is
-one checkable artifact type (generated module plus tests that
-can kill a mutant).
+It becomes a toy if spawn rewrites G, or if a bot may set
+verified itself. Production gates are in 12_grokcell_production.txt.
+The next honest slice is still one checkable artifact type
+(generated module plus tests that can kill a mutant).

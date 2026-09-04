@@ -63,6 +63,7 @@ They are not a license to collapse domains into one schema.
     Messages are control-plane records. They are not occurrence
     types. oda.spawn registers an owner. Construction rewrites
     G only through park. See 11_autonomous_grokcell.txt.
+    Production for grokbots: 12_grokcell_production.txt.
 
 Do not
 ------
