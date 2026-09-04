@@ -25,13 +25,19 @@ rewrite G. Construction still goes through park / licensed admit.
 Priority orders the queue. **Legality outranks priority**. `payload.verified`
 is ignored. `critical_module` admits only after a python_tests record
 and after an AST mutant dies. Frozen suites still need
-`python -m grokcell.runner <name>` first. Generated `module` + `tests`
-in the payload are scored by the surface. Fail-closed if the runner
-is absent or the mutant survives.
+`python -m grokcell.runner <name>` first. Generated `module` + `tests` are
+untrusted Python and are refused unless an OS-isolated executor is supplied.
+This prototype has no portable OS sandbox. For trusted local development only,
+set `GROKCELL_ALLOW_UNSANDBOXED_RUNNER=1` to execute them on the host; the
+runner still applies a hard timeout, bounded output, a minimal environment,
+content-integrity checks, and mutation testing. Frozen repository suites do not
+require this opt-in. Fail closed if the runner is absent or a mutant survives.
 
 **Chat is not the database.** `open()` resumes `vault/state/`
 (kernel checkpoint + surface queue/holds + admitted artifacts).
 Delete that directory for a fresh cell. Snapshot is not an MCP tool.
+Installed wheels keep mutable state under `~/.grokcell/vault/` by default;
+the source checkout retains the repository-local `vault/` behavior.
 
 ## Run
 

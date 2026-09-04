@@ -4,13 +4,24 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "grokcell-surface"
-version = "0.1.0"
+version = "0.1.1"
 description = "Stateful GrokCell agentic surface over the frozen OSAHR kernel"
 requires-python = ">=3.11"
 license = "MIT"
+dependencies = [
+  "osahr==0.2.1",
+  "pytest>=8,<10",
+]
 
 [tool.setuptools.packages.find]
 include = ["grokcell*"]
+
+[tool.setuptools.package-data]
+grokcell = [
+  "resources/vault/concepts/*.md",
+  "resources/world/pytest.ini",
+  "resources/world/suites/*/*.py",
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

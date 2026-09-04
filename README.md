@@ -146,7 +146,7 @@ No arbitrary source is compiled during a run. Dynamic rule hashes are included i
 ## Install
 
 ```bash
-python -m pip install osahr-0.2.0-py3-none-any.whl
+python -m pip install osahr-0.2.1-py3-none-any.whl
 ```
 
 For a source checkout:

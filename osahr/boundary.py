@@ -3,10 +3,12 @@
 from __future__ import annotations
 
 import copy
+import math
 from dataclasses import dataclass, field
 from enum import Enum
-from typing import Any
+from typing import Any, Mapping
 
+from .canonical import validate_state_value
 from .errors import ValidationError
 from .ids import EntityId
 from .schema import AttributeSpec
@@ -37,6 +39,10 @@ class BoundaryHandle:
     metadata: dict[str, Any] = field(default_factory=dict)
 
     def validate_payload(self, payload: dict[str, Any]) -> None:
+        try:
+            validate_state_value(payload)
+        except (TypeError, ValueError) as exc:
+            raise ValidationError("Boundary payload is not finite canonical data") from exc
         if not self.allow_payload_extensions:
             unknown = set(payload) - self.payload_schema.keys()
             if unknown and self.payload_schema:
@@ -79,6 +85,8 @@ class BoundaryState:
                 "interface_type": handle.interface_type,
                 "binding": None if handle.binding is None else str(handle.binding),
                 "nullable": handle.nullable,
+                "payload_schema": handle.payload_schema,
+                "allow_payload_extensions": handle.allow_payload_extensions,
                 "input_mode": handle.input_mode.value,
                 "metadata": handle.metadata,
             }
@@ -91,9 +99,33 @@ class ExternalEvent:
     simulation_time: float
     source_namespace: str
     source_sequence: int
-    event_id: str = field(compare=False)
+    event_id: str
     handle_id: str = field(compare=False)
     payload: dict[str, Any] = field(compare=False, default_factory=dict)
+
+    def __post_init__(self) -> None:
+        if (
+            isinstance(self.simulation_time, bool)
+            or not isinstance(self.simulation_time, (int, float))
+            or not math.isfinite(self.simulation_time)
+            or self.simulation_time < 0.0
+        ):
+            raise ValidationError("External event time must be finite and non-negative")
+        if not isinstance(self.source_namespace, str) or not self.source_namespace:
+            raise ValidationError("External event source namespace cannot be empty")
+        if (
+            isinstance(self.source_sequence, bool)
+            or not isinstance(self.source_sequence, int)
+            or self.source_sequence < 0
+        ):
+            raise ValidationError("External event source sequence must be non-negative")
+        if not isinstance(self.event_id, str) or not self.event_id:
+            raise ValidationError("External event ID cannot be empty")
+        if not isinstance(self.handle_id, str) or not self.handle_id:
+            raise ValidationError("External event handle ID cannot be empty")
+        if not isinstance(self.payload, Mapping):
+            raise ValidationError("External event payload must be a mapping")
+        object.__setattr__(self, "payload", copy.deepcopy(dict(self.payload)))
 
 
 @dataclass(frozen=True, slots=True)
@@ -105,6 +137,29 @@ class OutputEvent:
     event_type: str
     payload: dict[str, Any]
     causing_event_id: str
+
+    def __post_init__(self) -> None:
+        if (
+            not isinstance(self.event_id, str)
+            or not self.event_id
+            or isinstance(self.simulation_time, bool)
+            or not isinstance(self.simulation_time, (int, float))
+            or not math.isfinite(self.simulation_time)
+            or self.simulation_time < 0.0
+            or isinstance(self.event_index, bool)
+            or not isinstance(self.event_index, int)
+            or self.event_index < 0
+            or not isinstance(self.source_handle, str)
+            or not self.source_handle
+            or not isinstance(self.event_type, str)
+            or not self.event_type
+            or not isinstance(self.causing_event_id, str)
+            or not self.causing_event_id
+        ):
+            raise ValidationError("Output event identity is invalid")
+        if not isinstance(self.payload, Mapping):
+            raise ValidationError("Output event payload must be a mapping")
+        object.__setattr__(self, "payload", copy.deepcopy(dict(self.payload)))
 
 
 @dataclass(slots=True)

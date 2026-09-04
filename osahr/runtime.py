@@ -16,16 +16,16 @@ import copy
 import heapq
 import math
 from collections import deque
-from dataclasses import dataclass, field
 from typing import Any, Callable, Iterable
 
 from .adaptive import AdaptiveRegistry
 from .boundary import (
+    BoundaryDirection,
     BoundaryState,
     ExternalEvent,
     OutputEvent,
 )
-from .canonical import stable_hash
+from .canonical import stable_hash, validate_state_value
 from .commit import (
     fire_internal,
     process_external,
@@ -41,8 +41,17 @@ from .model import Model, RuntimeConfig
 from .observables import Observable
 from .occurrence import Occurrence, OccurrenceDelta, OccurrenceIndex, OccurrenceKey
 from .pattern import Rule, StateAssignment
+from .pending_validation import validate_pending_event
 from .rewrite import RewriteEngine, RewriteResult
 from .rng import RandomDraw, RandomStreams
+from .runtime_state import (
+    EnabledOccurrence,
+    PendingInternalEvent,
+    PlanCheckpoint as _PlanCheckpoint,
+    RuntimeSnapshot,
+    ScheduledAdaptation,
+    StepCheckpoint as _StepCheckpoint,
+)
 from .schedulers import (
     NextReactionScheduler,
     NextReactionSnapshot,
@@ -52,60 +61,8 @@ from .schedulers import (
 )
 
 
-@dataclass(frozen=True, slots=True, order=True)
-class ScheduledAdaptation:
-    simulation_time: float
-    source_sequence: int
-    update_id: str = field(compare=False)
-    assignments: tuple[StateAssignment, ...] = field(compare=False)
-
-
-@dataclass(frozen=True, slots=True)
-class EnabledOccurrence:
-    rule: Rule
-    match: Match
-    hazard: float
-
-
-@dataclass(slots=True)
-class PendingInternalEvent:
-    absolute_time: float
-    occurrence: EnabledOccurrence
-    draws: list[RandomDraw]
-    planned_at_time: float
-    planned_state_hash: str
-    total_activity: float
-    scheduler_kind: SchedulerKind = SchedulerKind.DIRECT_SSA
-    survival_integral_exact: bool = True
-    survival_integral: float | None = None
-
-
-@dataclass(slots=True)
-class RuntimeSnapshot:
-    graph: Hypergraph
-    boundary: BoundaryState
-    rules: dict[str, Rule]
-    parameters: dict[str, Any]
-    memory: dict[str, Any]
-    time: float
-    last_event_time: float
-    event_index: int
-    root_seed: int
-    rng_states: dict[str, tuple[int, int, int, int]]
-    external_queue: list[ExternalEvent]
-    adaptation_queue: list[ScheduledAdaptation]
-    meta_queue: list[MetaRuleEvent]
-    pending_internal: PendingInternalEvent | None
-    output_events: list[OutputEvent]
-    run_id: str
-    scheduler_kind: SchedulerKind
-    next_reaction_snapshot: NextReactionSnapshot | None = None
-    next_reaction_initialized: bool = False
-    thinning_audit: ThinningAudit = field(default_factory=ThinningAudit)
-
-
 class Runtime:
-    RUNTIME_VERSION = "osahr-python-0.2.0"
+    RUNTIME_VERSION = "osahr-python-0.2.1"
 
     def __init__(
         self,
@@ -114,14 +71,48 @@ class Runtime:
         root_seed: int,
         config: RuntimeConfig | None = None,
     ) -> None:
+        if (
+            isinstance(root_seed, bool)
+            or not isinstance(root_seed, int)
+            or root_seed < 0
+            or root_seed >= 1 << 128
+        ):
+            raise ValueError("root_seed must be an unsigned 128-bit integer")
+        try:
+            if stable_hash(model.graph.schema.to_canonical()) != model.graph.schema.hash:
+                raise ValidationError("Model schema hash is stale")
+            model.graph.validate()
+            model.boundary.validate(set(model.graph.vertices))
+            for rule in model.rules:
+                if stable_hash(rule.to_canonical()) != rule.hash:
+                    raise ValidationError(f"Rule {rule.rule_id!r} hash is stale")
+            for template in model.rule_templates:
+                if stable_hash(template.prototype.to_canonical()) != template.prototype.hash:
+                    raise ValidationError(
+                        f"Rule template {template.template_id!r} prototype hash is stale"
+                    )
+            validate_state_value(model.parameters)
+            validate_state_value(model.memory)
+            if stable_hash(model.to_canonical()) != model.hash:
+                raise ValidationError("Model hash is stale")
+        except (TypeError, ValueError) as exc:
+            raise ValidationError("Model authoritative state is not canonical") from exc
         self.model_hash = model.hash
         self.graph = model.graph.clone()
         self.boundary = model.boundary.clone()
-        self.rules = {rule.rule_id: rule for rule in model.rules}
-        self.rule_templates = {template.template_id: template for template in model.rule_templates}
+        owned_rules = copy.deepcopy(model.rules)
+        owned_templates = copy.deepcopy(model.rule_templates)
+        self.rules = {rule.rule_id: rule for rule in owned_rules}
+        self.rule_templates = {
+            template.template_id: template for template in owned_templates
+        }
+        self._rule_template_hashes = {
+            template_id: stable_hash(template.to_canonical())
+            for template_id, template in self.rule_templates.items()
+        }
         self.parameters = copy.deepcopy(model.parameters)
         self.memory = copy.deepcopy(model.memory)
-        self.adaptive_registry = AdaptiveRegistry(model.adaptive_parameters)
+        self.adaptive_registry = AdaptiveRegistry(copy.deepcopy(model.adaptive_parameters))
         self.adaptive_registry.validate(self.parameters)
 
         self.time = 0.0
@@ -147,6 +138,7 @@ class Runtime:
         self.adaptation_queue: list[ScheduledAdaptation] = []
         self.meta_queue: list[MetaRuleEvent] = []
         self.pending_internal: PendingInternalEvent | None = None
+        self._pending_integrity: str | None = None
 
         self.next_reaction = NextReactionScheduler()
         self._next_reaction_initialized = False
@@ -157,6 +149,8 @@ class Runtime:
         self.observables: dict[str, Observable] = {}
         self._recent_event_times: deque[float] = deque()
         self._indexed_augmented_hash: str | None = None
+        self._continuation_allowed = True
+        self._identity_version = 2
 
         self.run_id = stable_hash(
             {
@@ -164,8 +158,7 @@ class Runtime:
                 "initial_graph": self.graph.state_hash,
                 "root_seed": root_seed,
                 "runtime": self.RUNTIME_VERSION,
-                "scheduler": self.scheduler_kind.value,
-                "matcher": self.config.matcher_backend,
+                "config": self.config.to_canonical(),
             }
         )
         self._validate_limits()
@@ -186,9 +179,20 @@ class Runtime:
             )
 
     def _rule_state_canonical(self) -> list[tuple[str, str]]:
-        return [(rule_id, self.rules[rule_id].hash) for rule_id in sorted(self.rules)]
+        result: list[tuple[str, str]] = []
+        for rule_id in sorted(self.rules):
+            rule = self.rules[rule_id]
+            if rule_id != rule.rule_id or stable_hash(rule.to_canonical()) != rule.hash:
+                raise ReplayError("Runtime authoritative rule map is stale")
+            result.append((rule_id, rule.hash))
+        return result
 
     def _state_hash_at(self, time_value: float) -> str:
+        if (
+            stable_hash(self.graph.schema.to_canonical())
+            != self.graph.schema.hash
+        ):
+            raise ReplayError("Runtime schema hash is stale")
         return stable_hash(
             {
                 "graph": self.graph.to_canonical(),
@@ -231,21 +235,37 @@ class Runtime:
         )
 
     def inject(self, event: ExternalEvent) -> None:
+        self._require_continuation()
         if event.simulation_time < self.time:
             raise ValidationError("Cannot inject an event in the simulation past")
         if event.handle_id not in self.boundary.handles:
             raise ValidationError(f"Unknown boundary handle {event.handle_id!r}")
-        heapq.heappush(self.external_queue, event)
+        handle = self.boundary.handles[event.handle_id]
+        if handle.direction not in {
+            BoundaryDirection.INPUT,
+            BoundaryDirection.BIDIRECTIONAL,
+        }:
+            raise ValidationError(f"Boundary handle {event.handle_id!r} does not accept input")
+        handle.validate_payload(event.payload)
+        if any(item.event_id == event.event_id for item in self.external_queue):
+            raise ValidationError(f"Duplicate external event ID {event.event_id!r}")
+        heapq.heappush(self.external_queue, copy.deepcopy(event))
 
     def schedule_adaptation(self, update: ScheduledAdaptation) -> None:
+        self._require_continuation()
         if update.simulation_time < self.time:
             raise ValidationError("Cannot schedule adaptation in the simulation past")
-        heapq.heappush(self.adaptation_queue, update)
+        if any(item.update_id == update.update_id for item in self.adaptation_queue):
+            raise ValidationError(f"Duplicate scheduled adaptation ID {update.update_id!r}")
+        heapq.heappush(self.adaptation_queue, copy.deepcopy(update))
 
     def schedule_meta(self, event: MetaRuleEvent) -> None:
+        self._require_continuation()
         if event.simulation_time < self.time:
             raise ValidationError("Cannot schedule meta-rule update in the simulation past")
-        heapq.heappush(self.meta_queue, event)
+        if any(item.event_id == event.event_id for item in self.meta_queue):
+            raise ValidationError(f"Duplicate meta-rule event ID {event.event_id!r}")
+        heapq.heappush(self.meta_queue, copy.deepcopy(event))
 
     # ------------------------------------------------------------------
     # Limits and occurrence maintenance
@@ -263,6 +283,107 @@ class Runtime:
             raise ResourceLimitError("Event limit exceeded")
         if self.time > self.config.max_simulation_time:
             raise ResourceLimitError("Simulation-time limit exceeded")
+
+    def _validate_event_preflight(self, event_time: float) -> None:
+        if self.event_index >= self.config.max_events:
+            raise ResourceLimitError("Event limit exceeded")
+        if not math.isfinite(event_time):
+            raise ResourceLimitError("Event time must be finite")
+        if event_time < self.time:
+            raise ReplayError("Next event lies in the simulation past")
+        if event_time > self.config.max_simulation_time:
+            raise ResourceLimitError("Simulation-time limit exceeded")
+
+    def _require_continuation(self) -> None:
+        if not self._continuation_allowed:
+            raise ReplayError(
+                "Runtime state is audit-only; restore a native V2 snapshot to continue"
+            )
+
+    def _capture_step_checkpoint(self) -> _StepCheckpoint:
+        return _StepCheckpoint(
+            # Authoritative commit paths are copy-on-write. Retaining the old
+            # roots makes rollback O(1) instead of cloning the entire model on
+            # every event.
+            graph=self.graph,
+            boundary=self.boundary,
+            rules=self.rules,
+            parameters=self.parameters,
+            memory=self.memory,
+            time=self.time,
+            last_event_time=self.last_event_time,
+            event_index=self.event_index,
+            rng_states=self.random.snapshot(),
+            external_queue=self.external_queue,
+            adaptation_queue=self.adaptation_queue,
+            meta_queue=self.meta_queue,
+            pending_internal=self.pending_internal,
+            pending_integrity=self._pending_integrity,
+            next_reaction_snapshot=(
+                self.next_reaction.snapshot() if self._next_reaction_initialized else None
+            ),
+            next_reaction_initialized=self._next_reaction_initialized,
+            thinning_audit=copy.deepcopy(self.thinning_audit),
+            event_log_length=len(self.event_log),
+            output_events_length=len(self.output_events),
+            recent_event_times=tuple(self._recent_event_times),
+        )
+
+    def _restore_step_checkpoint(self, checkpoint: _StepCheckpoint) -> None:
+        self.graph = checkpoint.graph
+        self.boundary = checkpoint.boundary
+        self.rules = checkpoint.rules
+        self.parameters = checkpoint.parameters
+        self.memory = checkpoint.memory
+        self.time = checkpoint.time
+        self.last_event_time = checkpoint.last_event_time
+        self.event_index = checkpoint.event_index
+        self.random.restore(checkpoint.rng_states)
+        self.external_queue = checkpoint.external_queue
+        self.adaptation_queue = checkpoint.adaptation_queue
+        self.meta_queue = checkpoint.meta_queue
+        self.pending_internal = checkpoint.pending_internal
+        self._pending_integrity = checkpoint.pending_integrity
+        self.next_reaction = NextReactionScheduler()
+        self._next_reaction_initialized = checkpoint.next_reaction_initialized
+        if checkpoint.next_reaction_snapshot is not None:
+            self.next_reaction.restore(checkpoint.next_reaction_snapshot)
+        self.thinning_audit = checkpoint.thinning_audit
+        del self.event_log[checkpoint.event_log_length :]
+        del self.output_events[checkpoint.output_events_length :]
+        self._recent_event_times = deque(checkpoint.recent_event_times)
+        # Occurrence data is a derived cache. Rebuilding it from the restored
+        # authoritative state avoids retaining any partially refreshed matches.
+        self.occurrence_index.clear()
+        self._indexed_augmented_hash = None
+
+    def _plan_internal_transactionally(
+        self, *, search_limit: float | None = None
+    ) -> PendingInternalEvent | None:
+        checkpoint = _PlanCheckpoint(
+            rng_states=self.random.snapshot(),
+            pending_internal=copy.deepcopy(self.pending_internal),
+            pending_integrity=self._pending_integrity,
+            next_reaction_snapshot=(
+                self.next_reaction.snapshot() if self._next_reaction_initialized else None
+            ),
+            next_reaction_initialized=self._next_reaction_initialized,
+            thinning_audit=copy.deepcopy(self.thinning_audit),
+        )
+        try:
+            return self._plan_internal(search_limit=search_limit)
+        except BaseException:
+            self.random.restore(checkpoint.rng_states)
+            self.pending_internal = checkpoint.pending_internal
+            self._pending_integrity = checkpoint.pending_integrity
+            self.next_reaction = NextReactionScheduler()
+            self._next_reaction_initialized = checkpoint.next_reaction_initialized
+            if checkpoint.next_reaction_snapshot is not None:
+                self.next_reaction.restore(checkpoint.next_reaction_snapshot)
+            self.thinning_audit = checkpoint.thinning_audit
+            self.occurrence_index.clear()
+            self._indexed_augmented_hash = None
+            raise
 
     def _record_event_time(self) -> None:
         self._recent_event_times.append(self.time)
@@ -332,7 +453,7 @@ class Runtime:
 
     def _enabled(self, occurrence: Occurrence, hazard: float | None = None) -> EnabledOccurrence:
         return EnabledOccurrence(
-            occurrence.rule,
+            copy.deepcopy(occurrence.rule),
             self._fresh_match(occurrence.match),
             occurrence.hazard if hazard is None else hazard,
         )
@@ -439,6 +560,7 @@ class Runtime:
             scheduler_kind=SchedulerKind.DIRECT_SSA,
             survival_integral_exact=True,
         )
+        self._pending_integrity = self.pending_internal.integrity_hash
         return self.pending_internal
 
     # ------------------------------------------------------------------
@@ -515,6 +637,7 @@ class Runtime:
             survival_integral_exact=exact,
             survival_integral=survival,
         )
+        self._pending_integrity = self.pending_internal.integrity_hash
         return self.pending_internal
 
     def _plan_internal(self, *, search_limit: float | None = None) -> PendingInternalEvent | None:
@@ -529,7 +652,8 @@ class Runtime:
     # ------------------------------------------------------------------
 
     def peek_next_event_time(self) -> float | None:
-        pending = self._plan_internal()
+        self._require_continuation()
+        pending = self._plan_internal_transactionally()
         times: list[float] = []
         if pending is not None:
             times.append(pending.absolute_time)
@@ -574,8 +698,27 @@ class Runtime:
         return self.thinning_audit.drain(), self.thinning_audit.drain_survival()
 
     def step(self) -> StepResult:
+        self._require_continuation()
+        checkpoint = self._capture_step_checkpoint()
+        try:
+            return self._step_impl()
+        except BaseException:
+            self._restore_step_checkpoint(checkpoint)
+            raise
+
+    def _step_impl(self) -> StepResult:
         self._validate_limits()
         pending = self._plan_internal()
+        if pending is not None:
+            retained = pending is self.pending_internal
+            pending = validate_pending_event(
+                self,
+                pending,
+                expected_integrity=(self._pending_integrity if retained else None),
+            )
+            if retained:
+                self.pending_internal = pending
+                self._pending_integrity = pending.integrity_hash
         deterministic = self._next_deterministic_kind()
 
         if pending is None and deterministic is None:
@@ -585,33 +728,38 @@ class Runtime:
             kind, item = deterministic
             deterministic_time = item.simulation_time
             if pending is None or deterministic_time <= pending.absolute_time:
+                self._validate_event_preflight(deterministic_time)
                 draws, survival = self._preempt_draws_and_survival(
                     pending, deterministic_time
                 )
                 self.pending_internal = None
+                self._pending_integrity = None
                 if kind == "external":
-                    heapq.heappop(self.external_queue)
                     record = self._process_external(item, draws, survival)
+                    heapq.heappop(self.external_queue)
                     return StepResult(StepStatus.PROCESSED_EXTERNAL, event=record)
                 if kind == "adaptation":
-                    heapq.heappop(self.adaptation_queue)
                     record = self._process_scheduled_adaptation(item, draws, survival)
+                    heapq.heappop(self.adaptation_queue)
                     return StepResult(StepStatus.FIRED, event=record)
-                heapq.heappop(self.meta_queue)
                 record = self._process_meta(item, draws, survival)
+                heapq.heappop(self.meta_queue)
                 return StepResult(StepStatus.FIRED, event=record)
 
         assert pending is not None
+        self._validate_event_preflight(pending.absolute_time)
         if self.scheduler_kind is SchedulerKind.NEXT_REACTION:
             key = OccurrenceKey(
                 pending.occurrence.rule.rule_id, pending.occurrence.match.match_id
             )
             self.next_reaction.consume(key, pending.absolute_time)
         self.pending_internal = None
+        self._pending_integrity = None
         record = self._fire_internal(pending)
         return StepResult(StepStatus.FIRED, event=record)
 
     def run_events(self, count: int) -> list[EventRecord]:
+        self._require_continuation()
         if count < 0:
             raise ValueError("count cannot be negative")
         records: list[EventRecord] = []
@@ -624,12 +772,17 @@ class Runtime:
         return records
 
     def run_until_time(self, target_time: float) -> list[EventRecord]:
+        self._require_continuation()
         if target_time < self.time:
             raise ValueError("target_time cannot be in the past")
+        if not math.isfinite(target_time):
+            raise ValueError("target_time must be finite")
+        if target_time > self.config.max_simulation_time:
+            raise ResourceLimitError("Simulation-time limit exceeded")
         records: list[EventRecord] = []
         while self.time < target_time:
             if self.scheduler_kind is SchedulerKind.THINNING:
-                pending = self._plan_internal(search_limit=target_time)
+                pending = self._plan_internal_transactionally(search_limit=target_time)
                 deterministic = self._next_deterministic_kind()
                 deterministic_time = (
                     deterministic[1].simulation_time if deterministic is not None else math.inf
@@ -657,6 +810,7 @@ class Runtime:
         *,
         max_events: int | None = None,
     ) -> list[EventRecord]:
+        self._require_continuation()
         records: list[EventRecord] = []
         limit = self.config.max_events if max_events is None else max_events
         while not predicate(self):
@@ -740,6 +894,8 @@ class Runtime:
 
     def snapshot(self) -> RuntimeSnapshot:
         return RuntimeSnapshot(
+            model_hash=self.model_hash,
+            config=self.config,
             graph=self.graph.clone(),
             boundary=self.boundary.clone(),
             rules=copy.deepcopy(self.rules),
@@ -750,6 +906,7 @@ class Runtime:
             event_index=self.event_index,
             root_seed=self.root_seed,
             rng_states=self.random.snapshot(),
+            recent_event_times=tuple(self._recent_event_times),
             external_queue=copy.deepcopy(self.external_queue),
             adaptation_queue=copy.deepcopy(self.adaptation_queue),
             meta_queue=copy.deepcopy(self.meta_queue),
@@ -762,7 +919,9 @@ class Runtime:
             ),
             next_reaction_initialized=self._next_reaction_initialized,
             thinning_audit=copy.deepcopy(self.thinning_audit),
-        )
+            continuation_allowed=self._continuation_allowed,
+            identity_version=self._identity_version,
+        ).seal()
 
     @classmethod
     def from_snapshot(
@@ -772,37 +931,9 @@ class Runtime:
         *,
         config: RuntimeConfig | None = None,
     ) -> "Runtime":
-        if config is None:
-            config = RuntimeConfig(scheduler=snapshot.scheduler_kind)
-        runtime = cls(model, root_seed=snapshot.root_seed, config=config)
-        if runtime.scheduler_kind is not snapshot.scheduler_kind:
-            raise ReplayError("Snapshot scheduler differs from requested runtime scheduler")
-        runtime.graph = snapshot.graph.clone()
-        runtime.boundary = snapshot.boundary.clone()
-        runtime.rules = copy.deepcopy(snapshot.rules)
-        runtime.parameters = copy.deepcopy(snapshot.parameters)
-        runtime.memory = copy.deepcopy(snapshot.memory)
-        runtime.time = snapshot.time
-        runtime.last_event_time = snapshot.last_event_time
-        runtime.event_index = snapshot.event_index
-        runtime.random.restore(snapshot.rng_states)
-        runtime.external_queue = copy.deepcopy(snapshot.external_queue)
-        heapq.heapify(runtime.external_queue)
-        runtime.adaptation_queue = copy.deepcopy(snapshot.adaptation_queue)
-        heapq.heapify(runtime.adaptation_queue)
-        runtime.meta_queue = copy.deepcopy(snapshot.meta_queue)
-        heapq.heapify(runtime.meta_queue)
-        runtime.pending_internal = copy.deepcopy(snapshot.pending_internal)
-        runtime.output_events = copy.deepcopy(snapshot.output_events)
-        runtime.run_id = snapshot.run_id
-        runtime.event_log = []
-        runtime.thinning_audit = copy.deepcopy(snapshot.thinning_audit)
-        runtime.occurrence_index.clear()
-        runtime._indexed_augmented_hash = None
-        runtime._next_reaction_initialized = snapshot.next_reaction_initialized
-        if snapshot.next_reaction_snapshot is not None:
-            runtime.next_reaction.restore(snapshot.next_reaction_snapshot)
-        return runtime
+        from .snapshot_restore import restore_runtime
+
+        return restore_runtime(cls, model, snapshot, config=config)
 
     @classmethod
     def replay_deltas(
@@ -815,6 +946,7 @@ class Runtime:
     ) -> "Runtime":
         runtime = cls.from_snapshot(model, initial_snapshot, config=config)
         runtime.pending_internal = None
+        runtime._pending_integrity = None
         runtime._next_reaction_initialized = False
         runtime.next_reaction = NextReactionScheduler()
         for record in records:
@@ -848,6 +980,7 @@ class Runtime:
             runtime.time = record.post_time
             runtime.last_event_time = record.post_time
             runtime.event_index = record.event_index
+            runtime._record_event_time()
             runtime.graph.epoch = int(
                 record.cause.get("post_graph_epoch", runtime.graph.epoch)
             )
@@ -860,4 +993,5 @@ class Runtime:
             runtime.event_log.append(copy.deepcopy(record))
         runtime.occurrence_index.clear()
         runtime._indexed_augmented_hash = None
+        runtime._continuation_allowed = False
         return runtime

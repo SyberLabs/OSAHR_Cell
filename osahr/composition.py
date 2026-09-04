@@ -7,6 +7,7 @@ from dataclasses import dataclass, replace
 from typing import Any, Callable, Iterable
 
 from .boundary import BoundaryDirection, BoundaryHandle, BoundaryState
+from .canonical import canonical_equal
 from .errors import ValidationError
 from .graph import Hypergraph
 from .ids import EntityId
@@ -55,7 +56,7 @@ def _merge_flat_state(
     label: str,
 ) -> None:
     for key, value in source.items():
-        if key in destination and destination[key] != value:
+        if key in destination and not canonical_equal(destination[key], value):
             raise ValidationError(
                 f"Conflicting {label} key {key!r}; use disjoint names or equal initial values"
             )
@@ -73,8 +74,16 @@ def compose_structural(
 ) -> CompositionResult:
     if not components:
         raise ValidationError("At least one component is required")
-    if len(components) != len(set(components)):
-        raise ValidationError("Duplicate component name")
+    unsupported = [
+        name
+        for name, model in components.items()
+        if model.adaptive_parameters or model.rule_templates
+    ]
+    if unsupported:
+        raise ValidationError(
+            "Structural composition cannot preserve adaptive parameters or rule templates "
+            f"for components {sorted(unsupported)!r}"
+        )
     schema_hashes = {model.graph.schema.hash for model in components.values()}
     if len(schema_hashes) != 1:
         raise ValidationError("Structural composition currently requires identical schemas")
@@ -142,7 +151,7 @@ def compose_structural(
             attrs: dict[str, Any] = {}
             for source in attrs_list:
                 for key, value in source.items():
-                    if key in attrs and attrs[key] != value:
+                    if key in attrs and not canonical_equal(attrs[key], value):
                         raise ValidationError(
                             f"Conflicting attributes while identifying wired vertices: {key!r}"
                         )
@@ -187,17 +196,13 @@ def compose_structural(
             new_handle_id = f"{component_name}::{handle_id}"
             handle_maps[component_name][handle_id] = new_handle_id
             boundary.add(
-                BoundaryHandle(
+                replace(
+                    handle,
                     handle_id=new_handle_id,
-                    direction=handle.direction,
-                    interface_type=handle.interface_type,
                     binding=None
                     if handle.binding is None
                     else vertex_maps[component_name][handle.binding],
-                    nullable=handle.nullable,
                     payload_schema=copy.deepcopy(handle.payload_schema),
-                    allow_payload_extensions=handle.allow_payload_extensions,
-                    input_mode=handle.input_mode,
                     metadata={"component": component_name, **copy.deepcopy(handle.metadata)},
                 )
             )

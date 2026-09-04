@@ -7,6 +7,10 @@ from .messages import Message
 from .protocol import MCP_SCHEMA_VERSION, MOUTH_OWNER
 from .surface import GrokCellSurface
 
+MUTATING_TOOLS = frozenset(
+    {"bus.post", "bus.drain", "park.request", "oda.spawn", "oda.attach_skill"}
+)
+
 TOOL_SCHEMAS: dict[str, dict[str, Any]] = {
     "vault.query": {
         "name": "vault.query",
@@ -151,6 +155,10 @@ class ToolRegistry:
     def call(self, name: str, arguments: dict[str, Any]) -> dict[str, Any]:
         if name not in self.handlers:
             raise KeyError(name)
+        if name in MUTATING_TOOLS and self.bound_owner is None:
+            if name == "bus.post":
+                return {"queued": False, "message_id": "", "reason": "unbound_session"}
+            return {"decision": "refused", "reason": "unbound_session"}
         return self.handlers[name](arguments)
 
     def _vault_query(self, arguments: dict[str, Any]) -> dict[str, Any]:
@@ -161,14 +169,16 @@ class ToolRegistry:
         reason = self._session_reason(owner)
         if reason is not None:
             return {"queued": False, "message_id": "", "reason": reason}
-        ack = self.surface.post(
-            Message(
+        try:
+            message = Message(
                 source_owner=owner,
                 kind=str(arguments["kind"]),
                 priority=int(arguments["priority"]),
-                payload=dict(arguments.get("payload") or {}),
+                payload=arguments.get("payload"),
             )
-        )
+        except (KeyError, TypeError, ValueError):
+            return {"queued": False, "message_id": "", "reason": "invalid_payload"}
+        ack = self.surface.post(message)
         return {
             "queued": ack.queued,
             "message_id": ack.message_id,
@@ -191,13 +201,6 @@ class ToolRegistry:
         )
 
     def _spawn(self, arguments: dict[str, Any]) -> dict[str, Any]:
-        if self.bound_owner is None:
-            return {
-                "decision": "refused",
-                "reason": "unbound_session",
-                "bot_name": str(arguments.get("bot_name") or ""),
-                "new_bot": False,
-            }
         return self.surface.spawn_owner(
             bot_name=str(arguments.get("bot_name") or ""),
             job=str(arguments.get("job") or ""),

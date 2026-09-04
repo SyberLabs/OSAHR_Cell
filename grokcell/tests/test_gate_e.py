@@ -2,6 +2,8 @@ from __future__ import annotations
 
 from pathlib import Path
 
+import pytest
+
 from grokcell.fidelity import FidelityStore
 from grokcell.runner import run_component
 from grokcell.surface import GrokCellSurface
@@ -11,6 +13,11 @@ from grokcell.tools import TOOL_SCHEMAS, ToolRegistry
 MODULE_PING = "def ping() -> str:\n    return \"pong\"\n"
 TESTS_PING = "from service import ping\n\n\ndef test_ping_returns_pong():\n    assert ping() == \"pong\"\n"
 TESTS_WEAK = "def test_always_passes():\n    assert True\n"
+
+
+@pytest.fixture(autouse=True)
+def allow_trusted_generated_code(monkeypatch):
+    monkeypatch.setenv("GROKCELL_ALLOW_UNSANDBOXED_RUNNER", "1")
 
 
 def _scored(tmp_path: Path, *names: str) -> tuple[FidelityStore, Path]:
@@ -104,6 +111,18 @@ def test_generated_module_admits_when_tests_kill_mutants(tmp_path: Path):
     root = tmp_path / "state" / "artifacts" / "edge.ping"
     assert (root / "service.py").read_text(encoding="utf-8") == MODULE_PING
     assert (root / "test_service.py").read_text(encoding="utf-8") == TESTS_PING
+
+
+def test_generated_crlf_bytes_are_tested_and_preserved(tmp_path: Path):
+    tools = ToolRegistry(_surface(tmp_path))
+    module = MODULE_PING.replace("\n", "\r\n")
+    tests = TESTS_PING.replace("\n", "\r\n")
+    _propose(tools, "edge.crlf", module=module, tests=tests, verified=False)
+    drained = tools.call("bus.drain", {})
+    assert drained["results"][0]["status"] == "admit"
+    root = tmp_path / "state" / "artifacts" / "edge.crlf"
+    assert (root / "service.py").read_bytes() == module.encode("utf-8")
+    assert (root / "test_service.py").read_bytes() == tests.encode("utf-8")
 
 
 def test_missing_artifact_is_outcome_unknown(tmp_path: Path):

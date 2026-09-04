@@ -7,11 +7,11 @@ from dataclasses import dataclass
 from typing import Any
 
 from .boundary import BoundaryDelta, BoundaryDirection, BoundaryState, OutputEvent
-from .canonical import stable_hash
+from .canonical import canonical_equal, stable_hash, validate_state_value
 from .errors import MatchError, RewriteError, ValidationError
 from .expr import evaluate_value, set_path
 from .graph import GraphDelta, Hypergraph
-from .matcher import Match, build_expression_context
+from .matcher import Match, Matcher, build_expression_context
 from .pattern import BoundaryEffectKind, Rule
 
 
@@ -78,14 +78,17 @@ class RewriteEngine:
         event_index: int,
         event_id: str,
     ) -> RewriteResult:
-        if match.rule_id != rule.rule_id:
-            raise MatchError("Match belongs to a different rule")
-        if match.graph_epoch != graph.epoch:
-            raise MatchError("Stale match graph epoch")
-        if any(entity_id not in graph.vertices for entity_id in match.vertex_map.values()):
-            raise MatchError("Matched vertex no longer exists")
-        if any(entity_id not in graph.edges for entity_id in match.edge_map.values()):
-            raise MatchError("Matched edge no longer exists")
+        authoritative_match = Matcher().authoritative_rule_match(
+            graph,
+            rule,
+            match,
+            parameters=parameters,
+            memory=memory,
+            time=time,
+        )
+        if authoritative_match is None:
+            raise MatchError("Match is not valid for the authoritative graph and rule")
+        match = authoritative_match
 
         work_graph = graph.clone()
         work_boundary = boundary.clone()
@@ -173,7 +176,7 @@ class RewriteEngine:
                 before, after = work_graph.set_vertex_attributes(
                     vertex_id, updates, increment_epoch=False
                 )
-                if before != after:
+                if not canonical_equal(before, after):
                     delta.updated_vertices_before[vertex_id] = before
                     delta.updated_vertices_after[vertex_id] = after
 
@@ -210,7 +213,7 @@ class RewriteEngine:
                 before, after = work_graph.set_edge_attributes(
                     edge_id, updates, increment_epoch=False
                 )
-                if before != after:
+                if not canonical_equal(before, after):
                     delta.updated_edges_before[edge_id] = before
                     delta.updated_edges_after[edge_id] = after
 
@@ -282,6 +285,9 @@ class RewriteEngine:
             else:
                 set_path(work_memory, path, value)
 
+        validate_state_value(work_parameters)
+        validate_state_value(work_memory)
+
         outputs: list[OutputEvent] = []
         output_context = build_expression_context(
             work_graph,
@@ -304,6 +310,7 @@ class RewriteEngine:
                 name: evaluate_value(value, output_context)
                 for name, value in output_spec.payload.items()
             }
+            output_handle.validate_payload(payload)
             outputs.append(
                 OutputEvent(
                     event_id=stable_hash(

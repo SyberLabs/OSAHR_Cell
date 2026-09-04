@@ -13,12 +13,12 @@ from .boundary import (
     InputMode,
     OutputEvent,
 )
-from .canonical import stable_hash
+from .canonical import canonical_equal, stable_hash, validate_state_value
 from .errors import ReplayError, ResourceLimitError, ValidationError
 from .events import EventKind, EventRecord
 from .expr import evaluate_value, set_path
 from .graph import GraphDelta
-from .meta import MetaRuleAction, MetaRuleEvent
+from .meta import MetaRuleAction, MetaRuleEvent, RuleTemplate
 from .occurrence import OccurrenceKey
 from .pattern import Rule
 from .rng import RandomDraw
@@ -34,6 +34,20 @@ def _advance(rt: Runtime, post_time: float) -> None:
     rt.event_index += 1
     rt._validate_limits()
     rt._record_event_time()
+
+
+def _validated_template(rt: Runtime, template_id: str) -> RuleTemplate:
+    try:
+        template = rt.rule_templates[template_id]
+        expected = rt._rule_template_hashes[template_id]
+    except KeyError as exc:
+        raise ValidationError(f"Unknown rule template {template_id!r}") from exc
+    if (
+        stable_hash(template.to_canonical()) != expected
+        or stable_hash(template.prototype.to_canonical()) != template.prototype.hash
+    ):
+        raise ReplayError(f"Rule template {template_id!r} is stale")
+    return template
 
 
 def _event_id(rt: Runtime, kind: EventKind, **payload: Any) -> str:
@@ -105,6 +119,11 @@ def _require_rule(rt: Runtime, rule_id: str) -> Rule:
 
 def fire_internal(rt: Runtime, pending: PendingInternalEvent) -> EventRecord:
     occurrence = pending.occurrence
+    rule = _require_rule(rt, occurrence.rule.rule_id)
+    if rule.hash != occurrence.rule.hash:
+        raise ReplayError(
+            "Pending internal event rule differs from the authoritative runtime rule"
+        )
     if any(
         entity_id not in rt.graph.vertices
         for entity_id in occurrence.match.vertex_map.values()
@@ -121,7 +140,7 @@ def fire_internal(rt: Runtime, pending: PendingInternalEvent) -> EventRecord:
             "run_id": rt.run_id,
             "event_index": next_index,
             "kind": EventKind.INTERNAL_REWRITE.value,
-            "rule": occurrence.rule.rule_id,
+            "rule": rule.rule_id,
             "match": occurrence.match.match_id,
         }
     )
@@ -131,7 +150,7 @@ def fire_internal(rt: Runtime, pending: PendingInternalEvent) -> EventRecord:
         boundary=rt.boundary,
         parameters=rt.parameters,
         memory=rt.memory,
-        rule=occurrence.rule,
+        rule=rule,
         match=occurrence.match,
         time=post_time,
         delta_time=post_time - pre_time,
@@ -148,21 +167,21 @@ def fire_internal(rt: Runtime, pending: PendingInternalEvent) -> EventRecord:
 
     extra_draws = rt._post_commit_refresh(
         delta=result.graph_delta,
-        state_changed=(
-            result.parameter_before != result.parameter_after
-            or result.memory_before != result.memory_after
+        state_changed=not (
+            canonical_equal(result.parameter_before, result.parameter_after)
+            and canonical_equal(result.memory_before, result.memory_after)
         ),
         boundary_changed=not result.boundary_delta.is_empty(),
         fired_key=(
-            OccurrenceKey(occurrence.rule.rule_id, occurrence.match.match_id)
+            OccurrenceKey(rule.rule_id, occurrence.match.match_id)
             if rt.scheduler_kind is SchedulerKind.NEXT_REACTION
             else None
         ),
     )
     cause: dict[str, Any] = {
-        "rule_id": occurrence.rule.rule_id,
-        "rule_version": occurrence.rule.version,
-        "rule_hash": occurrence.rule.hash,
+        "rule_id": rule.rule_id,
+        "rule_version": rule.version,
+        "rule_hash": rule.hash,
         "match_id": occurrence.match.match_id,
         "vertex_map": occurrence.match.vertex_map,
         "edge_map": occurrence.match.edge_map,
@@ -189,7 +208,7 @@ def fire_internal(rt: Runtime, pending: PendingInternalEvent) -> EventRecord:
         pre_time=pre_time,
         pre_hash=pre_hash,
         cause=cause,
-        draws=pending.draws + extra_draws,
+        draws=list(pending.draws) + extra_draws,
         graph_delta=result.graph_delta,
         parameter_before=result.parameter_before,
         memory_before=result.memory_before,
@@ -213,21 +232,24 @@ def process_external(
     parameter_before = copy.deepcopy(rt.parameters)
     memory_before = copy.deepcopy(rt.memory)
     delta = GraphDelta()
+    next_graph = rt.graph
 
     if handle.input_mode is not InputMode.SIGNAL_ONLY:
         if handle.binding is None:
             raise ValidationError(f"Input handle {event.handle_id!r} is unbound")
-        before, after = rt.graph.set_vertex_attributes(
+        next_graph = rt.graph.clone()
+        before, after = next_graph.set_vertex_attributes(
             handle.binding,
             event.payload,
             replace=handle.input_mode is InputMode.REPLACE_BOUND_VERTEX_ATTRIBUTES,
             increment_epoch=False,
         )
-        if before != after:
+        if not canonical_equal(before, after):
             delta.updated_vertices_before[handle.binding] = before
             delta.updated_vertices_after[handle.binding] = after
-            rt.graph.epoch += 1
+            next_graph.epoch += 1
 
+    rt.graph = next_graph
     _advance(rt, event.simulation_time)
     extra_draws = rt._post_commit_refresh(
         delta=delta,
@@ -287,7 +309,10 @@ def process_scheduled_adaptation(
             path,
             evaluate_value(assignment.value, context),
         )
-    rt.parameters = rt.adaptive_registry.normalize(next_parameters)
+    next_parameters = rt.adaptive_registry.normalize(next_parameters)
+    validate_state_value(next_parameters)
+    validate_state_value(next_memory)
+    rt.parameters = next_parameters
     rt.memory = next_memory
     _advance(rt, update.simulation_time)
     extra_draws = rt._post_commit_refresh(
@@ -320,19 +345,17 @@ def process_meta(
     parameter_before = copy.deepcopy(rt.parameters)
     memory_before = copy.deepcopy(rt.memory)
     before_rules = rt._rule_state_canonical()
+    next_rules = dict(rt.rules)
     rule_after: Rule | None = None
 
     if event.action is MetaRuleAction.INSTANTIATE:
         assert event.template_id is not None
-        try:
-            template = rt.rule_templates[event.template_id]
-        except KeyError as exc:
-            raise ValidationError(f"Unknown rule template {event.template_id!r}") from exc
-        if event.rule_id in rt.rules:
+        template = _validated_template(rt, event.template_id)
+        if event.rule_id in next_rules:
             raise ValidationError(f"Rule {event.rule_id!r} already exists")
         instance_count = sum(
             1
-            for rule in rt.rules.values()
+            for rule in next_rules.values()
             if rule.meta.get("__osahr_template_id") == template.template_id
         )
         if instance_count >= template.max_instances:
@@ -347,20 +370,20 @@ def process_meta(
                 "__osahr_template_id": template.template_id,
             },
         )
-        rt.rules[event.rule_id] = rule_after
+        next_rules[event.rule_id] = rule_after
     elif event.action is MetaRuleAction.ENABLE:
         rule_after = replace(_require_rule(rt, event.rule_id), enabled=True)
-        rt.rules[event.rule_id] = rule_after
+        next_rules[event.rule_id] = rule_after
     elif event.action is MetaRuleAction.DISABLE:
         rule_after = replace(_require_rule(rt, event.rule_id), enabled=False)
-        rt.rules[event.rule_id] = rule_after
+        next_rules[event.rule_id] = rule_after
     elif event.action is MetaRuleAction.REMOVE:
         _require_rule(rt, event.rule_id)
-        rt.rules.pop(event.rule_id)
-        rt.occurrence_index.invalidate_rule(event.rule_id)
+        next_rules.pop(event.rule_id)
     else:  # pragma: no cover
         raise ValidationError(f"Unsupported meta action {event.action}")
 
+    rt.rules = next_rules
     rt._validate_scheduler_contract()
     _advance(rt, event.simulation_time)
     extra_draws = rt._post_commit_refresh(

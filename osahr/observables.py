@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Any, Protocol
 
+from .canonical import canonical_equal
 from .graph import Hypergraph
 
 
@@ -30,7 +31,11 @@ class EntityCount:
         return sum(
             1
             for entity_id in graph.vertices_by_type.get(self.type_id, ())
-            if all(graph.vertices[entity_id].attributes.get(k) == v for k, v in expected.items())
+            if all(
+                key in graph.vertices[entity_id].attributes
+                and canonical_equal(graph.vertices[entity_id].attributes[key], value)
+                for key, value in expected.items()
+            )
         )
 
 
@@ -45,7 +50,11 @@ class EdgeCount:
         return sum(
             1
             for entity_id in graph.edges_by_type.get(self.type_id, ())
-            if all(graph.edges[entity_id].attributes.get(k) == v for k, v in expected.items())
+            if all(
+                key in graph.edges[entity_id].attributes
+                and canonical_equal(graph.edges[entity_id].attributes[key], value)
+                for key, value in expected.items()
+            )
         )
 
 

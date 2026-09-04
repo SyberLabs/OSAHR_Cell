@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import copy
+import math
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
-from .canonical import stable_hash
+from .canonical import canonical_equal, stable_hash, validate_state_value
 from .errors import SchemaError, ValidationError
 from .expr import Expr
 
@@ -50,12 +52,22 @@ class AttributeSpec:
             raise ValidationError(
                 f"Attribute {name!r} expected {self.kind.value}, got {type(value).__name__}"
             )
+        if self.kind is ValueKind.FLOAT and isinstance(value, float) and not math.isfinite(value):
+            raise ValidationError(f"Attribute {name!r} must be finite")
         if self.minimum is not None and value < self.minimum:
             raise ValidationError(f"Attribute {name!r} is below minimum {self.minimum}")
         if self.maximum is not None and value > self.maximum:
             raise ValidationError(f"Attribute {name!r} is above maximum {self.maximum}")
-        if self.choices is not None and value not in self.choices:
+        if self.choices is not None and not any(
+            canonical_equal(value, choice) for choice in self.choices
+        ):
             raise ValidationError(f"Attribute {name!r} is not one of {sorted(self.choices)!r}")
+        try:
+            validate_state_value(value)
+        except (TypeError, ValueError) as exc:
+            raise ValidationError(
+                f"Attribute {name!r} is not finite canonical state"
+            ) from exc
 
 
 @dataclass(frozen=True, slots=True)
@@ -172,11 +184,11 @@ class Schema:
         *,
         allow_extensions: bool,
     ) -> dict[str, Any]:
-        result = dict(attrs)
+        result = copy.deepcopy(attrs)
         for name, spec in specs.items():
             if name not in result:
                 if spec.default is not None or spec.nullable:
-                    result[name] = spec.default
+                    result[name] = copy.deepcopy(spec.default)
                 elif spec.required:
                     raise ValidationError(f"Required attribute {name!r} is missing")
         if not allow_extensions:
@@ -184,6 +196,12 @@ class Schema:
             if unknown:
                 raise ValidationError(f"Unknown attributes: {sorted(unknown)!r}")
         for name, value in result.items():
+            try:
+                validate_state_value(value)
+            except (TypeError, ValueError) as exc:
+                raise ValidationError(
+                    f"Attribute {name!r} is not finite canonical state"
+                ) from exc
             if name in specs:
                 specs[name].validate(name, value)
         return result

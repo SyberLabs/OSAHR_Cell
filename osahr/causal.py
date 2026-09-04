@@ -5,6 +5,7 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Iterable
 
+from .canonical import canonical_equal
 from .events import EventKind, EventRecord
 from .ids import EntityId
 
@@ -19,7 +20,7 @@ def _flatten_changed_paths(before: Any, after: Any, prefix: str) -> set[str]:
             else:
                 result.update(_flatten_changed_paths(before[key], after[key], path))
         return result
-    return set() if before == after else {prefix}
+    return set() if canonical_equal(before, after) else {prefix}
 
 
 @dataclass(frozen=True, slots=True)

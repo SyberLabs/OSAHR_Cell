@@ -2,11 +2,13 @@
 
 from __future__ import annotations
 
+import copy
 from collections import Counter
+from collections.abc import Mapping
 from dataclasses import dataclass
 from typing import Any, Iterable
 
-from .canonical import stable_hash
+from .canonical import canonical_equal, stable_hash
 from .errors import MatchError
 from .expr import Expr
 from .graph import Hyperedge, Hypergraph, Incidence, Side
@@ -52,7 +54,7 @@ class Match:
             rule_id=rule_id,
             vertex_map=dict(vertex_map),
             edge_map=dict(edge_map),
-            bindings=dict(bindings),
+            bindings=copy.deepcopy(bindings),
             graph_epoch=graph_epoch,
             match_id=stable_hash(identity),
         )
@@ -71,10 +73,14 @@ def _match_attributes(
         if isinstance(term, AnyValue):
             continue
         if isinstance(term, Var):
-            if term.name in result and result[term.name] != value:
-                return None
+            if term.name in result:
+                try:
+                    if not canonical_equal(result[term.name], value):
+                        return None
+                except (TypeError, ValueError):
+                    return None
             result[term.name] = value
-        elif term != value:
+        elif not canonical_equal(term, value):
             return None
     return result
 
@@ -353,6 +359,105 @@ class Matcher:
         exists = bool(extensions)
         return exists if condition.polarity is ConditionPolarity.POSITIVE else not exists
 
+    def _rule_match_holds(
+        self,
+        graph: Hypergraph,
+        rule: Rule,
+        match: Match,
+        *,
+        parameters: dict[str, Any],
+        memory: dict[str, Any],
+        time: float,
+    ) -> bool:
+        context = build_expression_context(
+            graph,
+            match,
+            parameters=parameters,
+            memory=memory,
+            time=time,
+            extra={"meta": rule.meta},
+        )
+        if rule.guard is not None and not bool(rule.guard.evaluate(context)):
+            return False
+        return all(
+            self.condition_holds(
+                graph,
+                condition,
+                match,
+                parameters=parameters,
+                memory=memory,
+                time=time,
+                extra_context={"meta": rule.meta},
+            )
+            for condition in rule.conditions
+        )
+
+    def authoritative_rule_match(
+        self,
+        graph: Hypergraph,
+        rule: Rule,
+        match: Match,
+        *,
+        parameters: dict[str, Any],
+        memory: dict[str, Any],
+        time: float,
+    ) -> Match | None:
+        """Re-derive a supplied match against the authoritative graph and rule."""
+        if (
+            not isinstance(match.vertex_map, Mapping)
+            or not isinstance(match.edge_map, Mapping)
+            or not isinstance(match.bindings, Mapping)
+            or not rule.enabled
+            or match.rule_id != rule.rule_id
+            or match.graph_epoch != graph.epoch
+            or set(match.vertex_map) != set(rule.left.vertex_map)
+            or set(match.edge_map) != set(rule.left.edge_map)
+            or any(
+                not isinstance(entity_id, EntityId)
+                for entity_id in match.vertex_map.values()
+            )
+            or any(
+                not isinstance(entity_id, EntityId)
+                for entity_id in match.edge_map.values()
+            )
+        ):
+            return None
+        try:
+            candidates = self.find_pattern_matches(
+                graph,
+                rule.left,
+                rule_id=rule.rule_id,
+                prebound_vertices=match.vertex_map,
+                prebound_edges=match.edge_map,
+            )
+        except (KeyError, MatchError, TypeError, ValueError):
+            return None
+        if len(candidates) != 1:
+            return None
+        authoritative = candidates[0]
+        if (
+            authoritative.vertex_map != match.vertex_map
+            or authoritative.edge_map != match.edge_map
+            or authoritative.match_id != match.match_id
+            or set(authoritative.bindings) != set(match.bindings)
+        ):
+            return None
+        try:
+            if not canonical_equal(authoritative.bindings, match.bindings):
+                return None
+        except (TypeError, ValueError):
+            return None
+        if not self._rule_match_holds(
+            graph,
+            rule,
+            authoritative,
+            parameters=parameters,
+            memory=memory,
+            time=time,
+        ):
+            return None
+        return authoritative
+
     def find_rule_matches(
         self,
         graph: Hypergraph,
@@ -365,30 +470,15 @@ class Matcher:
         if not rule.enabled:
             return []
         matches = self.find_pattern_matches(graph, rule.left, rule_id=rule.rule_id)
-        result: list[Match] = []
-        for match in matches:
-            context = build_expression_context(
+        return [
+            match
+            for match in matches
+            if self._rule_match_holds(
                 graph,
+                rule,
                 match,
                 parameters=parameters,
                 memory=memory,
                 time=time,
-                extra={"meta": rule.meta},
             )
-            if rule.guard is not None and not bool(rule.guard.evaluate(context)):
-                continue
-            if not all(
-                self.condition_holds(
-                    graph,
-                    condition,
-                    match,
-                    parameters=parameters,
-                    memory=memory,
-                    time=time,
-                    extra_context={"meta": rule.meta},
-                )
-                for condition in rule.conditions
-            ):
-                continue
-            result.append(match)
-        return result
+        ]

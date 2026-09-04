@@ -215,9 +215,45 @@ class NextReactionScheduler:
         )
 
     def restore(self, snapshot: NextReactionSnapshot) -> None:
+        if not isinstance(snapshot, NextReactionSnapshot) or not isinstance(
+            snapshot.channels, dict
+        ):
+            raise SchedulerError("Invalid next-reaction snapshot")
+        for key, channel in snapshot.channels.items():
+            if (
+                not isinstance(key, OccurrenceKey)
+                or not isinstance(channel, NextReactionChannel)
+                or key != channel.key
+                or not math.isfinite(channel.hazard)
+                or channel.hazard < 0.0
+                or not math.isfinite(channel.internal_time)
+                or channel.internal_time < 0.0
+                or not math.isfinite(channel.threshold)
+                or channel.threshold <= 0.0
+                or not math.isfinite(channel.last_update_time)
+                or channel.last_update_time < 0.0
+                or (
+                    not math.isinf(channel.planned_time)
+                    and (
+                        not math.isfinite(channel.planned_time)
+                        or channel.planned_time < channel.last_update_time
+                    )
+                )
+                or isinstance(channel.version, bool)
+                or not isinstance(channel.version, int)
+                or channel.version < 0
+            ):
+                raise SchedulerError("Invalid next-reaction channel state")
+        if not isinstance(snapshot.audit_draws, list) or not all(
+            isinstance(draw, RandomDraw) for draw in snapshot.audit_draws
+        ):
+            raise SchedulerError("Invalid next-reaction audit state")
         self.channels = copy.deepcopy(snapshot.channels)
-        self._heap = copy.deepcopy(snapshot.heap)
-        heapq.heapify(self._heap)
+        # The heap is a derived acceleration structure; rebuilding it prevents
+        # redundant or stale serialized entries from becoming authoritative.
+        self._heap = []
+        for channel in self.channels.values():
+            self._push(channel)
         self._audit_draws = copy.deepcopy(snapshot.audit_draws)
 
 

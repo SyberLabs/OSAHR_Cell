@@ -7,11 +7,13 @@ Instantiation changes only validated data bindings and the stable rule identity.
 
 from __future__ import annotations
 
+import copy
 import math
 from dataclasses import dataclass, field, replace
 from enum import Enum
 from typing import Any, Mapping
 
+from .canonical import canonical_equal, validate_state_value
 from .errors import MetaRewriteError
 from .pattern import Rule
 
@@ -57,7 +59,9 @@ class MetaParameter:
         elif self.kind is MetaValueKind.STRING:
             if not isinstance(value, str):
                 raise MetaRewriteError(f"Meta parameter {self.name!r} expects string")
-        if self.choices and value not in self.choices:
+        if self.choices and not any(
+            canonical_equal(value, choice) for choice in self.choices
+        ):
             raise MetaRewriteError(
                 f"Meta parameter {self.name!r} must be one of {self.choices!r}"
             )
@@ -86,6 +90,15 @@ class RuleTemplate:
     @property
     def parameter_map(self) -> dict[str, MetaParameter]:
         return {item.name: item for item in self.parameters}
+
+    def to_canonical(self) -> dict[str, Any]:
+        return {
+            "template_id": self.template_id,
+            "version": self.version,
+            "prototype_hash": self.prototype.hash,
+            "parameters": self.parameters,
+            "max_instances": self.max_instances,
+        }
 
     def instantiate(self, instance_id: str, bindings: Mapping[str, Any]) -> Rule:
         if not instance_id:
@@ -123,14 +136,41 @@ class MetaRuleAction(str, Enum):
 class MetaRuleEvent:
     simulation_time: float
     source_sequence: int
-    event_id: str = field(compare=False)
+    event_id: str
     action: MetaRuleAction = field(compare=False)
     rule_id: str = field(compare=False)
     template_id: str | None = field(default=None, compare=False)
     bindings: Mapping[str, Any] = field(default_factory=dict, compare=False)
 
     def __post_init__(self) -> None:
-        if self.simulation_time < 0.0 or not math.isfinite(self.simulation_time):
+        if (
+            isinstance(self.simulation_time, bool)
+            or not isinstance(self.simulation_time, (int, float))
+            or self.simulation_time < 0.0
+            or not math.isfinite(self.simulation_time)
+        ):
             raise MetaRewriteError("Meta-rule event time must be finite and nonnegative")
-        if self.action is MetaRuleAction.INSTANTIATE and self.template_id is None:
+        if (
+            isinstance(self.source_sequence, bool)
+            or not isinstance(self.source_sequence, int)
+            or self.source_sequence < 0
+        ):
+            raise MetaRewriteError("Meta-rule source sequence must be nonnegative")
+        if not isinstance(self.event_id, str) or not self.event_id:
+            raise MetaRewriteError("Meta-rule event ID cannot be empty")
+        if not isinstance(self.action, MetaRuleAction):
+            raise MetaRewriteError("Meta-rule action is invalid")
+        if not isinstance(self.rule_id, str) or not self.rule_id:
+            raise MetaRewriteError("Meta-rule rule ID cannot be empty")
+        if self.template_id is not None and not isinstance(self.template_id, str):
+            raise MetaRewriteError("Meta-rule template ID is invalid")
+        if not isinstance(self.bindings, Mapping):
+            raise MetaRewriteError("Meta-rule bindings must be a mapping")
+        bindings = copy.deepcopy(dict(self.bindings))
+        try:
+            validate_state_value(bindings)
+        except (TypeError, ValueError) as exc:
+            raise MetaRewriteError("Meta-rule bindings are not canonical state") from exc
+        object.__setattr__(self, "bindings", bindings)
+        if self.action is MetaRuleAction.INSTANTIATE and not self.template_id:
             raise MetaRewriteError("Instantiation requires template_id")

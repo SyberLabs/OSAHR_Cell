@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any
 
-from .canonical import stable_hash
+from .canonical import stable_hash, validate_state_value
 from .errors import PatternError
 from .expr import Expr
 
@@ -155,6 +155,11 @@ class StateAssignment:
     def __post_init__(self) -> None:
         if not (self.target.startswith("parameters.") or self.target.startswith("memory.")):
             raise PatternError("State assignment target must begin with parameters. or memory.")
+        if not isinstance(self.value, Expr):
+            try:
+                validate_state_value(self.value)
+            except (TypeError, ValueError) as exc:
+                raise PatternError("State assignment literal is not canonical state") from exc
 
 
 class BoundaryEffectKind(str, Enum):

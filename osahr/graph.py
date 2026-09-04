@@ -2,11 +2,12 @@
 
 from __future__ import annotations
 
+import copy
 from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Iterable
 
-from .canonical import stable_hash
+from .canonical import canonical_equal, stable_hash
 from .errors import ValidationError
 from .ids import EntityId, IdAllocator
 from .schema import HyperedgeType, PortSpec, Schema
@@ -72,6 +73,14 @@ class GraphDelta:
         return not self.touched_entities()
 
 
+def _same_attribute(
+    before: dict[str, Any], after: dict[str, Any], name: str
+) -> bool:
+    if name not in before or name not in after:
+        return name not in before and name not in after
+    return canonical_equal(before[name], after[name])
+
+
 class Hypergraph:
     def __init__(
         self,
@@ -127,10 +136,11 @@ class Hypergraph:
 
     def clone(self) -> "Hypergraph":
         return Hypergraph(
-            self.schema,
+            copy.deepcopy(self.schema),
             namespace=self.id_allocator.namespace,
             vertices=(
-                Vertex(v.entity_id, v.type_id, dict(v.attributes)) for v in self.vertices.values()
+                Vertex(v.entity_id, v.type_id, copy.deepcopy(v.attributes))
+                for v in self.vertices.values()
             ),
             edges=(
                 Hyperedge(
@@ -138,7 +148,7 @@ class Hypergraph:
                     e.type_id,
                     tuple(e.tail),
                     tuple(e.head),
-                    dict(e.attributes),
+                    copy.deepcopy(e.attributes),
                 )
                 for e in self.edges.values()
             ),
@@ -157,7 +167,9 @@ class Hypergraph:
         entity_id: EntityId | None = None,
         increment_epoch: bool = True,
     ) -> Vertex:
-        entity_id = entity_id or self.id_allocator.allocate()
+        entity_id = entity_id or EntityId(
+            self.id_allocator.namespace, self.id_allocator.next_counter
+        )
         if entity_id in self.vertices or entity_id in self.edges:
             raise ValidationError(f"Duplicate entity ID {entity_id}")
         attrs = self.schema.materialize_vertex_attributes(type_id, attributes or {})
@@ -219,7 +231,9 @@ class Hypergraph:
         entity_id: EntityId | None = None,
         increment_epoch: bool = True,
     ) -> Hyperedge:
-        entity_id = entity_id or self.id_allocator.allocate()
+        entity_id = entity_id or EntityId(
+            self.id_allocator.namespace, self.id_allocator.next_counter
+        )
         if entity_id in self.vertices or entity_id in self.edges:
             raise ValidationError(f"Duplicate entity ID {entity_id}")
         try:
@@ -298,13 +312,17 @@ class Hypergraph:
     ) -> tuple[dict[str, Any], dict[str, Any]]:
         vertex = self.vertices[vertex_id]
         definition = self.schema.vertex_types[vertex.type_id]
-        for name in updates:
-            if name in definition.attributes and not definition.attributes[name].mutable:
-                if name in vertex.attributes and vertex.attributes[name] != updates[name]:
-                    raise ValidationError(f"Attribute {name!r} is immutable")
         before = dict(vertex.attributes)
         candidate = dict(updates) if replace else {**vertex.attributes, **updates}
-        vertex.attributes = self.schema.materialize_vertex_attributes(vertex.type_id, candidate)
+        if replace:
+            for name, spec in definition.attributes.items():
+                if not spec.mutable and name in before:
+                    candidate.setdefault(name, copy.deepcopy(before[name]))
+        after = self.schema.materialize_vertex_attributes(vertex.type_id, candidate)
+        for name, spec in definition.attributes.items():
+            if not spec.mutable and not _same_attribute(before, after, name):
+                raise ValidationError(f"Attribute {name!r} is immutable")
+        vertex.attributes = after
         if increment_epoch:
             self.epoch += 1
         return before, dict(vertex.attributes)
@@ -319,13 +337,17 @@ class Hypergraph:
     ) -> tuple[dict[str, Any], dict[str, Any]]:
         edge = self.edges[edge_id]
         definition = self.schema.edge_types[edge.type_id]
-        for name in updates:
-            if name in definition.attributes and not definition.attributes[name].mutable:
-                if name in edge.attributes and edge.attributes[name] != updates[name]:
-                    raise ValidationError(f"Attribute {name!r} is immutable")
         before = dict(edge.attributes)
         candidate = dict(updates) if replace else {**edge.attributes, **updates}
-        edge.attributes = self.schema.materialize_edge_attributes(edge.type_id, candidate)
+        if replace:
+            for name, spec in definition.attributes.items():
+                if not spec.mutable and name in before:
+                    candidate.setdefault(name, copy.deepcopy(before[name]))
+        after = self.schema.materialize_edge_attributes(edge.type_id, candidate)
+        for name, spec in definition.attributes.items():
+            if not spec.mutable and not _same_attribute(before, after, name):
+                raise ValidationError(f"Attribute {name!r} is immutable")
+        edge.attributes = after
         if increment_epoch:
             self.epoch += 1
         return before, dict(edge.attributes)
@@ -334,20 +356,49 @@ class Hypergraph:
         return {incidence.edge_id for incidence in self.incidences_by_vertex[vertex_id]}
 
     def validate(self) -> None:
+        if isinstance(self.epoch, bool) or not isinstance(self.epoch, int) or self.epoch < 0:
+            raise ValidationError("Graph epoch must be a non-negative integer")
+        if (
+            isinstance(self.id_allocator.namespace, bool)
+            or not isinstance(self.id_allocator.namespace, int)
+            or self.id_allocator.namespace < 0
+            or isinstance(self.id_allocator.next_counter, bool)
+            or not isinstance(self.id_allocator.next_counter, int)
+            or self.id_allocator.next_counter < 0
+        ):
+            raise ValidationError("Graph ID allocator state is invalid")
         seen = set(self.vertices) & set(self.edges)
         if seen:
             raise ValidationError(f"IDs used by both vertices and edges: {seen}")
+        expected_vertices_by_type = {
+            type_id: set() for type_id in self.schema.vertex_types
+        }
         for vertex_id, vertex in self.vertices.items():
-            if vertex_id != vertex.entity_id:
+            if not isinstance(vertex_id, EntityId) or vertex_id != vertex.entity_id:
                 raise ValidationError("Vertex map key does not match entity ID")
+            if (
+                vertex_id.namespace == self.id_allocator.namespace
+                and vertex_id.counter >= self.id_allocator.next_counter
+            ):
+                raise ValidationError("Graph ID allocator can reuse an existing vertex ID")
             self.schema.materialize_vertex_attributes(vertex.type_id, vertex.attributes)
+            expected_vertices_by_type[vertex.type_id].add(vertex_id)
+        if self.vertices_by_type != expected_vertices_by_type:
+            raise ValidationError("Vertex type index is inconsistent")
+        expected_edges_by_type = {type_id: set() for type_id in self.schema.edge_types}
         rebuilt: dict[EntityId, set[Incidence]] = {vertex_id: set() for vertex_id in self.vertices}
         for edge_id, edge in self.edges.items():
-            if edge_id != edge.entity_id:
+            if not isinstance(edge_id, EntityId) or edge_id != edge.entity_id:
                 raise ValidationError("Edge map key does not match entity ID")
+            if (
+                edge_id.namespace == self.id_allocator.namespace
+                and edge_id.counter >= self.id_allocator.next_counter
+            ):
+                raise ValidationError("Graph ID allocator can reuse an existing edge ID")
             definition = self.schema.edge_types.get(edge.type_id)
             if definition is None:
                 raise ValidationError(f"Unknown edge type {edge.type_id}")
+            expected_edges_by_type[edge.type_id].add(edge_id)
             self.schema.materialize_edge_attributes(edge.type_id, edge.attributes)
             self._validate_role_mapping(
                 definition, self._role_mapping(edge.tail), side=Side.TAIL
@@ -358,13 +409,21 @@ class Hypergraph:
             for incidence in edge.incidences:
                 if incidence.edge_id != edge_id:
                     raise ValidationError("Incidence edge ID mismatch")
+                if incidence.vertex_id not in rebuilt:
+                    raise ValidationError("Incidence references a missing vertex")
                 rebuilt[incidence.vertex_id].add(incidence)
+        if self.edges_by_type != expected_edges_by_type:
+            raise ValidationError("Edge type index is inconsistent")
         if rebuilt != self.incidences_by_vertex:
             raise ValidationError("Incidence index is inconsistent")
 
     def to_canonical(self) -> dict[str, Any]:
         return {
             "schema_hash": self.schema.hash,
+            "id_allocator": {
+                "namespace": self.id_allocator.namespace,
+                "next_counter": self.id_allocator.next_counter,
+            },
             "vertices": [
                 {
                     "id": str(vertex.entity_id),

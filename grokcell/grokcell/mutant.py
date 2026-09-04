@@ -6,7 +6,7 @@ import tempfile
 from pathlib import Path
 
 from .artifact import python_files
-from .runner import pytest_suite
+from .runner import RunOutcome, pytest_suite
 
 
 def _implementation_files(path: Path) -> list[Path]:
@@ -48,12 +48,15 @@ def mutate_source(source: str) -> str | None:
     return ast.unparse(mutated) + "\n"
 
 
-def kill_mutant(path: Path) -> tuple[bool, str]:
+def kill_mutant(path: Path, *, untrusted: bool = False) -> tuple[bool, str]:
     targets = _implementation_files(path)
     if not targets:
         return False, "mutant_untestable"
     original = targets[0].read_text(encoding="utf-8")
-    mutated = mutate_source(original)
+    try:
+        mutated = mutate_source(original)
+    except (SyntaxError, ValueError):
+        return False, "mutant_untestable"
     if mutated is None:
         return False, "mutant_untestable"
     with tempfile.TemporaryDirectory(prefix="grokcell-mutant-") as raw:
@@ -66,7 +69,13 @@ def kill_mutant(path: Path) -> tuple[bool, str]:
                 target.write_text(mutated, encoding="utf-8")
             else:
                 target.write_bytes(item.read_bytes())
-        proc = pytest_suite(dest)
-        if proc.returncode == 0:
+        proc = pytest_suite(dest, untrusted=untrusted)
+        if proc.outcome is RunOutcome.PASS:
             return False, "mutant_survived"
-        return True, "mutant_killed"
+        if proc.outcome is RunOutcome.TESTS_FAILED:
+            return True, "mutant_killed"
+        if proc.outcome is RunOutcome.TIMEOUT:
+            return False, "runner_timeout"
+        if proc.outcome is RunOutcome.SANDBOX_REQUIRED:
+            return False, "runner_sandbox_required"
+        return False, "runner_infrastructure"

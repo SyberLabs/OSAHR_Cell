@@ -8,6 +8,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from typing import Any, Mapping
 
+from .canonical import canonical_equal
 from .errors import AdaptationError
 from .expr import get_path, set_path
 
@@ -145,7 +146,7 @@ class AdaptiveRegistry:
         changed: set[str] = set()
         for path in self.specs:
             try:
-                if get_path(before, path) != get_path(after, path):
+                if not canonical_equal(get_path(before, path), get_path(after, path)):
                     changed.add(path)
             except Exception:
                 changed.add(path)
