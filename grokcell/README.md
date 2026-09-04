@@ -26,6 +26,10 @@ Priority orders the queue. **Legality outranks priority**. `payload.verified`
 is ignored. `critical_module` admits only after `python -m grokcell.runner <name>`
 writes a passing, current-hash record. Fail-closed if the runner is absent.
 
+**Chat is not the database.** `open()` resumes `vault/state/`
+(kernel checkpoint + surface queue/holds). Delete that directory
+for a fresh cell. Snapshot is not an MCP tool.
+
 ## Run
 
 From `grokcell/`:
@@ -65,9 +69,10 @@ without a client `verified` flag.
 | Only DPO + clocks rewrite G | OSAHR 0.2 kernel |
 | Junction admit / hold / reject / unknown | Experiment 05 |
 | Park licenses irreversible acts | Experiments 05 and 06 |
-| Chat is not the database | Process twin (00 / SyberRuntime) |
+| Chat is not the database | Process twin (00 / SyberRuntime); Gate B files |
 | LLM not in hazards | Experiments 01 / 02A |
 | `verified` from python_tests runner | Gate A (12); bot cannot set it |
+| File snapshot; `open()` resumes | Gate B (12); not an MCP tool |
 
 Deleted as unowned: no-swarm cap, one-mouth cap, spawn always refused.
 

@@ -32,7 +32,8 @@ Deterministic bus. Vault-gated classify. Sequential construction
 of named components through the kernel. Hold until dependencies
 exist. park.request refused unless hold_unresolved and deps are
 present. Spawn registers owners. Attach skill on any existing
-owner. Gate A: python_tests runner owns verified. No LLM.
+owner. Gate A: python_tests runner owns verified. Gate B:
+file snapshot of surface + kernel; open() resumes. No LLM.
 
 What v1 does not do
 -------------------

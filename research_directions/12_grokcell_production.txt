@@ -7,10 +7,11 @@ and name what grokbot production requires.
 
 Verdict
 -------
-v1 is a legal prototype of the control plane. It is not a grokbot
-host. A grokbot that called it today could lie about fidelity,
-spoof an owner, and lose all state when the process dies.
-Park licenses G. Nothing yet licenses the bot.
+v1 plus gates A-B is a legal prototype of the control plane.
+It is not a grokbot host. A grokbot that called it today could
+still spoof an owner. Restart no longer empties the cell:
+open() resumes vault/state. Park licenses G. Nothing yet
+licenses the bot.
 
 What v1 actually is (keep)
 --------------------------
@@ -26,11 +27,11 @@ What is broken for grokbot use (fix, in this order)
    writes vault/fidelity; classify fail-closes on runner_absent,
    runner_failed, or stale_fidelity. Not an MCP tool. Not MEASURED.
 
-2. Chat is still the database.
-   Surface, hold queue, and owners live in process memory.
-   Claims notes are gitignored files with no reload. Restart
-   = empty cell. Production: snapshot X + bus + owners to
-   files; inspect/open reloads them. Kernel already snapshots.
+2. Chat is still the database. **Gate B implemented in grokcell/**
+   (surface v3). Kernel checkpoint (osahr save_checkpoint) plus
+   surface.json (queue, holds, seq) under vault/state. open()
+   resumes. Incomplete pair fail-closes. Not an MCP tool.
+   Not MEASURED. Claims notes remain gitignored withhold files.
 
 3. Tools are a Python dict, not a host.
    mcp_manifest() exists. There is no MCP stdio/HTTP server, no
@@ -83,10 +84,10 @@ Stop at each. A later gate without an earlier one is theater.
 
 A. Honest verified. **Done as prototype in grokcell/ (v2).**
    python_tests writes the bit. Bot cannot set it. Fail-closed.
-   Next: B.
 
-B. File snapshot of surface + kernel. open() resumes. Chat is
-   not the database.
+B. File snapshot of surface + kernel. **Done as prototype in
+   grokcell/ (v3).** open() resumes. Chat is not the database.
+   Next: C.
 
 C. One MCP stdio server. Grokbot host (Cursor MCP or grok
    function-calling) talks only through existing tool names.
