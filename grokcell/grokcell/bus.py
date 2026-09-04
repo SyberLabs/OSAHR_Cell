@@ -15,6 +15,8 @@ def classify(
     vault: ConstraintVault,
     fidelity: FidelityStore,
 ) -> tuple[str, str]:
+    if str(message.source_owner or "").strip() not in owners:
+        return "reject", "unknown_owner"
     if message.kind == "oda.spawn":
         name = str(message.payload.get("bot_name") or "").strip()
         if not name:

@@ -50,6 +50,7 @@ class Message:
 class PostAck:
     queued: bool
     message_id: str
+    reason: str = ""
 
 
 @dataclass(frozen=True, slots=True)
