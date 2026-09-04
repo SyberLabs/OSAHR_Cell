@@ -1,11 +1,11 @@
-# Experiment 05 Report — Residual-Hypothesis Claim Status
+# Experiment 05 Report: Residual-Hypothesis Claim Status
 
 **Answering object:** claim status, not a point T to alpha*.
 **Confirmatory seed (declared):** `110518`. **Horizon:** 22.0 s.
 
 **Confirmatory status:** not executed. This report is formulation plus the labeled h=3 s instrument check.
 
-## Instrument check (04 holdout, h=3 s) — not confirmatory
+## Instrument check (04 holdout, h=3 s), not confirmatory
 
 Source SHA-256 `73227e650d18322b…`. Independent units: 20. Expressed: 12.
 

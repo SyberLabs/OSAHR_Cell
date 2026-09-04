@@ -27,6 +27,6 @@ Stages: `freeze`, `instrument`, `formulate` (freeze+instrument), `confirm`, `ana
 
 ## Read next
 
-- `EXPERIMENT_SPEC.md` — question, decision rule, freeze
-- `ARCHITECTURE.md` — HLMG split and invariants
-- `EXPERIMENT_REPORT.md` — written by the run script
+- `EXPERIMENT_SPEC.md`: question, decision rule, freeze
+- `ARCHITECTURE.md`: HLMG split and invariants
+- `EXPERIMENT_REPORT.md`: written by the run script

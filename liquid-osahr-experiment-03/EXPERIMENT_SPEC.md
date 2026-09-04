@@ -1,4 +1,4 @@
-# Experiment 03 Protocol — Query-Conditioned Trust
+# Experiment 03 Protocol: Query-Conditioned Trust
 
 **Status:** confirmatory reanalysis of frozen Liquid-OSAHR 02B artifacts, plus a labeled exploratory value-of-information study.
 

@@ -1,4 +1,4 @@
-# Research Notes — Experiment 02B
+# Research Notes: Experiment 02B
 
 ## Network Digital Twins
 

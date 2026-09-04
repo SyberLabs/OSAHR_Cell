@@ -39,10 +39,10 @@ MCP “edges” are **control-plane tool ports**, not radio links and not LLM ca
 
 ## Files
 
-- `vault/concepts/*.md` — `critical`, `background`, `outage`, `load`
-- `osahr_cell/vault.py` — `admissible(task_kind, edge_name, outage)`
-- `osahr_cell/anlf.py` — boundary payloads
-- `osahr_cell/junction.py` — `route-task` gate
-- `osahr_cell/mcp_tools.py` — JSON schemas
-- `osahr_cell/brain.py` — v1, no LLM
-- `scripts/run_experiment_06.py` — freeze / instrument / confirm / analyze
+- `vault/concepts/*.md`: `critical`, `background`, `outage`, `load`
+- `osahr_cell/vault.py`: `admissible(task_kind, edge_name, outage)`
+- `osahr_cell/anlf.py`: boundary payloads
+- `osahr_cell/junction.py`: `route-task` gate
+- `osahr_cell/mcp_tools.py`: JSON schemas
+- `osahr_cell/brain.py`: v1, no LLM
+- `scripts/run_experiment_06.py`: freeze / instrument / confirm / analyze

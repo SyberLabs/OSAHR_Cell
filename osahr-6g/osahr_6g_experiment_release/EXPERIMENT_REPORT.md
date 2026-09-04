@@ -177,7 +177,7 @@ Energy consumption is very similar across the three policies (~354 model energy 
 
 ## Stress controls
 
-### No outage — 20 trajectories per policy
+### No outage: 20 trajectories per policy
 
 | Policy | Goal utility | Critical success | Mean latency |
 |---|---:|---:|---:|
@@ -186,7 +186,7 @@ Energy consumption is very similar across the three policies (~354 model energy 
 
 Semantic minus throughput goal utility = -0.0006, bootstrap CI [-0.0101, +0.0090]. There is no evidence of a useful semantic advantage when healthy capacity makes deadline triage largely unnecessary.
 
-### Severe outage — 20 trajectories per policy
+### Severe outage: 20 trajectories per policy
 
 | Policy | Goal utility | Critical success | Mean latency |
 |---|---:|---:|---:|
@@ -228,7 +228,7 @@ Its event log also gives exact causal provenance: every completed task can be tr
 
 ## Optimal implementation route
 
-### Route 1 — Private Open RAN + industrial robotics (best first vertical)
+### Route 1: Private Open RAN + industrial robotics (best first vertical)
 
 Use OSAHR first as an **offline/shadow semantic-control twin** for a private 5G/Open-RAN robotic workcell. The reasons are practical:
 
@@ -240,7 +240,7 @@ Use OSAHR first as an **offline/shadow semantic-control twin** for a private 5G/
 
 Initial product: replay captured network/application traces, generate counterfactual policies, and report task-success distributions and causal failure paths.
 
-### Route 2 — O-RAN Non-RT RIC / SMO policy laboratory
+### Route 2: O-RAN Non-RT RIC / SMO policy laboratory
 
 OSAHR should next become a policy-evaluation rApp/service attached to the Non-RT RIC/SMO domain. It should ingest topology, KPIs, mobility/load summaries, application task state, and network-digital-twin features, then execute counterfactual ensembles before issuing policy recommendations.
 
@@ -248,7 +248,7 @@ This is the safest location for the Python reference runtime because its value i
 
 The output contract should be declarative: constraints, preferences, and candidate policy parameters rather than direct low-level PHY actions.
 
-### Route 3 — Near-RT advisory / xApp coupling
+### Route 3: Near-RT advisory / xApp coupling
 
 After calibration and performance engineering, expose a reduced OSAHR state model to a Near-RT RIC xApp. OSAHR need not run the full twin at every RAN control interval. Instead:
 
@@ -258,7 +258,7 @@ After calibration and performance engineering, expose a reduced OSAHR state mode
 
 This avoids trying to make a Python graph-rewrite engine replace optimized RAN control software.
 
-### Route 4 — Federated high-fidelity digital twin
+### Route 4: Federated high-fidelity digital twin
 
 Couple OSAHR to a PHY/network simulator or radio digital twin:
 
@@ -269,7 +269,7 @@ Couple OSAHR to a PHY/network simulator or radio digital twin:
 
 OSAHR should consume calibrated stochastic summaries or external events rather than reimplement OFDM, MCS selection, HARQ, beamforming, ray tracing, or a complete protocol stack.
 
-### Route 5 — Semantic representation and learned utility
+### Route 5: Semantic representation and learned utility
 
 Replace the synthetic scalar `utility` and `fidelity` with measurable quantities:
 
@@ -282,7 +282,7 @@ Replace the synthetic scalar `utility` and `fidelity` with measurable quantities
 
 This is where the current toy semantic term becomes a genuine semantic networking model.
 
-### Route 6 — Hazard calibration and inference
+### Route 6: Hazard calibration and inference
 
 Use OSAHR event-log likelihood to estimate rates from traces rather than hand-setting them.
 
@@ -297,7 +297,7 @@ Candidate parameters include:
 
 A fitted model should be evaluated on held-out traces and with calibration diagnostics before any control recommendation is trusted.
 
-### Route 7 — Decision-policy research
+### Route 7: Decision-policy research
 
 Once the environment is calibrated, compare control families on the *same OSAHR world model*:
 
@@ -314,14 +314,14 @@ The valuable object is then not a single routing algorithm, but a reproducible p
 
 A production-oriented stack should be layered:
 
-1. **Telemetry normalization** — O-RAN/3GPP/network/application adapters into canonical typed events.
-2. **Twin state** — OSAHR typed hypergraph, open boundaries, sufficient statistics, parameter state.
-3. **Calibration** — trace fitting, posterior/likelihood estimation, drift checks.
-4. **Scenario engine** — exact/approximate ensembles, outages, mobility, policy counterfactuals.
-5. **Semantic policy engine** — task utility/relevance/deadline models and candidate actions.
-6. **Safety/constraints** — invariant checks and hard operating envelopes outside learned optimization.
-7. **RIC integration** — non-RT recommendation first; near-RT reduced/compiled control later.
-8. **Audit plane** — event provenance, state hashes, policy-version IDs, replayable scenario bundles.
+1. **Telemetry normalization**: O-RAN/3GPP/network/application adapters into canonical typed events.
+2. **Twin state**: OSAHR typed hypergraph, open boundaries, sufficient statistics, parameter state.
+3. **Calibration**: trace fitting, posterior/likelihood estimation, drift checks.
+4. **Scenario engine**: exact/approximate ensembles, outages, mobility, policy counterfactuals.
+5. **Semantic policy engine**: task utility/relevance/deadline models and candidate actions.
+6. **Safety/constraints**: invariant checks and hard operating envelopes outside learned optimization.
+7. **RIC integration**: non-RT recommendation first; near-RT reduced/compiled control later.
+8. **Audit plane**: event provenance, state hashes, policy-version IDs, replayable scenario bundles.
 
 ## What not to build
 
@@ -335,12 +335,12 @@ Do not treat generic semantic embeddings as utility. A useful semantic metric mu
 
 ## Validation ladder
 
-1. **Synthetic mechanistic OSAHR model** — completed here.
-2. **Trace-driven OSAHR** — replace handcrafted path/service parameters with recorded/simulated traces.
-3. **Co-simulation with ns-3/Open-RAN stack** — OSAHR controls semantics/adaptation; lower layer supplies realistic network dynamics.
-4. **Hardware-in-the-loop private network** — robotics/edge AI testbed.
-5. **Shadow-mode RIC integration** — make recommendations without enforcement and compare against actual outcomes.
-6. **Constrained closed-loop trial** — only after calibration and safety validation.
+1. **Synthetic mechanistic OSAHR model**: completed here.
+2. **Trace-driven OSAHR**: replace handcrafted path/service parameters with recorded/simulated traces.
+3. **Co-simulation with ns-3/Open-RAN stack**: OSAHR controls semantics/adaptation; lower layer supplies realistic network dynamics.
+4. **Hardware-in-the-loop private network**: robotics/edge AI testbed.
+5. **Shadow-mode RIC integration**: make recommendations without enforcement and compare against actual outcomes.
+6. **Constrained closed-loop trial**: only after calibration and safety validation.
 
 ## Limitations
 

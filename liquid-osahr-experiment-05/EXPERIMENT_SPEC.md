@@ -1,4 +1,4 @@
-# Experiment 05 Protocol — Residual-Hypothesis Claim Status
+# Experiment 05 Protocol: Residual-Hypothesis Claim Status
 
 **Status:** formulated and frozen. Confirmatory long-horizon trajectories are not part of formulation.
 

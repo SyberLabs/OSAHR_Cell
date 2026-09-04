@@ -619,7 +619,7 @@ That would be research-heavy but legitimately novel.
 
 # 9. Systems biology, molecular interaction and “virtual cells”
 
-This is an almost exact conceptual match—but it comes with established competition.
+This is an almost exact conceptual match: but it comes with established competition.
 
 Rule-based biological modeling already exists precisely because explicitly enumerating every possible molecular complex becomes combinatorially impossible.
 
@@ -859,7 +859,7 @@ S_n.
 
 This suggests the strongest platform positioning:
 
-> **OSAHR — a compositional runtime for stochastic digital twins of adaptive networks.**
+> **OSAHR: a compositional runtime for stochastic digital twins of adaptive networks.**
 
 Not:
 

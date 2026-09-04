@@ -93,7 +93,7 @@ def write_report(path: Path, *, payload: dict) -> None:
     t_strict = payload["fields"]["T_strict"]
     prim = payload["confirmatory"]["goal_utility_ratio"]
     lines = [
-        "# Experiment 03 Report — Query-Conditioned Trust",
+        "# Experiment 03 Report: Query-Conditioned Trust",
         "",
         "**Status:** completed reanalysis of frozen Liquid-OSAHR 02B artifacts.",
         "**Simulation:** none. Confirmatory scores are arm selections from already-committed trajectories.",
@@ -112,7 +112,7 @@ def write_report(path: Path, *, payload: dict) -> None:
             f"| {cell['regime']} | {cell['alpha']:.2f} | calibrated_cell | {mae:.5f} | {cell['inadequacy']} |"
         )
     lines += [
-        "| weak_channel | 0.00 | default_mechanistic | — | fallback |",
+        "| weak_channel | 0.00 | default_mechanistic | - | fallback |",
         "",
         "Calibration LOSO selected alphas (6 folds per calibrated regime):",
         "",
@@ -133,10 +133,10 @@ def write_report(path: Path, *, payload: dict) -> None:
         "",
         "Paired difference in absolute error, T_strict minus global α=0 (negative = T better):",
         "",
-        f"- macro: `{_fmt_ci(prim['paired_vs_alpha0']['macro'])}` — {_resolved(prim['paired_vs_alpha0']['macro'])}",
+        f"- macro: `{_fmt_ci(prim['paired_vs_alpha0']['macro'])}`: {_resolved(prim['paired_vs_alpha0']['macro'])}",
     ]
     for regime, block in prim["paired_vs_alpha0"]["regimes"].items():
-        lines.append(f"- {regime}: `{_fmt_ci(block)}` — {_resolved(block)}")
+        lines.append(f"- {regime}: `{_fmt_ci(block)}`: {_resolved(block)}")
     lines += [
         "",
         "Per-regime MAE under T_strict:",

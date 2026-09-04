@@ -1,4 +1,4 @@
-# Liquid-OSAHR Experiment 01 — Audited Experiment Report
+# Liquid-OSAHR Experiment 01: Audited Experiment Report
 
 ## Executive result
 
@@ -372,7 +372,7 @@ One CfC learned-hazard trajectory continuously verifies OSAHR's incremental matc
 
 ## 14. Main OSAHR fidelity results
 
-### ID regime — goal-utility MAE versus oracle
+### ID regime: goal-utility MAE versus oracle
 
 | Twin | MAE |
 |---|---:|
@@ -381,7 +381,7 @@ One CfC learned-hazard trajectory continuously verifies OSAHR's incremental matc
 | CfC | 0.0643 |
 | constant | 0.1061 |
 
-### Generated sparse regime — goal-utility MAE versus oracle
+### Generated sparse regime: goal-utility MAE versus oracle
 
 | Twin | MAE |
 |---|---:|
@@ -390,7 +390,7 @@ One CfC learned-hazard trajectory continuously verifies OSAHR's incremental matc
 | GRU-dt | 0.0802 |
 | constant | 0.0978 |
 
-### Generated sparse regime — policy-effect MAE versus oracle
+### Generated sparse regime: policy-effect MAE versus oracle
 
 The policy effect is
 
@@ -509,7 +509,7 @@ The main bridge has six independent telemetry scenarios per regime. Bootstrap in
 
 ## 18. Optimal implementation route from here
 
-### Route A — calibrated 6G hazard identification
+### Route A: calibrated 6G hazard identification
 
 Replace the synthetic teacher with ns-3/srsRAN or recorded RAN/MEC telemetry and learn intensities such as:
 
@@ -517,11 +517,11 @@ Replace the synthetic teacher with ns-3/srsRAN or recorded RAN/MEC telemetry and
 \lambda_{service},\lambda_{handover},\lambda_{blockage},\lambda_{failure}.
 \]
 
-### Route B — decision-aware training
+### Route B: decision-aware training
 
 Augment event likelihood with a differentiable or surrogate penalty for errors that alter downstream control decisions. Pure likelihood weights every event according to statistical evidence, not operational consequence.
 
-### Route C — closed-loop Liquid-OSAHR
+### Route C: closed-loop Liquid-OSAHR
 
 Move from exogenous schedule
 
@@ -539,11 +539,11 @@ to a live continuous state
 
 with graph rewrites applying hidden-state jump maps.
 
-### Route D — certified neural stochastic scheduling
+### Route D: certified neural stochastic scheduling
 
 Develop valid bounds/integrals for neural hazards so continuously varying CfC/LTC intensities can be sampled with mathematically controlled thinning or integrated-hazard inversion.
 
-### Route E — graph-coupled liquid state
+### Route E: graph-coupled liquid state
 
 Give UEs, gNBs and MEC nodes their own liquid states and couple them through current OSAHR hyperedges. A handover would then modify not only a symbolic relation but the continuous vector field itself.
 
@@ -563,7 +563,7 @@ Experiment 01 demonstrates a legitimate Liquid-OSAHR architecture:
 }
 \]
 
-and—more importantly—finds where the architecture is *not yet sufficient*.
+and: more importantly: finds where the architecture is *not yet sufficient*.
 
 CfC provides a repeatable likelihood advantage under ID and pure sparse-observation conditions, even against a parameter-matched GRU. That advantage does not extend universally to stronger physical regime shifts. And stochastic graph simulation exposes a second problem that ordinary sequence benchmarks can hide: a model can predict hazards well yet still distort counterfactual policy effects.
 

@@ -1,4 +1,4 @@
-# Experiment 06 Protocol — NetworkBrain control plane
+# Experiment 06 Protocol: NetworkBrain control plane
 
 **Status:** formulated. Confirmatory seed `260826` is declared here **before** any confirmatory trajectory is executed.
 
@@ -6,7 +6,7 @@
 
 ## Question
 
-Can a 6G control twin keep **meaning** in a file-backed vault, **observations** in NWDAF-like AnLF payloads on the boundary, and **one mouth** that acts only when an intervention claim is unresolved — without putting a language model inside OSAHR hazards?
+Can a 6G control twin keep **meaning** in a file-backed vault, **observations** in NWDAF-like AnLF payloads on the boundary, and **one mouth** that acts only when an intervention claim is unresolved: without putting a language model inside OSAHR hazards?
 
 ## Hypothesis
 
@@ -34,7 +34,7 @@ Can a 6G control twin keep **meaning** in a file-backed vault, **observations** 
 | AnLF | `anlf.load.ema_v1`, `anlf.outage.threshold_cusum_v1` |
 | Brain | `osahr06_brain_v1_deterministic` (no LLM import) |
 | Park | `park.request_rewrite` refused unless `hold_unresolved` **and** currently matched **and** vault-legal |
-| Runtime seed mixing | `(root_seed, scenario, replicate)` — not policy or \(\alpha\) |
+| Runtime seed mixing | `(root_seed, scenario, replicate)`, not policy or \(\alpha\) |
 
 ## Decision rule at a junction
 

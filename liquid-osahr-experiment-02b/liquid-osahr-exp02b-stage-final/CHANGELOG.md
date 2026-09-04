@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.2.0 — 2026-08-18
+## 0.2.0: 2026-08-18
 
 Liquid-OSAHR Experiment 02B replaces the unconstrained 02A learned-world formulation with a standards-informed mechanism plus globally bounded topology-coupled CfC residual and explicit neural trust coefficient.
 

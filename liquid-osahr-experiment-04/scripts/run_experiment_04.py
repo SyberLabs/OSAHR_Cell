@@ -218,7 +218,7 @@ def write_report(path: Path, *, payload: dict) -> None:
     prim = payload["confirmatory"]["goal_utility_ratio"]
     cells = payload["fields"]["T_strict"]["cells"]
     lines = [
-        "# Experiment 04 Report — Same-Horizon Multi-Query Calibration",
+        "# Experiment 04 Report: Same-Horizon Multi-Query Calibration",
         "",
         "**Status:** completed synthetic confirmatory study.",
         "**Calibration seed:** 440318. **Confirmatory seed:** 880419. **Horizon:** 3.0 s.",
@@ -249,10 +249,10 @@ def write_report(path: Path, *, payload: dict) -> None:
         "",
         "Paired T_strict minus global α=0 (negative = T better):",
         "",
-        f"- macro: `{_fmt_ci(prim['paired_vs_alpha0']['macro'])}` — {_resolved(prim['paired_vs_alpha0']['macro'])}",
+        f"- macro: `{_fmt_ci(prim['paired_vs_alpha0']['macro'])}`: {_resolved(prim['paired_vs_alpha0']['macro'])}",
     ]
     for regime, block in prim["paired_vs_alpha0"]["regimes"].items():
-        lines.append(f"- {regime}: `{_fmt_ci(block)}` — {_resolved(block)}")
+        lines.append(f"- {regime}: `{_fmt_ci(block)}`: {_resolved(block)}")
     lines += [
         "",
         "## 3. All estimands",

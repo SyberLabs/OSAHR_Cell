@@ -1,4 +1,4 @@
-# Experiment 04 Protocol — Same-Horizon Multi-Query Calibration
+# Experiment 04 Protocol: Same-Horizon Multi-Query Calibration
 
 **Status:** confirmatory synthetic study, descendant of Experiments 02B and 03.
 

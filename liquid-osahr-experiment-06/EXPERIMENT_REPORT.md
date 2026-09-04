@@ -1,4 +1,4 @@
-# Experiment 06 Report — NetworkBrain stack
+# Experiment 06 Report: NetworkBrain stack
 
 **Status:** frozen and confirmatory-executed on seed `260826`, horizon 60 s. No language model in confirmatory.
 
@@ -49,7 +49,7 @@ Per scenario (eps = 0):
 | 2 | high_stress | `admit` | idle; Δ identical to vault-gated |
 | 3 | long_outage | `hold_unresolved` | load-penalty select among vault-legal matches |
 
-Scenario 3 is the KP11 cell: ensemble signs disagree (\(\alpha=1\) flips), oracle \(\Delta\) is expressed and negative, and every arm’s point \(\Delta\) also comes out negative — **illegal promotion** if that point is reported as a licensed directed effect. The Brain was allowed to *act* at hold; it was not licensed to *claim* the oracle-matching sign.
+Scenario 3 is the KP11 cell: ensemble signs disagree (\(\alpha=1\) flips), oracle \(\Delta\) is expressed and negative, and every arm’s point \(\Delta\) also comes out negative: **illegal promotion** if that point is reported as a licensed directed effect. The Brain was allowed to *act* at hold; it was not licensed to *claim* the oracle-matching sign.
 
 Scalar semantic has the lowest MAE. That does not license it as an intervention policy: it still uses the degraded `MEC-fast` edge that the vault forbids for `critical` (KP2, KP6). Vault/Brain are legality layers, not a bid to win predictive MAE.
 

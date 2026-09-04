@@ -1,4 +1,4 @@
-# Experiment 04 Report — Same-Horizon Multi-Query Calibration
+# Experiment 04 Report: Same-Horizon Multi-Query Calibration
 
 **Status:** completed synthetic confirmatory study.
 **Calibration seed:** 440318. **Confirmatory seed:** 880419. **Horizon:** 3.0 s.
@@ -31,11 +31,11 @@ Goal-utility semantic-vs-throughput effect MAE versus oracle.
 
 Paired T_strict minus global α=0 (negative = T better):
 
-- macro: `0.00998  [-0.00268, 0.02571]` — unresolved (95% CI includes 0)
-- id: `0.00000  [0.00000, 0.00000]` — unresolved (95% CI includes 0)
-- high_mobility: `0.02464  [-0.01817, 0.07751]` — unresolved (95% CI includes 0)
-- high_stress: `0.01528  [-0.00323, 0.04565]` — unresolved (95% CI includes 0)
-- weak_channel: `0.00000  [0.00000, 0.00000]` — unresolved (95% CI includes 0)
+- macro: `0.00998  [-0.00268, 0.02571]`: unresolved (95% CI includes 0)
+- id: `0.00000  [0.00000, 0.00000]`: unresolved (95% CI includes 0)
+- high_mobility: `0.02464  [-0.01817, 0.07751]`: unresolved (95% CI includes 0)
+- high_stress: `0.01528  [-0.00323, 0.04565]`: unresolved (95% CI includes 0)
+- weak_channel: `0.00000  [0.00000, 0.00000]`: unresolved (95% CI includes 0)
 
 ## 3. All estimands
 
