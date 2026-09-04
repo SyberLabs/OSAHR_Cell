@@ -62,7 +62,10 @@ TOOL_SCHEMAS: dict[str, dict[str, Any]] = {
     },
     "oda.spawn": {
         "name": "oda.spawn",
-        "description": "Cell v0 lock: spawning a bot is refused.",
+        "description": (
+            "Register a grokbot owner on the surface. Does not rewrite G. "
+            "Park still licenses construction."
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -74,7 +77,7 @@ TOOL_SCHEMAS: dict[str, dict[str, Any]] = {
     },
     "oda.attach_skill": {
         "name": "oda.attach_skill",
-        "description": "New rail = skill on an existing owner, not a new bot.",
+        "description": "Attach a skill rail to an existing owner.",
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -138,12 +141,10 @@ class ToolRegistry:
         )
 
     def _spawn(self, arguments: dict[str, Any]) -> dict[str, Any]:
-        return {
-            "decision": "refused",
-            "reason": "oda_spawn_lock",
-            "bot_name": arguments.get("bot_name"),
-            "new_bot": False,
-        }
+        return self.surface.spawn_owner(
+            bot_name=str(arguments.get("bot_name") or ""),
+            job=str(arguments.get("job") or ""),
+        )
 
     def _attach(self, arguments: dict[str, Any]) -> dict[str, Any]:
         return self.surface.attach_skill(
@@ -159,6 +160,6 @@ def mcp_manifest() -> dict[str, Any]:
         "tools": list(TOOL_SCHEMAS.values()),
         "notes": (
             "Tools are control-plane ports. They are not radio links, "
-            "not occurrence types, and not a bot swarm."
+            "not occurrence types. Spawn registers owners; it does not rewrite G."
         ),
     }

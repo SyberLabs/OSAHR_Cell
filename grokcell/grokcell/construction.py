@@ -137,7 +137,7 @@ def build_runtime(*, root_seed: int = ROOT_SEED) -> Runtime:
         parameters={"assemble_rate": ASSEMBLE_RATE},
         memory={
             "owners": [MOUTH_OWNER],
-            "skills_on_mouth": [],
+            "skills": {MOUTH_OWNER: []},
             "bots_spawned": 0,
             "components": [],
         },
