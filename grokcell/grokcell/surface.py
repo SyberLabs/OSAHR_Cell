@@ -1,4 +1,4 @@
-"""Stateful GrokCell surface. One mouth. Chat is not the database."""
+"""Stateful GrokCell surface. Chat is not the database. Park licenses G."""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
@@ -41,14 +41,21 @@ class GrokCellSurface:
             results.append(self._dispatch(message))
         return results
 
+    def owners(self) -> list[str]:
+        return list(self.runtime.memory.get("owners", [MOUTH_OWNER]))
+
     def _dispatch(self, message: Message) -> DrainItem:
         status, reason = classify(
             message,
             components=self.components(),
+            owners=self.owners(),
             vault=self.vault,
         )
         if status == "admit":
-            self._commit_propose(message)
+            if message.kind == "oda.spawn":
+                self._commit_spawn(message)
+            else:
+                self._commit_propose(message)
             return as_item(message, status, reason)
         if status == "hold_unresolved":
             self.held[message.message_id] = message
@@ -70,6 +77,45 @@ class GrokCellSurface:
             seq=self.inject_seq,
         )
 
+    def _commit_spawn(self, message: Message) -> None:
+        self.spawn_owner(
+            bot_name=str(message.payload.get("bot_name") or ""),
+            job=str(message.payload.get("job") or ""),
+        )
+
+    def spawn_owner(self, *, bot_name: str, job: str = "") -> dict:
+        name = str(bot_name or "").strip()
+        if not name:
+            return {
+                "decision": "refused",
+                "reason": "missing_name",
+                "bot_name": bot_name,
+                "new_bot": False,
+            }
+        owners = self.owners()
+        if name in owners:
+            return {
+                "decision": "refused",
+                "reason": "duplicate_owner",
+                "bot_name": name,
+                "new_bot": False,
+            }
+        owners.append(name)
+        self.runtime.memory["owners"] = owners
+        self.runtime.memory["bots_spawned"] = int(
+            self.runtime.memory.get("bots_spawned", 0)
+        ) + 1
+        skills = dict(self.runtime.memory.get("skills") or {})
+        skills.setdefault(name, [])
+        self.runtime.memory["skills"] = skills
+        return {
+            "decision": "accepted",
+            "reason": "owner_registered",
+            "bot_name": name,
+            "job": job,
+            "new_bot": True,
+        }
+
     def park_request(self, *, status: str, message_id: str) -> dict:
         if status != "hold_unresolved":
             return {
@@ -89,6 +135,7 @@ class GrokCellSurface:
         next_status, reason = classify(
             message,
             components=self.components(),
+            owners=self.owners(),
             vault=self.vault,
         )
         if next_status != "admit":
@@ -109,17 +156,18 @@ class GrokCellSurface:
         }
 
     def attach_skill(self, *, owner: str, skill: str, rail: str) -> dict:
-        if owner != MOUTH_OWNER:
+        if owner not in self.owners():
             return {
                 "decision": "refused",
-                "reason": "v0 attaches skills only on MOUTH",
+                "reason": "unknown_owner",
                 "new_bot": False,
             }
-        skills = list(self.runtime.memory.get("skills_on_mouth", []))
-        token = skill if not rail else f"{skill}:{rail}"
-        if token not in skills:
-            skills.append(skill)
-        self.runtime.memory["skills_on_mouth"] = skills
+        skills = dict(self.runtime.memory.get("skills") or {})
+        bucket = list(skills.get(owner, []))
+        if skill not in bucket:
+            bucket.append(skill)
+        skills[owner] = bucket
+        self.runtime.memory["skills"] = skills
         return {
             "decision": "accepted",
             "reason": f"skill rail {rail} on {owner}",
@@ -139,9 +187,12 @@ class GrokCellSurface:
         ]
         return {
             "surface_version": SURFACE_VERSION,
-            "owners": list(self.runtime.memory.get("owners", [MOUTH_OWNER])),
+            "owners": self.owners(),
             "bots_spawned": int(self.runtime.memory.get("bots_spawned", 0)),
-            "skills_on_mouth": list(self.runtime.memory.get("skills_on_mouth", [])),
+            "skills": {
+                key: list(value)
+                for key, value in dict(self.runtime.memory.get("skills") or {}).items()
+            },
             "components": self.components(),
             "state_hash": self.runtime.state_hash,
             "event_index": int(self.runtime.event_index),
