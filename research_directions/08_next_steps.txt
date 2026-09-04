@@ -31,6 +31,10 @@ Order, stop at each gate
    representation theorem. No new CfC. Not the apex.
 7. 10 is envelope-only around a frozen F. It waits for (3). It
    is not an LLM SKU and it does not unfreeze W.
+8. grokcell/ is the v0 host grokbots run on. One mouth, park,
+   sequential Component construction. Not a swarm. Not a
+   confirmatory seed. Next slice is a checkable mutant-killing
+   artifact, not more owners.
 
 Highest-value avenue (restated)
 -------------------------------
