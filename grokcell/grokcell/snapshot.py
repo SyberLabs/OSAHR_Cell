@@ -106,8 +106,8 @@ class SurfaceSnapshot:
             or isinstance(seq, bool)
             or not isinstance(inject_seq, int)
             or isinstance(inject_seq, bool)
-            or seq \u003c 0
-            or inject_seq \u003c 0
+            or seq < 0
+            or inject_seq < 0
             or inject_seq > seq
             or not isinstance(queued_payload, list)
             or not isinstance(held_payload, list)
@@ -120,7 +120,7 @@ class SurfaceSnapshot:
         if (
             len(identities) != len(set(identities))
             or any(
-                item.seq \u003c= 0 or item.message_id != f"m-{item.seq:04d}"
+                item.seq <= 0 or item.message_id != f"m-{item.seq:04d}"
                 for item in messages
             )
             or any(item.seq > seq for item in messages)

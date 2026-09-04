@@ -231,7 +231,7 @@ def run_component(name: str, *, store: FidelityStore | None = None) -> FidelityR
 def main(argv: list[str] | None = None) -> int:
     args = list(sys.argv[1:] if argv is None else argv)
     if not args:
-        print("usage: python -m grokcell.runner \u003ccomponent>", file=sys.stderr)
+        print("usage: python -m grokcell.runner <component>", file=sys.stderr)
         return 2
     record = run_component(args[0])
     print(json.dumps(record.to_json(), indent=2))
