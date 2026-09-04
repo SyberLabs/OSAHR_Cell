@@ -2,12 +2,19 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from pathlib import Path
 
 from .bus import as_item, classify, drain_order
-from .construction import build_runtime, graph_component_names, licensed_assemble
+from .construction import (
+    build_runtime,
+    graph_component_names,
+    licensed_assemble,
+    runtime_from_snapshot,
+)
 from .fidelity import FidelityStore
 from .messages import DrainItem, Message, PostAck
 from .protocol import MOUTH_OWNER, SURFACE_VERSION
+from .snapshot import SnapshotStore, SurfaceSnapshot
 from .vault import ConstraintVault
 
 
@@ -16,6 +23,7 @@ class GrokCellSurface:
     vault: ConstraintVault
     runtime: object
     fidelity: FidelityStore
+    snapshots: SnapshotStore
     queued: list[Message] = field(default_factory=list)
     held: dict[str, Message] = field(default_factory=dict)
     seq: int = 0
@@ -26,15 +34,47 @@ class GrokCellSurface:
         cls,
         vault: ConstraintVault | None = None,
         fidelity: FidelityStore | None = None,
+        state: Path | None = None,
     ) -> "GrokCellSurface":
         loaded = vault if vault is not None else ConstraintVault.load()
         scores = fidelity if fidelity is not None else FidelityStore.load()
-        return cls(vault=loaded, runtime=build_runtime(), fidelity=scores)
+        store = SnapshotStore.load(state)
+        pair = store.load_pair()
+        if pair is None:
+            return cls(
+                vault=loaded,
+                runtime=build_runtime(),
+                fidelity=scores,
+                snapshots=store,
+            )
+        kernel, surface = pair
+        return cls(
+            vault=loaded,
+            runtime=runtime_from_snapshot(kernel),
+            fidelity=scores,
+            snapshots=store,
+            queued=list(surface.queued),
+            held=dict(surface.held),
+            seq=surface.seq,
+            inject_seq=surface.inject_seq,
+        )
+
+    def _persist(self) -> None:
+        self.snapshots.save(
+            self.runtime,
+            SurfaceSnapshot(
+                seq=self.seq,
+                inject_seq=self.inject_seq,
+                queued=list(self.queued),
+                held=dict(self.held),
+            ),
+        )
 
     def post(self, message: Message) -> PostAck:
         self.seq += 1
         identified = message.with_identity(f"m-{self.seq:04d}", self.seq)
         self.queued.append(identified)
+        self._persist()
         return PostAck(queued=True, message_id=identified.message_id)
 
     def components(self) -> list[str]:
@@ -46,6 +86,7 @@ class GrokCellSurface:
         results: list[DrainItem] = []
         for message in batch:
             results.append(self._dispatch(message))
+        self._persist()
         return results
 
     def owners(self) -> list[str]:
@@ -116,6 +157,7 @@ class GrokCellSurface:
         skills = dict(self.runtime.memory.get("skills") or {})
         skills.setdefault(name, [])
         self.runtime.memory["skills"] = skills
+        self._persist()
         return {
             "decision": "accepted",
             "reason": "owner_registered",
@@ -157,6 +199,7 @@ class GrokCellSurface:
             }
         self._commit_propose(message)
         del self.held[message_id]
+        self._persist()
         return {
             "decision": "accepted",
             "reason": "hold resolved; kernel validated assemble-component",
@@ -177,6 +220,7 @@ class GrokCellSurface:
             bucket.append(skill)
         skills[owner] = bucket
         self.runtime.memory["skills"] = skills
+        self._persist()
         return {
             "decision": "accepted",
             "reason": f"skill rail {rail} on {owner}",
