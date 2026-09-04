@@ -9,12 +9,13 @@ CONCEPTS_DIR = PROJECT_ROOT / "vault" / "concepts"
 CLAIMS_NOTES_DIR = PROJECT_ROOT / "vault" / "claims"
 
 MOUTH_OWNER = "MOUTH"
-SURFACE_VERSION = "grokcell_surface_v2"
-MCP_SCHEMA_VERSION = "grokcell_mcp_v2"
+SURFACE_VERSION = "grokcell_surface_v3"
+MCP_SCHEMA_VERSION = "grokcell_mcp_v3"
 CONSTRUCTION_RULE_ID = "assemble-component"
 ROOT_SEED = 260904
 ASSEMBLE_RATE = 1.0
 FIDELITY_DIR = PROJECT_ROOT / "vault" / "fidelity"
+STATE_DIR = PROJECT_ROOT / "vault" / "state"
 SUITE_BY_COMPONENT = {
     "core.api": Path("world") / "suites" / "core_api",
     "app.ui": Path("world") / "suites" / "app_ui",

@@ -5,7 +5,7 @@ import json
 from dataclasses import dataclass
 from pathlib import Path
 
-from .protocol import FIDELITY_DIR
+from . import protocol
 
 
 @dataclass(frozen=True, slots=True)
@@ -41,7 +41,7 @@ class FidelityStore:
 
     @classmethod
     def load(cls, root: Path | None = None) -> "FidelityStore":
-        return cls(Path(root) if root is not None else FIDELITY_DIR)
+        return cls(Path(root) if root is not None else protocol.FIDELITY_DIR)
 
     def path_for(self, name: str) -> Path:
         safe = name.replace("/", "_")
