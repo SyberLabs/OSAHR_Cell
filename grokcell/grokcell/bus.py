@@ -9,10 +9,16 @@ def classify(
     message: Message,
     *,
     components: list[str],
+    owners: list[str],
     vault: ConstraintVault,
 ) -> tuple[str, str]:
     if message.kind == "oda.spawn":
-        return "reject", "oda_spawn_lock"
+        name = str(message.payload.get("bot_name") or "").strip()
+        if not name:
+            return "outcome_unknown", "missing_name"
+        if name in owners:
+            return "reject", "duplicate_owner"
+        return "admit", "owner_registered"
     if message.kind == "oda.attach_skill":
         return "reject", "use_oda_attach_skill_tool"
     if message.kind != "forge.propose":
