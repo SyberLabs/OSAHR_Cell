@@ -1,0 +1,14 @@
+{
+  "schema": "osahr_workbench_scenario_v0",
+  "id": 1,
+  "name": "identity",
+  "operator_role": "network_reliability_engineer",
+  "decision": "choose routing policy on the RAN/MEC twin",
+  "horizon_s": 60.0,
+  "root_seed": 260826,
+  "seed_mix": ["root", "scenario", "replicate"],
+  "overrides": {},
+  "baseline_policy": "throughput",
+  "semantic_policy": "vault_gated",
+  "estimand": "goal_utility_ratio"
+}

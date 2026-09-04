@@ -1,0 +1,17 @@
+{
+  "schema": "osahr_workbench_scenario_v0",
+  "id": 3,
+  "name": "long_outage",
+  "operator_role": "network_reliability_engineer",
+  "decision": "choose routing policy during a long fast-edge outage",
+  "horizon_s": 60.0,
+  "root_seed": 260826,
+  "seed_mix": ["root", "scenario", "replicate"],
+  "overrides": {
+    "fast_outage_start": 10.0,
+    "fast_outage_end": 45.0
+  },
+  "baseline_policy": "throughput",
+  "semantic_policy": "vault_gated",
+  "estimand": "goal_utility_ratio"
+}

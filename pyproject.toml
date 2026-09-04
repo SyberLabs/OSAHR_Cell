@@ -22,9 +22,9 @@ where = ["."]
 include = ["osahr", "osahr.*"]
 
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "workbench/tests"]
 addopts = "-q"
-pythonpath = ["."]
+pythonpath = [".", "liquid-osahr-experiment-06", "liquid-osahr-experiment-05"]
 
 [tool.setuptools.package-data]
 osahr = ["py.typed"]
