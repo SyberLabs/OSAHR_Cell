@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -41,7 +42,10 @@ class FidelityStore:
 
     @classmethod
     def load(cls, root: Path | None = None) -> "FidelityStore":
-        return cls(Path(root) if root is not None else protocol.FIDELITY_DIR)
+        if root is not None:
+            return cls(Path(root))
+        env = os.environ.get("GROKCELL_FIDELITY_DIR")
+        return cls(Path(env) if env else protocol.FIDELITY_DIR)
 
     def path_for(self, name: str) -> Path:
         safe = name.replace("/", "_")

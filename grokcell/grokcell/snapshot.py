@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import json
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -48,7 +49,10 @@ class SnapshotStore:
 
     @classmethod
     def load(cls, root: Path | None = None) -> "SnapshotStore":
-        return cls(Path(root) if root is not None else protocol.STATE_DIR)
+        if root is not None:
+            return cls(Path(root))
+        env = os.environ.get("GROKCELL_STATE_DIR")
+        return cls(Path(env) if env else protocol.STATE_DIR)
 
     @property
     def kernel_path(self) -> Path:
