@@ -1,7 +1,9 @@
 """Priority bus with vault constraints. Legality outranks priority."""
 from __future__ import annotations
 
+from .fidelity import FidelityStore
 from .messages import DrainItem, Message
+from .runner import current_suite_hash
 from .vault import ConstraintVault
 
 
@@ -11,6 +13,7 @@ def classify(
     components: list[str],
     owners: list[str],
     vault: ConstraintVault,
+    fidelity: FidelityStore,
 ) -> tuple[str, str]:
     if message.kind == "oda.spawn":
         name = str(message.payload.get("bot_name") or "").strip()
@@ -28,14 +31,13 @@ def classify(
     if constraint not in vault.concepts:
         return "outcome_unknown", "unknown_constraint"
     concept = vault.concepts[constraint]
-    verified = bool(payload.get("verified", False))
-    if concept.requires_fidelity and not verified:
-        return "reject", "unverified_critical"
-    if "unverified" in concept.excludes and not verified:
-        return "reject", "unverified_excluded"
     name = str(payload.get("name") or "")
     if not name:
         return "outcome_unknown", "missing_name"
+    if concept.requires_fidelity:
+        ok, reason = fidelity.check(name, expected_hash=current_suite_hash(name))
+        if not ok:
+            return "reject", reason
     if name in components:
         return "reject", "duplicate_component"
     missing = [
