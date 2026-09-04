@@ -31,7 +31,8 @@ They are not a license to collapse domains into one schema.
 
 5. MCP is recon, not routing
    Tool ports are control-plane skills. They are not radio links and
-   not occurrence types. One mouth. No specialist-bot swarm.
+   not occurrence types. Spawn registers owners on the surface.
+   Spawn does not rewrite G.
 
 6. Freeze before confirmatory
    Checksum the grammar, vault, and analytics versions. Declare the
@@ -60,8 +61,9 @@ They are not a license to collapse domains into one schema.
 
 11. GrokCell surface is the agent host
     Messages are control-plane records. They are not occurrence
-    types. One mouth. oda.spawn is refused. Construction rewrites
+    types. oda.spawn registers an owner. Construction rewrites
     G only through park. See 11_autonomous_grokcell.txt.
+    Production for grokbots: 12_grokcell_production.txt.
 
 Do not
 ------
@@ -74,4 +76,9 @@ Do not
 - Put an LLM or z-update inside occurrence hazards.
 - Represent neurons, layers, or residual streams as 6G
   occurrence types.
-- Spawn specialist bots to carry control-plane messages.
+- Let spawn, bus messages, or skills rewrite G.
+
+Unowned Cell v0 locks (no named requirement owner) were deleted
+2026-09-04 under Elon: no agentic-swarm cap, one-mouth cap,
+oda.spawn always refused. Park, DPO, 05 grammar, and chat-is-not-
+the-database remain.

@@ -1,7 +1,7 @@
 """Control-plane messages. Not OSAHR occurrence types."""
 from __future__ import annotations
 
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Any
 
 
@@ -24,11 +24,33 @@ class Message:
             seq=int(seq),
         )
 
+    def to_json(self) -> dict[str, Any]:
+        return {
+            "source_owner": self.source_owner,
+            "kind": self.kind,
+            "priority": self.priority,
+            "payload": dict(self.payload),
+            "message_id": self.message_id,
+            "seq": self.seq,
+        }
+
+    @classmethod
+    def from_json(cls, payload: dict[str, Any]) -> "Message":
+        return cls(
+            source_owner=str(payload["source_owner"]),
+            kind=str(payload["kind"]),
+            priority=int(payload["priority"]),
+            payload=dict(payload.get("payload") or {}),
+            message_id=str(payload.get("message_id") or ""),
+            seq=int(payload.get("seq") or 0),
+        )
+
 
 @dataclass(frozen=True, slots=True)
 class PostAck:
     queued: bool
     message_id: str
+    reason: str = ""
 
 
 @dataclass(frozen=True, slots=True)

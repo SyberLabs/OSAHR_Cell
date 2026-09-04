@@ -31,10 +31,15 @@ Order, stop at each gate
    representation theorem. No new CfC. Not the apex.
 7. 10 is envelope-only around a frozen F. It waits for (3). It
    is not an LLM SKU and it does not unfreeze W.
-8. grokcell/ is the v0 host grokbots run on. One mouth, park,
-   sequential Component construction. Not a swarm. Not a
-   confirmatory seed. Next slice is a checkable mutant-killing
-   artifact, not more owners.
+8. grokcell/ is the host grokbots run on. Spawn registers
+   owners. Park licenses G. Sequential Component construction.
+   Not a confirmatory seed. Production gates: 12. Gate A is a
+   grokcell/ prototype (runner-owned verified). Gate B is a
+   grokcell/ prototype (file snapshot; open() resumes). Gate C
+   is a grokcell/ prototype (MCP stdio over existing tools).
+   Gate D is a grokcell/ prototype (session bind). Gate E is a
+   grokcell/ prototype (one artifact type on admit; mutants die).
+   Next: skills still do not run.
 
 Highest-value avenue (restated)
 -------------------------------

@@ -107,7 +107,7 @@ def assemble_rule() -> Rule:
     )
 
 
-def build_runtime(*, root_seed: int = ROOT_SEED) -> Runtime:
+def construction_model() -> Model:
     schema = construction_schema()
     graph = Hypergraph(schema, namespace=0x6C11)
     graph.add_vertex("Cell", {})
@@ -130,21 +130,28 @@ def build_runtime(*, root_seed: int = ROOT_SEED) -> Runtime:
             input_mode=InputMode.REPLACE_BOUND_VERTEX_ATTRIBUTES,
         )
     )
-    model = Model(
+    return Model(
         graph,
         boundary,
         (assemble_rule(),),
         parameters={"assemble_rate": ASSEMBLE_RATE},
         memory={
             "owners": [MOUTH_OWNER],
-            "skills_on_mouth": [],
+            "skills": {MOUTH_OWNER: []},
             "bots_spawned": 0,
             "components": [],
         },
         model_id="grokcell-construction",
         version="0.1.0",
     )
-    return Runtime(model, root_seed=root_seed)
+
+
+def build_runtime(*, root_seed: int = ROOT_SEED) -> Runtime:
+    return Runtime(construction_model(), root_seed=root_seed)
+
+
+def runtime_from_snapshot(snapshot: object) -> Runtime:
+    return Runtime.from_snapshot(construction_model(), snapshot)
 
 
 def graph_component_names(runtime: Runtime) -> list[str]:

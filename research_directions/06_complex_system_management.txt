@@ -10,8 +10,9 @@ Manage systems whose topology, rules, and stochastic clocks
 co-evolve: RAN + cloud + training cluster + supply of models;
 or grid + telecom + logistics. Each subsystem keeps its own
 schema. They couple only through typed BoundaryHandles.
-OSAHR was built for this composition. GrokCell is one mouth
-over the *composite* claim, not a swarm of subsystem bots.
+OSAHR was built for this composition. GrokCell is the licensed
+claim path over the *composite*, not a second kernel per
+subsystem.
 
 Facilitation
 ------------
@@ -33,12 +34,12 @@ are allowed to cross subsystems are few and declared
 Claim status is scored per physical scenario, not per chat
 turn. admit: local legal matches fire. hold: one Brain may
 request a vault-legal rewrite in one subsystem at a time.
-unknown: withhold, park a note, do not "coordinate via more
-agents."
+unknown: withhold, park a note, do not couple subsystems
+through chat.
 
 Shared structures this pays for
 -------------------------------
-Open composition, boundary handles, one mouth, junction-only
+Open composition, boundary handles, licensed park, junction-only
 semantics, freeze, park. This is the payoff of keeping the
 other directions separate: the composite only works if the
 kernels were not fused.

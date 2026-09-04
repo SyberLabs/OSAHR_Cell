@@ -27,7 +27,8 @@ Ledger (one file each)
 08_next_steps.txt             apex: close park on one checkable world
 09_hybrid_substrate.txt       inhabitant PDMP; taxonomy, not a new CfC
 10_frozen_operator_controller.txt  envelope: frozen F + licensed z
-11_autonomous_grokcell.txt    surface grokbots run; not a swarm
+11_autonomous_grokcell.txt    surface grokbots run; spawn registers owners
+12_grokcell_production.txt    gates A-E before grokbot production; not a kernel
 
 Canonical GitHub: https://github.com/SyberLabs/OSAHR_Cell
 Older ranking of OSAHR application attractiveness (not this

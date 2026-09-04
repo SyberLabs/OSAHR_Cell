@@ -1,12 +1,21 @@
-"""Stateful GrokCell surface. One mouth. Chat is not the database."""
+"""Stateful GrokCell surface. Chat is not the database. Park licenses G."""
 from __future__ import annotations
 
 from dataclasses import dataclass, field
+from pathlib import Path
 
+from .artifact import ArtifactStore, resolve_artifact
 from .bus import as_item, classify, drain_order
-from .construction import build_runtime, graph_component_names, licensed_assemble
+from .construction import (
+    build_runtime,
+    graph_component_names,
+    licensed_assemble,
+    runtime_from_snapshot,
+)
+from .fidelity import FidelityStore
 from .messages import DrainItem, Message, PostAck
 from .protocol import MOUTH_OWNER, SURFACE_VERSION
+from .snapshot import SnapshotStore, SurfaceSnapshot
 from .vault import ConstraintVault
 
 
@@ -14,20 +23,66 @@ from .vault import ConstraintVault
 class GrokCellSurface:
     vault: ConstraintVault
     runtime: object
+    fidelity: FidelityStore
+    snapshots: SnapshotStore
+    artifacts: ArtifactStore
     queued: list[Message] = field(default_factory=list)
     held: dict[str, Message] = field(default_factory=dict)
     seq: int = 0
     inject_seq: int = 0
 
     @classmethod
-    def open(cls, vault: ConstraintVault | None = None) -> "GrokCellSurface":
+    def open(
+        cls,
+        vault: ConstraintVault | None = None,
+        fidelity: FidelityStore | None = None,
+        state: Path | None = None,
+    ) -> "GrokCellSurface":
         loaded = vault if vault is not None else ConstraintVault.load()
-        return cls(vault=loaded, runtime=build_runtime())
+        scores = fidelity if fidelity is not None else FidelityStore.load()
+        store = SnapshotStore.load(state)
+        artifacts = ArtifactStore(store.root / "artifacts")
+        pair = store.load_pair()
+        if pair is None:
+            return cls(
+                vault=loaded,
+                runtime=build_runtime(),
+                fidelity=scores,
+                snapshots=store,
+                artifacts=artifacts,
+            )
+        kernel, surface = pair
+        return cls(
+            vault=loaded,
+            runtime=runtime_from_snapshot(kernel),
+            fidelity=scores,
+            snapshots=store,
+            artifacts=artifacts,
+            queued=list(surface.queued),
+            held=dict(surface.held),
+            seq=surface.seq,
+            inject_seq=surface.inject_seq,
+        )
+
+    def _persist(self) -> None:
+        self.snapshots.save(
+            self.runtime,
+            SurfaceSnapshot(
+                seq=self.seq,
+                inject_seq=self.inject_seq,
+                queued=list(self.queued),
+                held=dict(self.held),
+            ),
+        )
 
     def post(self, message: Message) -> PostAck:
+        owner = str(message.source_owner or "").strip()
+        if owner not in self.owners():
+            return PostAck(queued=False, message_id="", reason="unknown_owner")
         self.seq += 1
         identified = message.with_identity(f"m-{self.seq:04d}", self.seq)
         self.queued.append(identified)
+        self._persist()
         return PostAck(queued=True, message_id=identified.message_id)
 
     def components(self) -> list[str]:
@@ -39,16 +94,25 @@ class GrokCellSurface:
         results: list[DrainItem] = []
         for message in batch:
             results.append(self._dispatch(message))
+        self._persist()
         return results
+
+    def owners(self) -> list[str]:
+        return list(self.runtime.memory.get("owners", [MOUTH_OWNER]))
 
     def _dispatch(self, message: Message) -> DrainItem:
         status, reason = classify(
             message,
             components=self.components(),
+            owners=self.owners(),
             vault=self.vault,
+            fidelity=self.fidelity,
         )
         if status == "admit":
-            self._commit_propose(message)
+            if message.kind == "oda.spawn":
+                self._commit_spawn(message)
+            else:
+                self._commit_propose(message)
             return as_item(message, status, reason)
         if status == "hold_unresolved":
             self.held[message.message_id] = message
@@ -62,6 +126,9 @@ class GrokCellSurface:
 
     def _commit_propose(self, message: Message) -> None:
         payload = message.payload
+        artifact = resolve_artifact(payload)
+        if artifact is not None:
+            self.artifacts.materialize(artifact)
         self.inject_seq += 1
         licensed_assemble(
             self.runtime,
@@ -70,7 +137,57 @@ class GrokCellSurface:
             seq=self.inject_seq,
         )
 
-    def park_request(self, *, status: str, message_id: str) -> dict:
+    def _commit_spawn(self, message: Message) -> None:
+        self.spawn_owner(
+            bot_name=str(message.payload.get("bot_name") or ""),
+            job=str(message.payload.get("job") or ""),
+        )
+
+    def spawn_owner(self, *, bot_name: str, job: str = "") -> dict:
+        name = str(bot_name or "").strip()
+        if not name:
+            return {
+                "decision": "refused",
+                "reason": "missing_name",
+                "bot_name": bot_name,
+                "new_bot": False,
+            }
+        owners = self.owners()
+        if name in owners:
+            return {
+                "decision": "refused",
+                "reason": "duplicate_owner",
+                "bot_name": name,
+                "new_bot": False,
+            }
+        owners.append(name)
+        self.runtime.memory["owners"] = owners
+        self.runtime.memory["bots_spawned"] = int(
+            self.runtime.memory.get("bots_spawned", 0)
+        ) + 1
+        skills = dict(self.runtime.memory.get("skills") or {})
+        skills.setdefault(name, [])
+        self.runtime.memory["skills"] = skills
+        self._persist()
+        return {
+            "decision": "accepted",
+            "reason": "owner_registered",
+            "bot_name": name,
+            "job": job,
+            "new_bot": True,
+        }
+
+    def park_request(
+        self,
+        *,
+        status: str = "",
+        message_id: str = "",
+        act: str = "",
+        name: str = "",
+    ) -> dict:
+        verb = str(act or "").strip()
+        if verb:
+            return self.artifacts.act(act=verb, name=name)
         if status != "hold_unresolved":
             return {
                 "decision": "refused",
@@ -89,7 +206,9 @@ class GrokCellSurface:
         next_status, reason = classify(
             message,
             components=self.components(),
+            owners=self.owners(),
             vault=self.vault,
+            fidelity=self.fidelity,
         )
         if next_status != "admit":
             detail = "dependency" if reason == "missing_dependency" else reason
@@ -101,6 +220,7 @@ class GrokCellSurface:
             }
         self._commit_propose(message)
         del self.held[message_id]
+        self._persist()
         return {
             "decision": "accepted",
             "reason": "hold resolved; kernel validated assemble-component",
@@ -109,17 +229,19 @@ class GrokCellSurface:
         }
 
     def attach_skill(self, *, owner: str, skill: str, rail: str) -> dict:
-        if owner != MOUTH_OWNER:
+        if owner not in self.owners():
             return {
                 "decision": "refused",
-                "reason": "v0 attaches skills only on MOUTH",
+                "reason": "unknown_owner",
                 "new_bot": False,
             }
-        skills = list(self.runtime.memory.get("skills_on_mouth", []))
-        token = skill if not rail else f"{skill}:{rail}"
-        if token not in skills:
-            skills.append(skill)
-        self.runtime.memory["skills_on_mouth"] = skills
+        skills = dict(self.runtime.memory.get("skills") or {})
+        bucket = list(skills.get(owner, []))
+        if skill not in bucket:
+            bucket.append(skill)
+        skills[owner] = bucket
+        self.runtime.memory["skills"] = skills
+        self._persist()
         return {
             "decision": "accepted",
             "reason": f"skill rail {rail} on {owner}",
@@ -139,9 +261,12 @@ class GrokCellSurface:
         ]
         return {
             "surface_version": SURFACE_VERSION,
-            "owners": list(self.runtime.memory.get("owners", [MOUTH_OWNER])),
+            "owners": self.owners(),
             "bots_spawned": int(self.runtime.memory.get("bots_spawned", 0)),
-            "skills_on_mouth": list(self.runtime.memory.get("skills_on_mouth", [])),
+            "skills": {
+                key: list(value)
+                for key, value in dict(self.runtime.memory.get("skills") or {}).items()
+            },
             "components": self.components(),
             "state_hash": self.runtime.state_hash,
             "event_index": int(self.runtime.event_index),
@@ -150,4 +275,5 @@ class GrokCellSurface:
             "hold_queue": len(self.held),
             "queued": len(self.queued),
             "held": held,
+            "artifacts": self.artifacts.list(),
         }

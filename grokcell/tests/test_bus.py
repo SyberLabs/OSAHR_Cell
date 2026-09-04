@@ -1,8 +1,12 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from grokcell.messages import Message
 from grokcell.surface import GrokCellSurface
 from grokcell.tools import ToolRegistry, TOOL_SCHEMAS
+
+from support import scored_surface
 
 
 def test_tool_ports_are_not_occurrence_types():
@@ -16,15 +20,17 @@ def test_tool_ports_are_not_occurrence_types():
     assert "assemble-component" in rule_ids
 
 
-def test_constraints_outrank_priority():
-    surface = GrokCellSurface.open()
+def test_constraints_outrank_priority(tmp_path: Path):
+    from grokcell.fidelity import FidelityStore
+
+    surface = GrokCellSurface.open(fidelity=FidelityStore(tmp_path))
     tools = ToolRegistry(surface)
     tools.call(
         "bus.post",
         {
             "source_owner": "MOUTH",
             "kind": "forge.propose",
-            "priority": 1,
+            "priority": 99,
             "payload": {
                 "name": "core.api",
                 "constraint": "critical_module",
@@ -38,26 +44,24 @@ def test_constraints_outrank_priority():
         {
             "source_owner": "MOUTH",
             "kind": "oda.spawn",
-            "priority": 99,
-            "payload": {"bot_name": "swarm"},
+            "priority": 1,
+            "payload": {"bot_name": "edge-sensor"},
         },
     )
     drained = tools.call("bus.drain", {})
-    statuses = [item["status"] for item in drained["results"]]
-    kinds = [item["kind"] for item in drained["results"]]
     spawn = next(item for item in drained["results"] if item["kind"] == "oda.spawn")
     propose = next(item for item in drained["results"] if item["kind"] == "forge.propose")
-    assert spawn["status"] == "reject"
-    assert propose["status"] == "admit"
-    assert kinds.count("oda.spawn") == 1
+    assert spawn["status"] == "admit"
+    assert propose["status"] == "reject"
+    assert propose["reason"] == "runner_absent"
     inspect = tools.call("surface.inspect", {})
-    assert "core.api" in inspect["components"]
-    assert inspect["bots_spawned"] == 0
-    assert statuses
+    assert inspect["components"] == []
+    assert "edge-sensor" in inspect["owners"]
+    assert inspect["bots_spawned"] == 1
 
 
-def test_missing_dependency_holds():
-    surface = GrokCellSurface.open()
+def test_missing_dependency_holds(tmp_path: Path):
+    surface = scored_surface("app.ui", root=tmp_path)
     tools = ToolRegistry(surface)
     tools.call(
         "bus.post",
@@ -68,7 +72,6 @@ def test_missing_dependency_holds():
             "payload": {
                 "name": "app.ui",
                 "constraint": "critical_module",
-                "verified": True,
                 "depends_on": ["core.api"],
             },
         },
@@ -80,8 +83,10 @@ def test_missing_dependency_holds():
     assert inspect["hold_queue"] == 1
 
 
-def test_unverified_critical_is_rejected():
-    surface = GrokCellSurface.open()
+def test_unverified_critical_is_rejected(tmp_path: Path):
+    from grokcell.fidelity import FidelityStore
+
+    surface = GrokCellSurface.open(fidelity=FidelityStore(tmp_path))
     tools = ToolRegistry(surface)
     tools.call(
         "bus.post",
@@ -99,6 +104,7 @@ def test_unverified_critical_is_rejected():
     )
     drained = tools.call("bus.drain", {})
     assert drained["results"][0]["status"] == "reject"
+    assert drained["results"][0]["reason"] == "runner_absent"
     inspect = tools.call("surface.inspect", {})
     assert inspect["components"] == []
 

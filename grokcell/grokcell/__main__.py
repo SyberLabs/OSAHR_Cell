@@ -3,11 +3,13 @@ from __future__ import annotations
 
 import json
 
+from grokcell.runner import run_component
 from grokcell.surface import GrokCellSurface
 from grokcell.tools import ToolRegistry
 
 
 def main() -> None:
+    record = run_component("core.api")
     surface = GrokCellSurface.open()
     tools = ToolRegistry(surface)
     tools.call(
@@ -19,14 +21,18 @@ def main() -> None:
             "payload": {
                 "name": "core.api",
                 "constraint": "critical_module",
-                "verified": True,
                 "depends_on": [],
             },
         },
     )
     drained = tools.call("bus.drain", {})
     inspect = tools.call("surface.inspect", {})
-    print(json.dumps({"drain": drained, "inspect": inspect}, indent=2))
+    print(
+        json.dumps(
+            {"runner": record.to_json(), "drain": drained, "inspect": inspect},
+            indent=2,
+        )
+    )
 
 
 if __name__ == "__main__":

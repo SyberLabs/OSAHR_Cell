@@ -7,34 +7,27 @@ description: >-
 ---
 # GrokCell ODA
 
-The organization exists for the mission. Produce the effect with the smallest existing owner.
+The organization exists for the mission. Produce the effect with the smallest existing owner. Spawn is allowed. Spawn does not rewrite G.
 
 ## Fast path
 
 Stop at the first rung that holds.
 
 1. **An existing owner can do it** → assign it there. Done. Solo is the default.
-2. **It needs a new rail** → write a **skill on an existing owner**. Not a new bot.
-3. **The work is genuinely independent** → attach an existing specialist, with a detach condition.
-4. **All three spawn-test conditions hold** → only then create a bot.
-5. **None of the above** → leave the slot empty. An empty slot beats an invented bot.
+2. **It needs a new rail** → write a **skill on an existing owner**.
+3. **The work is genuinely independent** → spawn or attach, with a detach condition. `oda.spawn` registers an owner on the surface. It does not assemble a Component.
+4. **None of the above** → leave the slot empty. An empty slot beats an invented bot.
 
-## Hard locks (Cell v0)
+## Owned locks (physics or named experiments)
 
-These outrank any language that sounds like "form a new detachment."
+Unowned Cell v0 recommendations were deleted (Elon: no owner → not a requirement). These remain because they have owners:
 
-1. **New rail = skill on an existing owner, not a new bot.**
-2. **Spawn test: all three must be true** before creating a bot: the rail has been daily for several days; the current owner's description would become two jobs; a one-paragraph law can be written. **Any fail → keep the skill.**
-3. **Attach from the existing pool.** Do not create a bot because a function was named.
-4. Memory may be files or infrastructure, not a dedicated agent.
-5. No Cloud Agent unless the mouth names it.
-6. **Chat is not the database.** Durable state lives in files the cell already uses, not the thread.
-7. **One mouth.** The human talks to FEDERATION_COMMAND / MOUTH. Specialists report to that mouth.
-8. Park send, spend, publish, delete, sign.
-9. Personal and narrative fields go through WRITER + ChatGPT. No em dashes. One draft.
-10. No generic empty helper. Leave unnamed bots unnamed.
-11. Sidebar Sections group work. Do not add names to organize.
-12. **Smallest existing owner is the requirement.** One owner may hold several jobs. Three functions is not a requirement.
+1. **Park** send, spend, publish, delete, sign. Owner: experiment 05 grammar + experiment 06 vault. `park.request` is the only license for low-reversibility acts on G.
+2. **Only DPO + clocks rewrite G.** Owner: OSAHR 0.2 kernel. Tools, bus messages, and grokbots are not occurrence types.
+3. **Chat is not the database.** Owner: process twin (SyberRuntime / 00). Durable state lives in files the cell already uses, not the thread.
+4. **Junction grammar.** Owner: experiment 05. admit | hold_unresolved | reject | outcome_unknown. Do not promote a predictor that matches while the ensemble withholds.
+
+Deleted as unowned: no agentic swarm; one mouth as a hard cap; `oda.spawn` always refused; spawn-test three conditions as a lock; skills only on MOUTH; no Cloud Agent unless the mouth names it; WRITER/em-dash as a system lock; sidebar-as-law.
 
 ## Irreversible work
 
@@ -42,4 +35,4 @@ Ordinary breakage is recovery (`grokcell-recovery-repair`). If continuing is mor
 
 ## Done when
 
-The cell produced the effect with who already exists, wrote a skill instead of a bot when a rail was missing, parked irreversible acts, and left no invented structure behind.
+The cell produced the effect, parked irreversible acts, and left G unchanged except through DPO after a licensed admit or park.
