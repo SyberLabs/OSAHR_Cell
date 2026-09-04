@@ -7,5 +7,6 @@ requires_fidelity: true
 
 # Critical module
 
-A construction component that requires a verified checkable world
+A construction component that requires a python_tests runner record
 before park may admit it onto the Cell graph. Contrast [[unverified]].
+`payload.verified` is ignored. Fail-closed if the runner is absent.

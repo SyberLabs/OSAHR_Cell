@@ -16,3 +16,4 @@ include = ["grokcell*"]
 testpaths = ["tests"]
 pythonpath = [".", ".."]
 addopts = "-q"
+norecursedirs = ["world", "vault", ".venv"]
