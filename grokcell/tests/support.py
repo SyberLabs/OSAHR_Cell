@@ -13,4 +13,4 @@ def scored_surface(*names: str, root: Path) -> GrokCellSurface:
         record = run_component(name, store=store)
         if not record.passed:
             raise AssertionError(f"runner failed for {name}: exit {record.exit_code}")
-    return GrokCellSurface.open(fidelity=store)
+    return GrokCellSurface.open(fidelity=store, state=root / "state")
