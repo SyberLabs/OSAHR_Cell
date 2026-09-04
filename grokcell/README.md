@@ -1,14 +1,14 @@
 # Autonomous GrokCell
 
 Stateful agentic surface grokbots run on. Descendant of OSAHR 0.2.
-Not the kernel. Not a bot swarm. Not confirmatory science.
+Not the kernel. Not confirmatory science.
 
 Experiment 06 (seed 260826) remains the last executed confirmatory
 record. This package is a prototype control plane.
 
 ## What it is
 
-A layer **above** grokbots, not a new family of them.
+A layer **above** grokbots.
 
 ```text
 grokbot / agent
@@ -19,12 +19,12 @@ grokbot / agent
 ```
 
 Messages are control-plane objects. They are not radio links and
-not occurrence types. The mouth is `MOUTH`. `oda.spawn` is refused.
-A new rail is `oda.attach_skill` on that owner.
+not occurrence types. `oda.spawn` registers an owner. It does not
+rewrite G. Construction still goes through park / licensed admit.
 
-OSAHR owns the **system graph** being built: Cell, Slot, Component,
-PartOf. Park is the only path that commits a component. Priority
-cannot override a vault exclude or a missing dependency.
+Priority orders the queue. **Legality outranks priority**: an
+unverified `critical_module` at 99 is still rejected. Spawn is
+not a ban and not a second kernel.
 
 ## Run
 
@@ -53,12 +53,24 @@ propose, drains, and prints `surface.inspect`.
 | `bus.drain` | Classify the queue; admit commits |
 | `surface.inspect` | Owners, components, hashes, holds |
 | `park.request` | Commit a held propose iff deps exist |
-| `oda.spawn` | Always refused in v0 |
-| `oda.attach_skill` | Skill rail on MOUTH, not a new bot |
+| `oda.spawn` | Register an owner; does not rewrite G |
+| `oda.attach_skill` | Skill rail on an existing owner |
+
+## Laws that remain (named owners)
+
+| Law | Owner |
+|---|---|
+| Only DPO + clocks rewrite G | OSAHR 0.2 kernel |
+| Junction admit / hold / reject / unknown | Experiment 05 |
+| Park licenses irreversible acts | Experiments 05 and 06 |
+| Chat is not the database | Process twin (00 / SyberRuntime) |
+| LLM not in hazards | Experiments 01 / 02A |
+
+Deleted as unowned: no-swarm cap, one-mouth cap, spawn always refused.
 
 ## Do not
 
 - Put an LLM in hazards
 - Treat bus messages as OSAHR rules
-- Spawn specialist grokbots to "do message passing"
-- Bypass DPO from the tool layer
+- Let spawn bypass DPO
+- Call this MEASURED
