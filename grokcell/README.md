@@ -23,12 +23,15 @@ not occurrence types. `oda.spawn` registers an owner. It does not
 rewrite G. Construction still goes through park / licensed admit.
 
 Priority orders the queue. **Legality outranks priority**. `payload.verified`
-is ignored. `critical_module` admits only after `python -m grokcell.runner <name>`
-writes a passing, current-hash record. Fail-closed if the runner is absent.
+is ignored. `critical_module` admits only after a python_tests record
+and after an AST mutant dies. Frozen suites still need
+`python -m grokcell.runner <name>` first. Generated `module` + `tests`
+in the payload are scored by the surface. Fail-closed if the runner
+is absent or the mutant survives.
 
 **Chat is not the database.** `open()` resumes `vault/state/`
-(kernel checkpoint + surface queue/holds). Delete that directory
-for a fresh cell. Snapshot is not an MCP tool.
+(kernel checkpoint + surface queue/holds + admitted artifacts).
+Delete that directory for a fresh cell. Snapshot is not an MCP tool.
 
 ## Run
 
@@ -56,8 +59,11 @@ stdio, wrapping the same tool names. Not HTTP. Gate D: connect
 as an owner (`initialize` params `owner`). Unbound or mismatched
 `bus.post` is refused. Spawn is how a new name enters. In-process
 `ToolRegistry` defaults to MOUTH; the stdio process starts unbound.
-`GROKCELL_STATE_DIR` and `GROKCELL_FIDELITY_DIR` override the
-default vault paths so the process can resume Gate B files.
+Gate E: admit writes `vault/state/artifacts/<name>/` (module + tests).
+`park.request` `act` send/publish/delete/sign stamps those files
+and does not rewrite G. `GROKCELL_STATE_DIR` and
+`GROKCELL_FIDELITY_DIR` override the default vault paths so the
+process can resume Gate B files.
 
 ```json
 {
@@ -77,8 +83,8 @@ default vault paths so the process can resume Gate B files.
 | `vault.query` | Read a constraint concept |
 | `bus.post` | Queue a typed message |
 | `bus.drain` | Classify the queue; admit commits |
-| `surface.inspect` | Owners, components, hashes, holds |
-| `park.request` | Commit a held propose iff deps exist |
+| `surface.inspect` | Owners, components, hashes, holds, artifacts |
+| `park.request` | Commit a held propose, or license artifact files |
 | `oda.spawn` | Register an owner; does not rewrite G |
 | `oda.attach_skill` | Skill rail on an existing owner |
 
@@ -95,6 +101,7 @@ default vault paths so the process can resume Gate B files.
 | File snapshot; `open()` resumes | Gate B (12); not an MCP tool |
 | MCP stdio over existing tools | Gate C (12); not a second API |
 | Session bind; registered `source_owner` | Gate D (12); not a new tool |
+| One artifact type; mutants die | Gate E (12); park stamps files |
 
 Deleted as unowned: no-swarm cap, one-mouth cap, spawn always refused.
 

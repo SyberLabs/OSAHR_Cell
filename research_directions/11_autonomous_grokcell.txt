@@ -35,7 +35,9 @@ present. Spawn registers owners. Attach skill on any existing
 owner. Gate A: python_tests runner owns verified. Gate B:
 file snapshot of surface + kernel; open() resumes. Gate C:
 one MCP stdio process over existing tool names. Gate D:
-session bind; source_owner must be the bound owner. No LLM.
+session bind; source_owner must be the bound owner. Gate E:
+admit writes module + tests; mutants die; park licenses those
+files. No LLM.
 
 What v1 does not do
 -------------------
@@ -43,7 +45,7 @@ What v1 does not do
 - LLM in lambda
 - Unfreezing foundation weights (10)
 - A confirmatory seed
-- python_tests as the checkable world (next slice toward 08.3)
+- Skills as a declared tool allow-list (item 6 in 12)
 - Putting owners on the construction graph as vertices
 
 Do not
@@ -58,5 +60,5 @@ Viability
 This is the right host for grokbots if park stays the join.
 It becomes a toy if spawn rewrites G, or if a bot may set
 verified itself. Production gates are in 12_grokcell_production.txt.
-The next honest slice is still one checkable artifact type
-(generated module plus tests that can kill a mutant).
+The next honest slice is a skill rail that actually constrains
+tools, not another artifact type.

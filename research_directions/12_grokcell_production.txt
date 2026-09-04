@@ -7,11 +7,12 @@ and name what grokbot production requires.
 
 Verdict
 -------
-v1 plus gates A-D is a legal prototype of the control plane.
+v1 plus gates A-E is a legal prototype of the control plane.
 It is not yet production. Restart no longer empties the cell.
 There is one stdio MCP process. bus.post requires a bound
-registered owner; spawn is how a new name enters. A grokbot
-still cannot leave a checkable artifact. Park licenses G.
+registered owner. admit writes one artifact type (module +
+tests). Tests can kill a mutant. Park send/publish/delete/sign
+those files. Skills still do not run. Park licenses G.
 
 What v1 actually is (keep)
 --------------------------
@@ -43,12 +44,13 @@ What is broken for grokbot use (fix, in this order)
    the registry. Unbound or mismatched bus.post is refused.
    Spawn is how a new name enters. Not a new tool. Not MEASURED.
 
-5. admit writes a name, not an artifact.
-   Component vertices hold a string. No module, no test, no
-   mutant. Park cannot send/publish/delete/sign a real object.
-   Production: one artifact type (generated module + tests).
-   admit writes files. Tests can kill a mutant. That is 08.3.
-   Without it, grokbots are a guestbook.
+5. admit writes a name, not an artifact. **Gate E implemented in
+   grokcell/ (v6).** admit writes module + tests under
+   vault/state/artifacts. AST mutants must die or classify
+   rejects mutant_survived. park.request send/publish/delete/sign
+   stamps those files; G still only moves through DPO. Payload
+   source is scored by the surface runner, not by payload.verified.
+   Not a new tool. Not MEASURED.
 
 6. Skills do not run.
    oda.attach_skill stores "grokcell-forge". It does not load
@@ -90,11 +92,12 @@ C. One MCP stdio server. **Done as prototype in grokcell/ (v4).**
    Grokbot host talks only through existing tool names.
 
 D. Session bind. **Done as prototype in grokcell/ (v5).**
-   source_owner must be the bound registered owner. Next: E.
+   source_owner must be the bound registered owner.
 
-E. One artifact type on admit. Files on disk. Mutants die.
-   Park send/publish/delete/sign those files, still via DPO
-   for G and via the filesystem for the artifact.
+E. One artifact type on admit. **Done as prototype in grokcell/
+   (v6).** Files on disk. Mutants die. Park send/publish/delete/sign
+   those files, still via DPO for G and via the filesystem for
+   the artifact. Next: skills still do not run (item 6).
 
 Done when a grokbot, across two process lives, can propose a
 module, be held, get a runner-scored admit, and leave a

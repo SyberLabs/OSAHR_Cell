@@ -37,8 +37,9 @@ Order, stop at each gate
    grokcell/ prototype (runner-owned verified). Gate B is a
    grokcell/ prototype (file snapshot; open() resumes). Gate C
    is a grokcell/ prototype (MCP stdio over existing tools).
-   Gate D is a grokcell/ prototype (session bind). Next: E
-   artifact files (08.3).
+   Gate D is a grokcell/ prototype (session bind). Gate E is a
+   grokcell/ prototype (one artifact type on admit; mutants die).
+   Next: skills still do not run.
 
 Highest-value avenue (restated)
 -------------------------------

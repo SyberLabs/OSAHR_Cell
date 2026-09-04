@@ -8,17 +8,20 @@ agent tool call
         -> python_tests fidelity (not payload.verified)
         -> vault constraints (critical_module, unverified)
             -> claim grammar: admit | hold_unresolved | reject | outcome_unknown
-                forge.propose admit: ExternalEvent on Slot, then kernel assemble-component
+                forge.propose admit: write module+tests; ExternalEvent on Slot;
+                    then kernel assemble-component. Mutant must die.
                 oda.spawn admit: register owner in memory; G unchanged
                 hold: stay in the hold queue; park.request may resolve
                 reject | unknown: vault note; no rewrite
+                park file acts: send/publish/delete/sign artifacts; G unchanged
 ```
 
 Kernel state remains X = (G, B, R, Theta, Z, t, n). No first-class H.
 The bus does not call RewriteEngine. assemble-component is a DPO rule.
 park.request never bypasses DPO. Spawn is not a DPO rule.
 payload.verified is ignored. critical_module is fail-closed without
-a current python_tests record.
+a current python_tests record. admit writes files under
+vault/state/artifacts. Component vertices still hold only a name.
 
 ## Layers (do not collapse)
 
@@ -29,7 +32,8 @@ a current python_tests record.
 | Fidelity | python_tests runner records | No |
 | Bus | priority + legality | No |
 | ODA | owner registry + skills | No |
-| Park | license at hold | Request only |
+| Park | license at hold, or file acts | Request only |
+| Artifacts | module + tests on disk | No |
 | Kernel | assemble-component | Yes, after legality |
 
 ## Construction schema
@@ -44,6 +48,6 @@ Owners live in runtime memory. They are not vertices.
 ## Relation to 08
 
 This is the 08 loop as a GrokCell runtime: one artifact type
-(Component) on a checkable twin, park as Stabilize. Spawn adds
-mouths that can post; it does not replace park. It is not a
-confirmatory experiment and it is not an LLM SKU.
+(generated module + tests) on a checkable twin, park as Stabilize.
+Spawn adds mouths that can post; it does not replace park. It is
+not a confirmatory experiment and it is not an LLM SKU.
