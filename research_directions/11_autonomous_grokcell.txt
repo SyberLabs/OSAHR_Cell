@@ -34,7 +34,8 @@ exist. park.request refused unless hold_unresolved and deps are
 present. Spawn registers owners. Attach skill on any existing
 owner. Gate A: python_tests runner owns verified. Gate B:
 file snapshot of surface + kernel; open() resumes. Gate C:
-one MCP stdio process over existing tool names. No LLM.
+one MCP stdio process over existing tool names. Gate D:
+session bind; source_owner must be the bound owner. No LLM.
 
 What v1 does not do
 -------------------

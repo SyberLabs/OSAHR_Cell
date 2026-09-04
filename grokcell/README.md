@@ -52,8 +52,10 @@ checkable suite. `python -m grokcell` then proposes `core.api`
 without a client `verified` flag.
 
 `python -m grokcell.mcp` is the Gate C host: JSON-RPC MCP over
-stdio, wrapping the same tool names. Not HTTP. Bind a grokbot
-host (Cursor MCP or grok function-calling) to that process.
+stdio, wrapping the same tool names. Not HTTP. Gate D: connect
+as an owner (`initialize` params `owner`). Unbound or mismatched
+`bus.post` is refused. Spawn is how a new name enters. In-process
+`ToolRegistry` defaults to MOUTH; the stdio process starts unbound.
 `GROKCELL_STATE_DIR` and `GROKCELL_FIDELITY_DIR` override the
 default vault paths so the process can resume Gate B files.
 
@@ -92,6 +94,7 @@ default vault paths so the process can resume Gate B files.
 | `verified` from python_tests runner | Gate A (12); bot cannot set it |
 | File snapshot; `open()` resumes | Gate B (12); not an MCP tool |
 | MCP stdio over existing tools | Gate C (12); not a second API |
+| Session bind; registered `source_owner` | Gate D (12); not a new tool |
 
 Deleted as unowned: no-swarm cap, one-mouth cap, spawn always refused.
 

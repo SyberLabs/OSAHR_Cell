@@ -37,7 +37,8 @@ Order, stop at each gate
    grokcell/ prototype (runner-owned verified). Gate B is a
    grokcell/ prototype (file snapshot; open() resumes). Gate C
    is a grokcell/ prototype (MCP stdio over existing tools).
-   Next: D session bind, then still 08.3 artifact files.
+   Gate D is a grokcell/ prototype (session bind). Next: E
+   artifact files (08.3).
 
 Highest-value avenue (restated)
 -------------------------------
