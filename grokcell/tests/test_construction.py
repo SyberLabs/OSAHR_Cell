@@ -1,11 +1,14 @@
 from __future__ import annotations
 
-from grokcell.surface import GrokCellSurface
+from pathlib import Path
+
 from grokcell.tools import ToolRegistry
 
+from support import scored_surface
 
-def test_sequential_construction_commits_through_the_kernel():
-    surface = GrokCellSurface.open()
+
+def test_sequential_construction_commits_through_the_kernel(tmp_path: Path):
+    surface = scored_surface("core.api", "app.ui", root=tmp_path)
     tools = ToolRegistry(surface)
     before = tools.call("surface.inspect", {})
     tools.call(
@@ -17,7 +20,6 @@ def test_sequential_construction_commits_through_the_kernel():
             "payload": {
                 "name": "core.api",
                 "constraint": "critical_module",
-                "verified": True,
                 "depends_on": [],
             },
         },
@@ -38,7 +40,6 @@ def test_sequential_construction_commits_through_the_kernel():
             "payload": {
                 "name": "app.ui",
                 "constraint": "critical_module",
-                "verified": True,
                 "depends_on": ["core.api"],
             },
         },
@@ -49,8 +50,8 @@ def test_sequential_construction_commits_through_the_kernel():
     assert final["components"] == ["core.api", "app.ui"]
 
 
-def test_park_refuses_unless_hold():
-    surface = GrokCellSurface.open()
+def test_park_refuses_unless_hold(tmp_path: Path):
+    surface = scored_surface("app.ui", root=tmp_path)
     tools = ToolRegistry(surface)
     tools.call(
         "bus.post",
@@ -61,7 +62,6 @@ def test_park_refuses_unless_hold():
             "payload": {
                 "name": "app.ui",
                 "constraint": "critical_module",
-                "verified": True,
                 "depends_on": ["core.api"],
             },
         },
@@ -84,8 +84,8 @@ def test_park_refuses_unless_hold():
     assert "dependency" in held["reason"]
 
 
-def test_park_at_hold_commits_when_deps_exist():
-    surface = GrokCellSurface.open()
+def test_park_at_hold_commits_when_deps_exist(tmp_path: Path):
+    surface = scored_surface("core.api", "app.ui", root=tmp_path)
     tools = ToolRegistry(surface)
     tools.call(
         "bus.post",
@@ -96,7 +96,6 @@ def test_park_at_hold_commits_when_deps_exist():
             "payload": {
                 "name": "app.ui",
                 "constraint": "critical_module",
-                "verified": True,
                 "depends_on": ["core.api"],
             },
         },
@@ -112,7 +111,6 @@ def test_park_at_hold_commits_when_deps_exist():
             "payload": {
                 "name": "core.api",
                 "constraint": "critical_module",
-                "verified": True,
                 "depends_on": [],
             },
         },
@@ -130,9 +128,9 @@ def test_park_at_hold_commits_when_deps_exist():
 
 
 def test_no_llm_in_surface_modules():
-    from pathlib import Path
+    from pathlib import Path as P
 
-    root = Path(__file__).resolve().parents[1] / "grokcell"
+    root = P(__file__).resolve().parents[1] / "grokcell"
     forbidden = ("openai", "anthropic", "groq", "litellm", "transformers")
     for path in root.glob("*.py"):
         text = path.read_text(encoding="utf-8")
