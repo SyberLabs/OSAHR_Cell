@@ -41,5 +41,9 @@ GrokCell skills .cursor/skills/
 GrokCell surface grokcell/                     prototype host grokbots run
 Workbench       workbench/                     licensed decision packets over exp 06
 
+The private osahr_project tree does not include workbench/. The two
+GitHub histories have diverged. Do not merge them without an explicit
+PI decision.
+
 Do not cite research_directions as MEASURED. Experiment 06 (seed 260826)
 is the last executed confirmatory record. Do not put an LLM in hazards.
