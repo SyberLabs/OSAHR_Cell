@@ -12,42 +12,47 @@ model-tooling infrastructural layer: the construction twin, DPO
 legality, and park. Agents interact through tool ports. They do
 not become occurrence types.
 
-This is 08 made concrete as GrokCell, not a specialist swarm.
+This is 08 made concrete as GrokCell.
 
     Agent -> bus.post(priority, constraints)
           -> admit | hold | reject | unknown
-          -> OSAHR assemble-component on admit
+          -> OSAHR assemble-component on admit of forge.propose
           -> sequential Component graph
+    oda.spawn -> owner registry (memory). G unchanged.
 
-ODA locks stay in force. Solo is the default. New rail = skill
-on MOUTH. oda.spawn is refused in v0 regardless of priority.
 Chat is not the database. Park send/publish/delete/sign.
 
-What v0 already does
+The Cell v0 swarm / one-mouth / spawn-refused locks had no named
+requirement owner. Deleted 2026-09-04. Solo remains the default
+because it is smaller, not because spawn is illegal.
+
+What v1 already does
 --------------------
 Deterministic bus. Vault-gated classify. Sequential construction
 of named components through the kernel. Hold until dependencies
 exist. park.request refused unless hold_unresolved and deps are
-present. No LLM.
+present. Spawn registers owners. Attach skill on any existing
+owner. No LLM.
 
-What v0 does not do
+What v1 does not do
 -------------------
 - Multi-agent routing as a CTMC
 - LLM in lambda
 - Unfreezing foundation weights (10)
 - A confirmatory seed
 - python_tests as the checkable world (next slice toward 08.3)
+- Putting owners on the construction graph as vertices
 
 Do not
 ------
-- Invent grokbots to carry messages
 - Put bus.kind values into osahr-6g
 - Let priority admit an illegal propose
+- Let spawn bypass DPO
 - Call this MEASURED
 
 Viability
 ---------
 This is the right host for grokbots if park stays the join.
-It becomes a toy if we spawn a swarm to "orchestrate." The next
-honest slice is one checkable artifact type (generated module
-plus tests that can kill a mutant), not more owners.
+It becomes a toy if spawn rewrites G. The next honest slice is
+one checkable artifact type (generated module plus tests that
+can kill a mutant).
