@@ -21,14 +21,14 @@ Start with the 6G experiment for a result, or with 02B for the methodology argum
 
 | Experiment | Question | Status |
 |---|---|---|
-| [6G 01](osahr-6g/osahr_6g_experiment_release/EXPERIMENT_REPORT.md): Goal-aware semantic control over a RAN/MEC twin | Does routing by what a task is *for* preserve application value under disruption? | Executed; 30 trajectories per policy, plus no-outage and severe-outage controls |
-| [01](liquid-osahr-experiment-01/EXPERIMENT_REPORT.md): Liquid hazards over OSAHR | Can an irregular-time recurrent model supply event intensities that OSAHR consumes as an exact piecewise-constant stochastic law? | Executed; three training seeds, approximately parameter-matched GRU check |
-| [02A](liquid-osahr-experiment-02a/liquid-osahr-experiment-02a/EXPERIMENT_REPORT.md): Closed-loop topology-coupled neural state | Does closing the neural feedback loop improve counterfactual fidelity? | Executed |
-| [02B](liquid-osahr-experiment-02b/liquid-osahr-exp02b-stage-final/EXPERIMENT_REPORT.md): Intervention-calibrated standards-informed RAN twin | Can a mechanistically anchored liquid residual improve a twin without sacrificing intervention fidelity? | Executed; 400-run untouched confirmatory holdout |
-| [03](liquid-osahr-experiment-03/EXPERIMENT_REPORT.md): Query-conditioned trust | Is trust in a learned residual a property of the query rather than of the model? | Reanalysis of frozen 02B artifacts; no new simulation |
-| [04](liquid-osahr-experiment-04/EXPERIMENT_REPORT.md): Same-horizon multi-query calibration | Does one calibrated trust coefficient survive across estimands at a shared horizon? | Executed; calibration seed 440318, confirmatory seed 880419 |
-| [05](liquid-osahr-experiment-05/EXPERIMENT_REPORT.md): Residual-hypothesis claim status | What can be *claimed*, not merely estimated, about a residual effect? | Formulation and instrument check only; 22 s confirmatory declared on seed 110518, **not executed** |
-| [06](liquid-osahr-experiment-06/EXPERIMENT_REPORT.md): NetworkBrain stack | Can a semantic vault and a deterministic controller gate rewrites without licensing claims they cannot support? | Executed; seed 260826, 60 s horizon, no language model in confirmatory |
+| [6G 01](osahr-6g/osahr_6g_experiment_release/EXPERIMENT_REPORT.md) — Goal-aware semantic control over a RAN/MEC twin | Does routing by what a task is *for* preserve application value under disruption? | Executed; 30 trajectories per policy, plus no-outage and severe-outage controls |
+| [01](liquid-osahr-experiment-01/EXPERIMENT_REPORT.md) — Liquid hazards over OSAHR | Can an irregular-time recurrent model supply event intensities that OSAHR consumes as an exact piecewise-constant stochastic law? | Executed; three training seeds, approximately parameter-matched GRU check |
+| [02A](liquid-osahr-experiment-02a/liquid-osahr-experiment-02a/EXPERIMENT_REPORT.md) — Closed-loop topology-coupled neural state | Does closing the neural feedback loop improve counterfactual fidelity? | Executed |
+| [02B](liquid-osahr-experiment-02b/liquid-osahr-exp02b-stage-final/EXPERIMENT_REPORT.md) — Intervention-calibrated standards-informed RAN twin | Can a mechanistically anchored liquid residual improve a twin without sacrificing intervention fidelity? | Executed; 400-run untouched confirmatory holdout |
+| [03](liquid-osahr-experiment-03/EXPERIMENT_REPORT.md) — Query-conditioned trust | Is trust in a learned residual a property of the query rather than of the model? | Reanalysis of frozen 02B artifacts; no new simulation |
+| [04](liquid-osahr-experiment-04/EXPERIMENT_REPORT.md) — Same-horizon multi-query calibration | Does one calibrated trust coefficient survive across estimands at a shared horizon? | Executed; calibration seed 440318, confirmatory seed 880419 |
+| [05](liquid-osahr-experiment-05/EXPERIMENT_REPORT.md) — Residual-hypothesis claim status | What can be *claimed*, not merely estimated, about a residual effect? | Formulation and instrument check only; 22 s confirmatory declared on seed 110518, **not executed** |
+| [06](liquid-osahr-experiment-06/EXPERIMENT_REPORT.md) — NetworkBrain stack | Can a semantic vault and a deterministic controller gate rewrites without licensing claims they cannot support? | Executed; seed 260826, 60 s horizon, no language model in confirmatory |
 
 ### Selected results
 
@@ -84,9 +84,9 @@ above the PHY/RF layer as an adaptive semantic and control twin.
 
 Three schedulers are explicit model/runtime choices:
 
-1. **Direct SSA**: exact CTMC simulation for piecewise-constant occurrence hazards.
-2. **Modified next reaction**: independent internal Poisson clocks, preserving unaffected channel clocks across sparse local updates.
-3. **Bounded thinning**: exact event generation for continuously time-varying hazards when each time-dependent occurrence supplies a finite dominating bound over the requested planning window.
+1. **Direct SSA** — exact CTMC simulation for piecewise-constant occurrence hazards.
+2. **Modified next reaction** — independent internal Poisson clocks, preserving unaffected channel clocks across sparse local updates.
+3. **Bounded thinning** — exact event generation for continuously time-varying hazards when each time-dependent occurrence supplies a finite dominating bound over the requested planning window.
 
 A DPO-invalid pattern embedding is not a stochastic channel. Applicability is checked **before** its hazard contributes to total activity.
 

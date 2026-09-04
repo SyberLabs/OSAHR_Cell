@@ -1,4 +1,4 @@
-# Research Notes: Liquid-OSAHR Experiment 02A
+# Research Notes — Liquid-OSAHR Experiment 02A
 
 ## Continuous-time liquid models
 
@@ -33,7 +33,7 @@ Independent recent evidence for separating continuous graph dynamics from abrupt
 
 ## PDMP and exact thinning
 
-**Azaïs et al., Piecewise deterministic Markov process: recent results**  
+**Azaïs et al., Piecewise deterministic Markov process — recent results**  
 https://arxiv.org/abs/1309.6061
 
 The mathematical class most closely matching Liquid-OSAHR 02A: deterministic continuous evolution between random jumps.
@@ -57,7 +57,7 @@ https://www.itu.int/en/ITU-R/study-groups/rsg5/rwp5d/imt-2030/pages/default.aspx
 
 As of February/March 2026, IMT-2030 technical performance requirements explicitly include AI and Communication (AIAC), ubiquitous intelligence, and security/resilience among core scenarios/principles.
 
-**3GPP TS 28.561: Management aspects of Network Digital Twins**  
+**3GPP TS 28.561 — Management aspects of Network Digital Twins**  
 https://www.3gpp.org/dynareport/28561.htm
 
 Release-19 Network Digital Twin management work is the closest standards-facing location for OSAHR's shadow-policy-evaluation role.

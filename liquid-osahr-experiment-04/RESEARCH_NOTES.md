@@ -1,4 +1,4 @@
-# Research notes: Experiment 04
+# Research notes — Experiment 04
 
 03 showed that 2 s single-query calibration barely identified T. 04 asked whether matching horizon and estimand support is enough.
 

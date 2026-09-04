@@ -1,4 +1,4 @@
-# Research notes: Experiment 03
+# Research notes — Experiment 03
 
 ## Established (02B)
 
@@ -30,7 +30,7 @@ That is closer to a calibrated answering policy than to a new neural authority \
 
 ## Deliberate non-features
 
-- per-event-head \(\alpha\) (service/failure/handover): 02B recommended it; it needs new rollouts, not this reanalysis;
+- per-event-head \(\alpha\) (service/failure/handover) — 02B recommended it; it needs new rollouts, not this reanalysis;
 - neural \(\mathcal T_\theta\);
 - interpolating uncalibrated regimes from neighbors;
 - putting \(T\) inside the OSAHR state hash.

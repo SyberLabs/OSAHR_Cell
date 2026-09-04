@@ -1,4 +1,4 @@
-# Liquid-OSAHR Experiment 02A: Full Technical Report
+# Liquid-OSAHR Experiment 02A — Full Technical Report
 
 **Closed-loop topology-coupled continuous neural state with certified stochastic graph-rewrite hazards.**
 
@@ -220,7 +220,7 @@ Selected goal-utility results:
 
 Most effect-error intervals are wide because there are only six independent scenarios. One notable result is high-stress `cfc_closed` versus `cfc_openloop`: the closed model has **larger** goal-utility effect error by about +0.0318, with bootstrap CI approximately [+0.0016,+0.0705]. On ID, the closed model also has significantly worse goal-utility level error than the no-jump CfC (difference +0.0427, CI roughly [+0.0174,+0.0744]).
 
-For mean latency under high stress, feedback helps materially relative to both no-jump and open-loop CfC; the closed-minus-nojump level-error difference is about -0.1019 with a negative bootstrap interval. This shows the feedback loop is not simply harmful: it improves some dynamical quantities while degrading some intervention estimands.
+For mean latency under high stress, feedback helps materially relative to both no-jump and open-loop CfC; the closed-minus-nojump level-error difference is about -0.1019 with a negative bootstrap interval. This shows the feedback loop is not simply harmful—it improves some dynamical quantities while degrading some intervention estimands.
 
 ## 15. Exact thinning audit
 
@@ -260,7 +260,7 @@ Experiment 02A establishes the computational object but also exposes its core ep
 \delta\lambda_t \rightarrow \delta e_t \rightarrow \delta G_{t^+} \rightarrow \delta H_{t^+} \rightarrow \delta\lambda_{t+1}\rightarrow\cdots
 \]
 
-This recursive amplification is exactly why closed-loop twins are powerful: and why intervention validation must be stronger than prediction validation.
+This recursive amplification is exactly why closed-loop twins are powerful—and why intervention validation must be stronger than prediction validation.
 
 The experiment therefore suggests a hierarchy of trust:
 
@@ -327,7 +327,7 @@ That is a sharper and more valuable goal than ordinary next-event prediction.
 - Hasani et al., Closed-form Continuous-time Neural Models (CfC): https://arxiv.org/abs/2106.13898
 - Hasani et al., Liquid Time-constant Networks: https://arxiv.org/abs/2006.04439
 - Marino et al., Liquid-Graph Time-Constant Network for Multi-Agent Systems Control: https://arxiv.org/abs/2404.13982
-- Azaïs et al., Piecewise deterministic Markov process: recent results: https://arxiv.org/abs/1309.6061
+- Azaïs et al., Piecewise deterministic Markov process — recent results: https://arxiv.org/abs/1309.6061
 - Lemaire et al., Exact simulation of jump times of PDMPs: https://arxiv.org/abs/1602.07871
 - Sevak et al., Physics-Informed Graph Neural Jump ODEs for Cascading Failure Prediction (2026): https://arxiv.org/abs/2603.20838
 - Shchur et al., Neural Temporal Point Processes: A Review: https://arxiv.org/abs/2104.03528

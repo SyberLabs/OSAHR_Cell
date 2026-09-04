@@ -1,4 +1,4 @@
-# Experiment 03 Report: Query-Conditioned Trust
+# Experiment 03 Report — Query-Conditioned Trust
 
 **Status:** completed reanalysis of frozen Liquid-OSAHR 02B artifacts.
 **Simulation:** none. Confirmatory scores are arm selections from already-committed trajectories.
@@ -13,7 +13,7 @@ on `goal_utility_ratio` only. Uncalibrated queries and regimes fall back to α=0
 | high_mobility | 0.00 | calibrated_cell | 0.07126 | False |
 | high_stress | 0.00 | calibrated_cell | 0.06850 | False |
 | id | 0.50 | calibrated_cell | 0.00463 | False |
-| weak_channel | 0.00 | default_mechanistic | - | fallback |
+| weak_channel | 0.00 | default_mechanistic | — | fallback |
 
 Calibration LOSO selected alphas (6 folds per calibrated regime):
 
@@ -59,11 +59,11 @@ Independent unit: physical scenario. 50,000 scenario bootstraps.
 
 Paired difference in absolute error, T_strict minus global α=0 (negative = T better):
 
-- macro: `-0.01140  [-0.02963, 0.00000]`: unresolved (95% CI includes 0)
-- id: `-0.04561  [-0.10541, -0.00305]`: negative, 95% CI excludes 0
-- high_mobility: `0.00000  [0.00000, 0.00000]`: unresolved (95% CI includes 0)
-- high_stress: `0.00000  [0.00000, 0.00000]`: unresolved (95% CI includes 0)
-- weak_channel: `0.00000  [0.00000, 0.00000]`: unresolved (95% CI includes 0)
+- macro: `-0.01140  [-0.02963, 0.00000]` — unresolved (95% CI includes 0)
+- id: `-0.04561  [-0.10541, -0.00305]` — negative, 95% CI excludes 0
+- high_mobility: `0.00000  [0.00000, 0.00000]` — unresolved (95% CI includes 0)
+- high_stress: `0.00000  [0.00000, 0.00000]` — unresolved (95% CI includes 0)
+- weak_channel: `0.00000  [0.00000, 0.00000]` — unresolved (95% CI includes 0)
 
 Per-regime MAE under T_strict:
 
@@ -110,7 +110,7 @@ Calibrated cells: high_mobility→α=0.00, high_stress→α=0.00, id→α=0.50. 
 
 An ex-post global α=0.25 would have produced a lower confirmatory goal-utility macro MAE than frozen `T_strict`. That ranking was already visible in 02B and is **not** a frozen selector. Using it here would convert Experiment 03 into the thing 02B refused to do: pick α on the holdout.
 
-The exploratory LOSO field, fitted on confirmatory scenarios themselves, prefers α=0.5 on all five ID scenarios and α=0.25 on all five high-stress scenarios for goal utility, and prefers α=1.0 on ID and high-stress for mean latency. Same-horizon, multi-query calibration is therefore still the highest-leverage next measurement, not a larger neural trust head.
+The exploratory LOSO field, fitted on confirmatory scenarios themselves, prefers α=0.5 on all five ID scenarios and α=0.25 on all five high-stress scenarios for goal utility, and prefers α=1.0 on ID and high-stress for mean latency. Same-horizon, multi-query calibration is therefore still the highest-leverage next measurement — not a larger neural trust head.
 
 ## 6. Exactness and scope
 

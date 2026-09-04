@@ -175,7 +175,7 @@ def _status_row(summary: dict, status: str) -> str:
 
 def write_report(path: Path, *, instrument: dict | None, confirmatory: dict | None) -> None:
     lines = [
-        "# Experiment 05 Report: Residual-Hypothesis Claim Status",
+        "# Experiment 05 Report — Residual-Hypothesis Claim Status",
         "",
         "**Answering object:** claim status, not a point T to alpha*.",
         f"**Confirmatory seed (declared):** `{CONFIRMATORY_SEED}`. **Horizon:** {HORIZON} s.",
@@ -189,7 +189,7 @@ def write_report(path: Path, *, instrument: dict | None, confirmatory: dict | No
     if instrument is not None:
         prim = instrument["estimands"][PRIMARY_ESTIMAND]["0.00"]
         lines += [
-            "## Instrument check (04 holdout, h=3 s), not confirmatory",
+            "## Instrument check (04 holdout, h=3 s) — not confirmatory",
             "",
             f"Source SHA-256 `{instrument['source_sha256'][:16]}…`. Independent units: {prim['n']}. Expressed: {prim['expressed_n']}.",
             "",

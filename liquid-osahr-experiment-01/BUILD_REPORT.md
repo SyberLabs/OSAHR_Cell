@@ -1,4 +1,4 @@
-# Liquid-OSAHR Experiment 01: Build and Verification Report
+# Liquid-OSAHR Experiment 01 — Build and Verification Report
 
 **Date:** 2026-08-17
 

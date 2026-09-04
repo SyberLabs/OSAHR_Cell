@@ -1,4 +1,4 @@
-# Liquid-OSAHR Experiment 02B: Intervention-Calibrated Standards-Informed RAN Twin
+# Liquid-OSAHR Experiment 02B — Intervention-Calibrated Standards-Informed RAN Twin
 
 **Release:** 0.2.0  
 **Experiment status:** completed research prototype / confirmatory synthetic study  
@@ -367,7 +367,7 @@ The most defensible implementation route is:
 
 ## 19. Primary-source research grounding
 
-- 3GPP TS 28.561: Management and orchestration; Management aspects of Network Digital Twins (Release 19). https://www.3gpp.org/dynareport/28561.htm
+- 3GPP TS 28.561 — Management and orchestration; Management aspects of Network Digital Twins (Release 19). https://www.3gpp.org/dynareport/28561.htm
 - 3GPP, “The Network Digital Twin: Enabling Network Intelligence and Automation,” 27 Apr 2026. https://www.3gpp.org/technologies/digital-twin1
 - ETSI / 3GPP TR 38.901, channel model for 0.5–100 GHz, including UMi Street Canyon. https://www.etsi.org/deliver/etsi_tr/138900_138999/138901/
 - srsRAN Project, JSON Metrics output. https://docs.srsran.com/projects/project/en/latest/user_manuals/source/outputs.html
@@ -387,4 +387,4 @@ The result is more important:
 
 > **Trust is not a scalar property of a digital-twin model. It is a property of a model, regime, intervention, outcome, and causal query together.**
 
-The same full residual model was the best local hazard predictor in every tested regime, while different trust levels were optimal for different counterfactual questions. For an OSAHR-style twin, the correct product is therefore not “the most accurate network predictor.” It is a system that carries competing mechanistic/neural hypotheses into counterfactual simulation and exposes where a decision is robust: or fragile: to model trust.
+The same full residual model was the best local hazard predictor in every tested regime, while different trust levels were optimal for different counterfactual questions. For an OSAHR-style twin, the correct product is therefore not “the most accurate network predictor.” It is a system that carries competing mechanistic/neural hypotheses into counterfactual simulation and exposes where a decision is robust—or fragile—to model trust.

@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.1.0: 2026-08-18
+## 0.1.0 — 2026-08-18
 
 Initial Experiment 03: query-conditioned residual trust as a frozen lookup field over Liquid-OSAHR 02B artifacts.
 

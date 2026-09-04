@@ -1,4 +1,4 @@
-# Liquid-OSAHR Experiment 02B: Build and Verification Report
+# Liquid-OSAHR Experiment 02B — Build and Verification Report
 
 **Release date:** 2026-08-18  
 **Package:** `liquid-osahr-experiment-02b==0.2.0`

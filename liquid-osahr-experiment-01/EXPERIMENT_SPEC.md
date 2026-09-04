@@ -1,4 +1,4 @@
-# Liquid-OSAHR Experiment 01: Preregistered-Style Specification
+# Liquid-OSAHR Experiment 01 — Preregistered-Style Specification
 
 ## 1. Research question
 
