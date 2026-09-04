@@ -38,6 +38,7 @@ From `grokcell/`:
 python -m pytest tests
 python -m grokcell.runner core.api
 python -m grokcell
+PYTHONPATH=.:.. python -m grokcell.mcp
 ```
 
 From the repository root:
@@ -49,6 +50,23 @@ python -m pytest grokcell/tests
 `python -m grokcell.runner core.api` (inside `grokcell/`) runs the
 checkable suite. `python -m grokcell` then proposes `core.api`
 without a client `verified` flag.
+
+`python -m grokcell.mcp` is the Gate C host: JSON-RPC MCP over
+stdio, wrapping the same tool names. Not HTTP. Bind a grokbot
+host (Cursor MCP or grok function-calling) to that process.
+`GROKCELL_STATE_DIR` and `GROKCELL_FIDELITY_DIR` override the
+default vault paths so the process can resume Gate B files.
+
+```json
+{
+  "mcpServers": {
+    "grokcell": {
+      "command": "python",
+      "args": ["-m", "grokcell.mcp"]
+    }
+  }
+}
+```
 
 ## Tools
 
@@ -73,6 +91,7 @@ without a client `verified` flag.
 | LLM not in hazards | Experiments 01 / 02A |
 | `verified` from python_tests runner | Gate A (12); bot cannot set it |
 | File snapshot; `open()` resumes | Gate B (12); not an MCP tool |
+| MCP stdio over existing tools | Gate C (12); not a second API |
 
 Deleted as unowned: no-swarm cap, one-mouth cap, spawn always refused.
 
