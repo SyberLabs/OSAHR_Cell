@@ -71,6 +71,9 @@ class GrokCellSurface:
         )
 
     def post(self, message: Message) -> PostAck:
+        owner = str(message.source_owner or "").strip()
+        if owner not in self.owners():
+            return PostAck(queued=False, message_id="", reason="unknown_owner")
         self.seq += 1
         identified = message.with_identity(f"m-{self.seq:04d}", self.seq)
         self.queued.append(identified)
