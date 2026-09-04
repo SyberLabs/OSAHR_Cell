@@ -5,6 +5,7 @@
 ```text
 agent tool call
     -> bus (priority, seq)
+        -> python_tests fidelity (not payload.verified)
         -> vault constraints (critical_module, unverified)
             -> claim grammar: admit | hold_unresolved | reject | outcome_unknown
                 forge.propose admit: ExternalEvent on Slot, then kernel assemble-component
@@ -16,6 +17,8 @@ agent tool call
 Kernel state remains X = (G, B, R, Theta, Z, t, n). No first-class H.
 The bus does not call RewriteEngine. assemble-component is a DPO rule.
 park.request never bypasses DPO. Spawn is not a DPO rule.
+payload.verified is ignored. critical_module is fail-closed without
+a current python_tests record.
 
 ## Layers (do not collapse)
 
@@ -23,6 +26,7 @@ park.request never bypasses DPO. Spawn is not a DPO rule.
 |---|---|---|
 | Messages | typed control-plane records | No |
 | Vault | markdown + concept_id | No |
+| Fidelity | python_tests runner records | No |
 | Bus | priority + legality | No |
 | ODA | owner registry + skills | No |
 | Park | license at hold | Request only |
