@@ -19,7 +19,10 @@ TOOL_SCHEMAS: dict[str, dict[str, Any]] = {
     },
     "bus.post": {
         "name": "bus.post",
-        "description": "Queue a typed control-plane message. Does not rewrite G.",
+        "description": (
+            "Queue a typed control-plane message. source_owner must be "
+            "the bound registered owner. Does not rewrite G."
+        ),
         "inputSchema": {
             "type": "object",
             "properties": {
@@ -92,8 +95,17 @@ TOOL_SCHEMAS: dict[str, dict[str, Any]] = {
 
 
 class ToolRegistry:
-    def __init__(self, surface: GrokCellSurface) -> None:
+    def __init__(
+        self,
+        surface: GrokCellSurface,
+        bound_owner: str | None = MOUTH_OWNER,
+    ) -> None:
         self.surface = surface
+        if bound_owner is None:
+            self.bound_owner: str | None = None
+        else:
+            name = str(bound_owner).strip()
+            self.bound_owner = name or None
         self.handlers: dict[str, Callable[[dict[str, Any]], dict[str, Any]]] = {
             "vault.query": self._vault_query,
             "bus.post": self._bus_post,
@@ -103,6 +115,31 @@ class ToolRegistry:
             "oda.spawn": self._spawn,
             "oda.attach_skill": self._attach,
         }
+
+    def bind(self, owner: str) -> dict[str, Any]:
+        name = str(owner or "").strip()
+        if not name or name not in self.surface.owners():
+            return {
+                "decision": "refused",
+                "reason": "unknown_owner",
+                "owner": name,
+            }
+        self.bound_owner = name
+        return {
+            "decision": "accepted",
+            "reason": "session_bound",
+            "owner": name,
+        }
+
+    def _session_reason(self, source_owner: str) -> str | None:
+        if self.bound_owner is None:
+            return "unbound_session"
+        owner = str(source_owner or "").strip()
+        if owner not in self.surface.owners():
+            return "unknown_owner"
+        if owner != self.bound_owner:
+            return "session_mismatch"
+        return None
 
     @property
     def schemas(self) -> list[dict[str, Any]]:
@@ -117,15 +154,23 @@ class ToolRegistry:
         return self.surface.vault.query(str(arguments["concept_id"]))
 
     def _bus_post(self, arguments: dict[str, Any]) -> dict[str, Any]:
+        owner = str(arguments.get("source_owner") or "").strip()
+        reason = self._session_reason(owner)
+        if reason is not None:
+            return {"queued": False, "message_id": "", "reason": reason}
         ack = self.surface.post(
             Message(
-                source_owner=str(arguments.get("source_owner") or MOUTH_OWNER),
+                source_owner=owner,
                 kind=str(arguments["kind"]),
                 priority=int(arguments["priority"]),
                 payload=dict(arguments.get("payload") or {}),
             )
         )
-        return {"queued": ack.queued, "message_id": ack.message_id}
+        return {
+            "queued": ack.queued,
+            "message_id": ack.message_id,
+            "reason": ack.reason,
+        }
 
     def _bus_drain(self, arguments: dict[str, Any]) -> dict[str, Any]:
         items = self.surface.drain()
@@ -141,6 +186,13 @@ class ToolRegistry:
         )
 
     def _spawn(self, arguments: dict[str, Any]) -> dict[str, Any]:
+        if self.bound_owner is None:
+            return {
+                "decision": "refused",
+                "reason": "unbound_session",
+                "bot_name": str(arguments.get("bot_name") or ""),
+                "new_bot": False,
+            }
         return self.surface.spawn_owner(
             bot_name=str(arguments.get("bot_name") or ""),
             job=str(arguments.get("job") or ""),
