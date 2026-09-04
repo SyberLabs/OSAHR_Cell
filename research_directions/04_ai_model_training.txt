@@ -38,7 +38,7 @@ Shared structures this pays for
 -------------------------------
 Freeze before confirmatory (already 02B/05/06). Off-clock MTLF
 (already 06). Boundary handles for exogenous telemetry. Claim
-status as shipping law. One mouth for "ship this checkpoint."
+status as shipping law. Park licenses "ship this checkpoint."
 
 Do not
 ------
