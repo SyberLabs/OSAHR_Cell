@@ -1,0 +1,17 @@
+{
+  "schema": "osahr_workbench_scenario_v0",
+  "id": 2,
+  "name": "high_stress",
+  "operator_role": "network_reliability_engineer",
+  "decision": "choose routing policy under elevated critical and background load",
+  "horizon_s": 60.0,
+  "root_seed": 260826,
+  "seed_mix": ["root", "scenario", "replicate"],
+  "overrides": {
+    "critical_rate_per_ue": 0.45,
+    "background_rate_per_ue": 0.72
+  },
+  "baseline_policy": "throughput",
+  "semantic_policy": "vault_gated",
+  "estimand": "goal_utility_ratio"
+}

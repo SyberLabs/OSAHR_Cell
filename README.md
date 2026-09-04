@@ -143,6 +143,19 @@ No arbitrary source is compiled during a run. Dynamic rule hashes are included i
 - causal event-footprint reconstruction;
 - snapshots, delta replay, and canonical audit export.
 
+## Decision workbench
+
+The kernel is not the product. `workbench/` mints a replayable decision
+packet from the frozen Experiment 06 corpus: baseline vs vault-gated
+semantic, with **action license** and **claim license** kept separate.
+Unknown scenarios, attacker-supplied ensembles, and claim-grade inflation
+fail loud. See [workbench/README.md](workbench/README.md) and issue #13.
+
+```bash
+python -m workbench decide workbench/scenarios/03-long-outage.json --out /tmp/osahr-packet
+python -m workbench replay /tmp/osahr-packet/decision.json
+```
+
 ## Install
 
 ```bash
@@ -351,7 +364,7 @@ model = Model(
 
 A rule or scheduled adaptation that attempts to commit `rate <= 0` fails before the invalid adaptive state is accepted. Projection is available only when explicitly declared as part of model semantics.
 
-## Safe meta-rewriting
+### Safe meta-rewriting
 
 A rule template is compiled before the run. Its expressions may read the immutable per-instance `meta` namespace:
 
