@@ -54,6 +54,7 @@ class GrokCellSurface:
                 legacy_model=construction_model(),
                 legacy_config=RuntimeConfig(),
             )
+            replaced_audit_only = False
             if pair is None:
                 surface = cls(
                     vault=loaded,
@@ -64,9 +65,18 @@ class GrokCellSurface:
                 )
             else:
                 kernel, saved = pair
+                runtime = runtime_from_snapshot(kernel)
+                if not getattr(kernel, "continuation_allowed", True):
+                    live = build_runtime()
+                    for key in ("owners", "bots_spawned", "skills"):
+                        value = runtime.memory.get(key)
+                        if value is not None:
+                            live.memory[key] = copy.deepcopy(value)
+                    runtime = live
+                    replaced_audit_only = True
                 surface = cls(
                     vault=loaded,
-                    runtime=runtime_from_snapshot(kernel),
+                    runtime=runtime,
                     fidelity=scores,
                     snapshots=store,
                     artifacts=artifacts,
@@ -75,7 +85,8 @@ class GrokCellSurface:
                     seq=saved.seq,
                     inject_seq=saved.inject_seq,
                 )
-            surface.artifacts.prune_except(set(surface.components()))
+            if not replaced_audit_only:
+                surface.artifacts.prune_except(set(surface.components()))
         return surface
 
     def _persist(self) -> None:
@@ -242,7 +253,7 @@ class GrokCellSurface:
         verb = str(act or "").strip()
         if verb:
             with self.snapshots.locked():
-                if name not in self.components() and name in self.artifacts.names():
+                if name not in self.components():
                     return {
                         "decision": "refused",
                         "reason": "component_not_admitted",

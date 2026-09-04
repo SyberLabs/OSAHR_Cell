@@ -207,7 +207,8 @@ def run_path(
         exit_code=proc.exit_code,
         outcome=proc.outcome.value,
     )
-    target.put(record)
+    if proc.passed or not untrusted:
+        target.put(record)
     return record
 
 

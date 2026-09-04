@@ -202,18 +202,18 @@ class SnapshotStore:
             return not all(
                 (self.root / manifest[key]).is_file() for key in ("kernel", "surface")
             )
+        has_generation = any(self.root.glob("kernel-*.osahr.gz")) or any(
+            self.root.glob("surface-*.json")
+        )
+        if has_generation:
+            # Generation files mean CURRENT is the only valid pointer. A planted
+            # legacy pair next to them is tampering, not a crashed migration.
+            return True
         legacy_kernel = self.kernel_path.is_file()
         legacy_surface = self.surface_path.is_file()
         if legacy_kernel != legacy_surface:
             return True
-        if legacy_kernel and legacy_surface:
-            # A complete legacy pair remains the last committed generation.
-            # Generation files without CURRENT may be debris from a crashed
-            # migration and must not make that committed pair unreadable.
-            return False
-        return any(self.root.glob("kernel-*.osahr.gz")) or any(
-            self.root.glob("surface-*.json")
-        )
+        return False
 
     def _revision(self) -> str | None:
         if self.current_path.is_file():

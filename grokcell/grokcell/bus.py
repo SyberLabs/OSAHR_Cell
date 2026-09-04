@@ -8,6 +8,7 @@ from .artifact import Artifact, resolve_artifact, stage_artifact
 from .fidelity import FidelityStore
 from .messages import DrainItem, Message
 from .mutant import kill_mutant
+from .protocol import SUITE_BY_COMPONENT
 from .runner import RunOutcome, pytest_suite, run_path, suite_hash
 from .vault import ConstraintVault
 
@@ -44,6 +45,10 @@ def classify(
     artifact = resolve_artifact(payload)
     if artifact is None:
         return "outcome_unknown", "missing_artifact", None
+    if artifact.source == "payload" and name in SUITE_BY_COMPONENT:
+        return "reject", "reserved_component_name", None
+    if artifact.source == "suite" and not concept.requires_fidelity:
+        return "reject", "suite_requires_fidelity", None
     if name in components:
         return "reject", "duplicate_component", None
     missing = [

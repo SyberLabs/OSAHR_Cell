@@ -208,4 +208,4 @@ def test_park_refuses_file_act_without_artifact(tmp_path: Path):
     refused = tools.call("park.request", {"act": "sign", "name": "core.api"})
     assert refused["decision"] == "refused"
     assert refused["bypasses_dpo"] is False
-    assert refused["reason"] == "missing_artifact"
+    assert refused["reason"] == "component_not_admitted"
