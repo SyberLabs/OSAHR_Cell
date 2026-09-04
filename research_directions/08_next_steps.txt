@@ -33,9 +33,9 @@ Order, stop at each gate
    is not an LLM SKU and it does not unfreeze W.
 8. grokcell/ is the host grokbots run on. Spawn registers
    owners. Park licenses G. Sequential Component construction.
-   Not a confirmatory seed. Production gates: 12. Next slice
-   is still 08.3 / gate A: runner-owned verified, not more
-   owners.
+   Not a confirmatory seed. Production gates: 12. Gate A is a
+   grokcell/ prototype (runner-owned verified). Next: B snapshot,
+   then still 08.3 artifact files.
 
 Highest-value avenue (restated)
 -------------------------------

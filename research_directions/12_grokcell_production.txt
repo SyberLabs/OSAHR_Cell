@@ -21,11 +21,10 @@ No LLM. That geometry is correct. Do not replace it.
 
 What is broken for grokbot use (fix, in this order)
 ---------------------------------------------------
-1. verified is a client boolean.
-   A bot sets payload.verified=True and critical_module admits.
-   Experiment 05/06 scored claims from an ensemble. Here the
-   product law is hollow. Production: a runner the bot does not
-   control sets verified. Fail-closed if the runner is absent.
+1. verified is a client boolean. **Gate A implemented in grokcell/**
+   (surface v2). payload.verified is ignored. python_tests runner
+   writes vault/fidelity; classify fail-closes on runner_absent,
+   runner_failed, or stale_fidelity. Not an MCP tool. Not MEASURED.
 
 2. Chat is still the database.
    Surface, hold queue, and owners live in process memory.
@@ -82,8 +81,9 @@ Ordered production gates
 ------------------------
 Stop at each. A later gate without an earlier one is theater.
 
-A. Honest verified. python_tests (or the 06 twin as Simulate)
-   writes the fidelity bit. Bot cannot set it. Fail-closed.
+A. Honest verified. **Done as prototype in grokcell/ (v2).**
+   python_tests writes the bit. Bot cannot set it. Fail-closed.
+   Next: B.
 
 B. File snapshot of surface + kernel. open() resumes. Chat is
    not the database.
