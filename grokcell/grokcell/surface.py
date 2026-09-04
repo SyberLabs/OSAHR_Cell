@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 
 from .bus import as_item, classify, drain_order
 from .construction import build_runtime, graph_component_names, licensed_assemble
+from .fidelity import FidelityStore
 from .messages import DrainItem, Message, PostAck
 from .protocol import MOUTH_OWNER, SURFACE_VERSION
 from .vault import ConstraintVault
@@ -14,15 +15,21 @@ from .vault import ConstraintVault
 class GrokCellSurface:
     vault: ConstraintVault
     runtime: object
+    fidelity: FidelityStore
     queued: list[Message] = field(default_factory=list)
     held: dict[str, Message] = field(default_factory=dict)
     seq: int = 0
     inject_seq: int = 0
 
     @classmethod
-    def open(cls, vault: ConstraintVault | None = None) -> "GrokCellSurface":
+    def open(
+        cls,
+        vault: ConstraintVault | None = None,
+        fidelity: FidelityStore | None = None,
+    ) -> "GrokCellSurface":
         loaded = vault if vault is not None else ConstraintVault.load()
-        return cls(vault=loaded, runtime=build_runtime())
+        scores = fidelity if fidelity is not None else FidelityStore.load()
+        return cls(vault=loaded, runtime=build_runtime(), fidelity=scores)
 
     def post(self, message: Message) -> PostAck:
         self.seq += 1
@@ -50,6 +57,7 @@ class GrokCellSurface:
             components=self.components(),
             owners=self.owners(),
             vault=self.vault,
+            fidelity=self.fidelity,
         )
         if status == "admit":
             if message.kind == "oda.spawn":
@@ -137,6 +145,7 @@ class GrokCellSurface:
             components=self.components(),
             owners=self.owners(),
             vault=self.vault,
+            fidelity=self.fidelity,
         )
         if next_status != "admit":
             detail = "dependency" if reason == "missing_dependency" else reason
