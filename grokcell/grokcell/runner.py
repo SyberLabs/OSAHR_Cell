@@ -44,19 +44,12 @@ def current_suite_hash(name: str) -> str | None:
     return suite_hash(path)
 
 
-def run_component(name: str, *, store: FidelityStore | None = None) -> FidelityRecord:
-    target = store if store is not None else FidelityStore.load()
-    path = suite_path(name)
-    if path is None:
-        record = FidelityRecord(name=name, passed=False, suite_hash="", exit_code=2)
-        target.put(record)
-        return record
-    digest = suite_hash(path)
+def pytest_suite(path: Path) -> subprocess.CompletedProcess[str]:
     env = dict(os.environ)
     env["PYTEST_DISABLE_PLUGIN_AUTOLOAD"] = "1"
     env.pop("PYTEST_ADDOPTS", None)
     ini = PROJECT_ROOT / "world" / "pytest.ini"
-    proc = subprocess.run(
+    return subprocess.run(
         [
             sys.executable,
             "-m",
@@ -75,6 +68,12 @@ def run_component(name: str, *, store: FidelityStore | None = None) -> FidelityR
         env=env,
         check=False,
     )
+
+
+def run_path(name: str, path: Path, *, store: FidelityStore | None = None) -> FidelityRecord:
+    target = store if store is not None else FidelityStore.load()
+    digest = suite_hash(path)
+    proc = pytest_suite(path)
     record = FidelityRecord(
         name=name,
         passed=proc.returncode == 0,
@@ -83,6 +82,16 @@ def run_component(name: str, *, store: FidelityStore | None = None) -> FidelityR
     )
     target.put(record)
     return record
+
+
+def run_component(name: str, *, store: FidelityStore | None = None) -> FidelityRecord:
+    target = store if store is not None else FidelityStore.load()
+    path = suite_path(name)
+    if path is None:
+        record = FidelityRecord(name=name, passed=False, suite_hash="", exit_code=2)
+        target.put(record)
+        return record
+    return run_path(name, path, store=target)
 
 
 def main(argv: list[str] | None = None) -> int:
