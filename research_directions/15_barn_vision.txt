@@ -11,6 +11,7 @@ The HTML
 vision/barn/index.html
 
 Open it. Click Next, or Play. Arrow keys work.
+Deep link a beat with ?s=7 (raising day).
 It is a click-through raise, not an app.
 
     python3 -m http.server --directory vision/barn 8765
@@ -57,9 +58,8 @@ Algorithm (order kept)
    vision, not a requirement to ship a UI. "Network" must not
    smuggle in a mesh. "Repair / build until product emerges"
    is admit / reject / hold / park.
-2. Deleted the mesh, the dashboard, and the console. If this
-   mock is itself too much chrome, delete the stills and keep
-   the SVG raise.
+2. Deleted the mesh, the dashboard, and the console. Mood stills
+   stay in vision/barn/stills/ as film, not in the raise.
 3. Simplified to four joints and one example (waitlist).
 4. Cycle time: a static storyboard, not a fake live cell.
 5. Automate last: Play is a slideshow. It does not run the

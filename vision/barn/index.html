@@ -337,12 +337,14 @@
         joints: { site: "admit", tests: "admit", email: "park", charge: "hold" },
         files: ["the pack  remains if chat dies", "charge still not enabled"],
         product: { site: true, email: true, charge: false },
-        stills: true
+        stills: false
       }
     ];
 
     let i = 0;
     let timer = null;
+    const start = Number(new URLSearchParams(location.search).get("s"));
+    if (Number.isInteger(start) && start >= 0 && start < scenes.length) i = start;
 
     function paintJoint(name, state) {
       const g = document.getElementById("bay-" + name);
@@ -394,6 +396,9 @@
       }
       document.getElementById("stills").classList.toggle("show", !!s.stills);
       document.querySelectorAll(".steps button").forEach((b, n) => b.classList.toggle("now", n === i));
+      if (location.search !== "?s=" + i) {
+        history.replaceState(null, "", "?s=" + i);
+      }
     }
 
     document.querySelectorAll("#stills img").forEach((img) => {
