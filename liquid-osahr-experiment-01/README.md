@@ -95,21 +95,21 @@ python scripts/analyze_identification_paired.py
 
 ## Repository map
 
-- `liquid_osahr/liquid.py` — CfC and dense LTC cells
-- `liquid_osahr/teacher.py` — mechanistic hidden-state synthetic wireless teacher
-- `liquid_osahr/data.py` — deterministic splits, normalization, irregular batching
-- `liquid_osahr/models.py` — CfC/LTC/GRU/LSTM/MLP/constant marked-hazard models
-- `liquid_osahr/training.py` — exact piecewise-constant point-process NLL
-- `liquid_osahr/metrics.py` — held-out likelihood, rate error, count calibration, time-rescaling tests
-- `liquid_osahr/osahr_bridge.py` — 6G hypergraph twin + external neural-hazard updates
-- `scripts/` — release orchestration and analysis
-- `artifacts/` — checkpoints, raw results, generated trace bundle, logs
-- `vendor/osahr/` — OSAHR 0.2 runtime
+- `liquid_osahr/liquid.py` - CfC and dense LTC cells
+- `liquid_osahr/teacher.py` - mechanistic hidden-state synthetic wireless teacher
+- `liquid_osahr/data.py` - deterministic splits, normalization, irregular batching
+- `liquid_osahr/models.py` - CfC/LTC/GRU/LSTM/MLP/constant marked-hazard models
+- `liquid_osahr/training.py` - exact piecewise-constant point-process NLL
+- `liquid_osahr/metrics.py` - held-out likelihood, rate error, count calibration, time-rescaling tests
+- `liquid_osahr/osahr_bridge.py` - 6G hypergraph twin + external neural-hazard updates
+- `scripts/` - release orchestration and analysis
+- `artifacts/` - checkpoints, raw results, generated trace bundle, logs
+- `vendor/osahr/` - OSAHR 0.2 runtime
 
 ## Read next
 
-- `EXPERIMENT_SPEC.md` — hypotheses and statistical design
-- `ARCHITECTURE.md` — hybrid semantics and exactness boundary
-- `RESEARCH_NOTES.md` — primary-source grounding
-- `EXPERIMENT_REPORT.md` — audited empirical results and limitations
-- `THIRD_PARTY_NOTICES.md` — licensing/implementation provenance
+- `EXPERIMENT_SPEC.md` - hypotheses and statistical design
+- `ARCHITECTURE.md` - hybrid semantics and exactness boundary
+- `RESEARCH_NOTES.md` - primary-source grounding
+- `EXPERIMENT_REPORT.md` - audited empirical results and limitations
+- `THIRD_PARTY_NOTICES.md` - licensing/implementation provenance

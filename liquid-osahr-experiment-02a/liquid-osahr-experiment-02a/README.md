@@ -38,11 +38,11 @@ The graph changes the continuous neural field, the field changes stochastic grap
 
 Five field models are compared:
 
-1. `oracle` — exact analytic topology-coupled teacher;
-2. `cfc_closed` — graph-coupled CfC with learned event jumps;
-3. `cfc_nojump` — same topology-coupled CfC without event jumps;
-4. `cfc_openloop` — initial-topology CfC with no graph/event feedback except OSAHR legality masking;
-5. `gru_closed` — near-parameter-matched topology-coupled graph GRU with event jumps.
+1. `oracle` - exact analytic topology-coupled teacher;
+2. `cfc_closed` - graph-coupled CfC with learned event jumps;
+3. `cfc_nojump` - same topology-coupled CfC without event jumps;
+4. `cfc_openloop` - initial-topology CfC with no graph/event feedback except OSAHR legality masking;
+5. `gru_closed` - near-parameter-matched topology-coupled graph GRU with event jumps.
 
 Each is tested under `throughput` and `semantic` policies in three regimes:
 

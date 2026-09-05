@@ -30,13 +30,13 @@ See `TELEMETRY_CONTRACT.md` for the source boundary and unit/provenance requirem
 
 ## Key artifacts
 
-- `artifacts/residual_cfc.pt` — trained residual checkpoint
-- `artifacts/training_summary.json` — predictive calibration
-- `artifacts/intervention_calibration_multi.json` — frozen 18-scenario intervention calibration
-- `artifacts/confirmatory_release.csv` — 400 untouched confirmatory trajectories
-- `artifacts/confirmatory_summary.csv` — compact results
-- `artifacts/ood_hazard_evaluation.json` — factual OOD hazard audit
-- `artifacts/predictive_vs_counterfactual.json` — prediction/intervention mismatch audit
+- `artifacts/residual_cfc.pt` - trained residual checkpoint
+- `artifacts/training_summary.json` - predictive calibration
+- `artifacts/intervention_calibration_multi.json` - frozen 18-scenario intervention calibration
+- `artifacts/confirmatory_release.csv` - 400 untouched confirmatory trajectories
+- `artifacts/confirmatory_summary.csv` - compact results
+- `artifacts/ood_hazard_evaluation.json` - factual OOD hazard audit
+- `artifacts/predictive_vs_counterfactual.json` - prediction/intervention mismatch audit
 
 ## Scope warning
 
