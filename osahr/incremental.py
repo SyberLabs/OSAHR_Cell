@@ -16,7 +16,7 @@ from .canonical import canonical_equal
 from .graph import GraphDelta, Hypergraph
 from .ids import EntityId
 from .indexed_matcher import IndexedMatcher
-from .matcher import Match, Matcher, build_expression_context
+from .matcher import Match, Matcher
 from .pattern import Rule
 
 
@@ -223,33 +223,18 @@ class IncrementalMatcher:
         memory: dict[str, Any],
         time: float,
     ) -> list[Match]:
-        result: list[Match] = []
-        for match in candidates:
-            context = build_expression_context(
+        return [
+            match
+            for match in candidates
+            if self.reference._rule_match_holds(
                 graph,
+                rule,
                 match,
                 parameters=parameters,
                 memory=memory,
                 time=time,
-                extra={"meta": rule.meta},
             )
-            if rule.guard is not None and not bool(rule.guard.evaluate(context)):
-                continue
-            if not all(
-                self.reference.condition_holds(
-                    graph,
-                    condition,
-                    match,
-                    parameters=parameters,
-                    memory=memory,
-                    time=time,
-                    extra_context={"meta": rule.meta},
-                )
-                for condition in rule.conditions
-            ):
-                continue
-            result.append(match)
-        return result
+        ]
 
     def _localized_candidates(
         self,

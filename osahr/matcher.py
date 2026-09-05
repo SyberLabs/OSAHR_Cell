@@ -132,6 +132,39 @@ def _edge_matches(
     )
 
 
+def _resolve_prebindings(
+    graph: Hypergraph,
+    pattern: PatternGraph,
+    prebound_vertices: dict[str, EntityId] | None,
+    prebound_edges: dict[str, EntityId] | None,
+) -> tuple[dict[str, EntityId], dict[str, EntityId]] | None:
+    """Copy caller maps, or None when a present binding cannot be an image."""
+    vertices = dict(prebound_vertices or {})
+    edges = dict(prebound_edges or {})
+    vertex_specs, edge_specs = pattern.vertex_map, pattern.edge_map
+    if not set(vertices) <= set(vertex_specs):
+        raise MatchError("Prebound vertex key is not present in pattern")
+    if not set(edges) <= set(edge_specs):
+        raise MatchError("Prebound edge key is not present in pattern")
+    for key, entity_id in vertices.items():
+        if entity_id not in graph.vertices:
+            return None
+        spec = vertex_specs[key]
+        if not graph.schema.is_vertex_compatible(
+            graph.vertices[entity_id].type_id, spec.type_id, allow_subtypes=spec.allow_subtypes
+        ):
+            return None
+    for key, entity_id in edges.items():
+        if entity_id not in graph.edges or graph.edges[entity_id].type_id != edge_specs[key].type_id:
+            return None
+    return vertices, edges
+
+
+def _canonical_matches(matches: list[Match]) -> list[Match]:
+    unique = {match.match_id: match for match in matches}
+    return [unique[key] for key in sorted(unique)]
+
+
 def build_expression_context(
     graph: Hypergraph,
     match: Match,
@@ -191,29 +224,13 @@ class Matcher:
         prebound_edges: dict[str, EntityId] | None = None,
         initial_bindings: dict[str, Any] | None = None,
     ) -> list[Match]:
-        prebound_vertices = dict(prebound_vertices or {})
-        prebound_edges = dict(prebound_edges or {})
+        resolved = _resolve_prebindings(graph, pattern, prebound_vertices, prebound_edges)
+        if resolved is None:
+            return []
+        prebound_vertices, prebound_edges = resolved
         initial_bindings = dict(initial_bindings or {})
         vertex_specs = pattern.vertex_map
         edge_specs = pattern.edge_map
-
-        if not set(prebound_vertices) <= set(vertex_specs):
-            raise MatchError("Prebound vertex key is not present in pattern")
-        if not set(prebound_edges) <= set(edge_specs):
-            raise MatchError("Prebound edge key is not present in pattern")
-
-        for key, entity_id in prebound_vertices.items():
-            if entity_id not in graph.vertices:
-                return []
-            spec = vertex_specs[key]
-            actual = graph.vertices[entity_id]
-            if not graph.schema.is_vertex_compatible(
-                actual.type_id, spec.type_id, allow_subtypes=spec.allow_subtypes
-            ):
-                return []
-        for key, entity_id in prebound_edges.items():
-            if entity_id not in graph.edges or graph.edges[entity_id].type_id != edge_specs[key].type_id:
-                return []
 
         candidates: dict[str, tuple[EntityId, ...]] = {}
         for key, spec in vertex_specs.items():
@@ -309,8 +326,7 @@ class Matcher:
                 del edge_map[key]
 
         assign_vertices(0, {}, set(), initial_bindings)
-        unique = {match.match_id: match for match in matches}
-        return [unique[key] for key in sorted(unique)]
+        return _canonical_matches(matches)
 
     def condition_holds(
         self,

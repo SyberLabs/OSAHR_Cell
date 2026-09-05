@@ -8,10 +8,9 @@ from __future__ import annotations
 
 from typing import Any
 
-from .errors import MatchError
 from .graph import Hypergraph, Side
 from .ids import EntityId
-from .matcher import Match, Matcher, _edge_matches, _match_attributes
+from .matcher import Match, Matcher, _canonical_matches, _edge_matches, _match_attributes, _resolve_prebindings
 from .pattern import PatternGraph
 
 
@@ -28,21 +27,11 @@ class IndexedMatcher(Matcher):
         prebound_edges: dict[str, EntityId] | None = None,
         initial_bindings: dict[str, Any] | None = None,
     ) -> list[Match]:
-        prebound_vertices = dict(prebound_vertices or {})
-        prebound_edges = dict(prebound_edges or {})
+        resolved = _resolve_prebindings(graph, pattern, prebound_vertices, prebound_edges)
+        if resolved is None:
+            return []
+        prebound_vertices, prebound_edges = resolved
         vertex_specs, edge_specs = pattern.vertex_map, pattern.edge_map
-        if not set(prebound_vertices) <= set(vertex_specs):
-            raise MatchError("Prebound vertex key is not present in pattern")
-        if not set(prebound_edges) <= set(edge_specs):
-            raise MatchError("Prebound edge key is not present in pattern")
-        if any(entity_id not in graph.vertices for entity_id in prebound_vertices.values()):
-            return []
-        if any(
-            entity_id not in graph.edges
-            or graph.edges[entity_id].type_id != edge_specs[key].type_id
-            for key, entity_id in prebound_edges.items()
-        ):
-            return []
 
         # Each occurrence of a symbolic vertex records its exact incidence role.
         positions = {
@@ -189,4 +178,4 @@ class IndexedMatcher(Matcher):
                 del vertex_map[key]
 
         assign_vertices(dict(initial_bindings or {}))
-        return sorted(matches, key=lambda match: match.match_id)
+        return _canonical_matches(matches)
