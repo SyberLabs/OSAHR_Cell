@@ -1,0 +1,75 @@
+{
+  "case": "real repository maintenance; not a new component admission or market validation",
+  "baseline_revision": "2bf8e91606aa0d3d6a253eef1c021be5ebad24be",
+  "baseline_source_blob": "851bea32a2eaa1f99e755254fa7a8715743adf31",
+  "source_path": "grokcell/grokcell/construction.py",
+  "baseline_source_lf_sha256": "9340716826f63deaa5d4b5ec69565441bdfbff671071444df4d35ae3bdde2442",
+  "baseline_executed_bytes_sha256": "c110db545c2f255f9ca0121de14e4ae33b355eea5ad75abc43d76a1dd4659fc1",
+  "baseline_executed_crlf": true,
+  "repaired_source_lf_sha256": "7d86404a40215321e12af744555011459c9d516744faddd0192ff2f45766c7be",
+  "model_identity_unchanged": true,
+  "model_hash": "2bac67eb6f58f44047d643b018c42118b887efd0fdd8b6e2598dc6f9fd678228",
+  "rule_hash": "eb478689144821a428961fea0f7f8285de8672ef645b6fcd9be58bfa4c471856",
+  "schema_hash": "9c623d8c1ae28b0136834a36e60b25a84832d54c4fed71a8ca7d76fce5a170a1",
+  "environment": {
+    "python": "3.12.14",
+    "system": "Windows"
+  },
+  "before": {
+    "1": {
+      "last_event_matches_live": false,
+      "live_state_hash": "3af5c3a142499a098dbe0d88b7988ee6f50efaba59a705962492225c6e13b2ab",
+      "last_event_post_hash": "3309a427563fe3f6610f1c7f7793c59494da030b6e6d758f82b143f725defe1c",
+      "replay_matches_live": false,
+      "replay_state_hash": "3309a427563fe3f6610f1c7f7793c59494da030b6e6d758f82b143f725defe1c"
+    },
+    "2": {
+      "last_event_matches_live": false,
+      "live_state_hash": "517ab99b09b35e3559219deec85ce6040e6f9bd62e74db67208e248a46e55ef4",
+      "last_event_post_hash": "5d3f2ce0e096739450ee573d78ea7e2b3e9f577b727dc166509f7b38567c661a",
+      "replay_matches_live": false,
+      "replay_error": "ReplayError",
+      "replay_error_message": "Pre-state hash mismatch at event 3: 3309a427563fe3f6610f1c7f7793c59494da030b6e6d758f82b143f725defe1c != 3af5c3a142499a098dbe0d88b7988ee6f50efaba59a705962492225c6e13b2ab"
+    }
+  },
+  "after": {
+    "1": {
+      "last_event_matches_live": true,
+      "live_state_hash": "3309a427563fe3f6610f1c7f7793c59494da030b6e6d758f82b143f725defe1c",
+      "last_event_post_hash": "3309a427563fe3f6610f1c7f7793c59494da030b6e6d758f82b143f725defe1c",
+      "replay_matches_live": true,
+      "replay_state_hash": "3309a427563fe3f6610f1c7f7793c59494da030b6e6d758f82b143f725defe1c"
+    },
+    "2": {
+      "last_event_matches_live": true,
+      "live_state_hash": "59265192817e747dde8b83948f4a992dab04571a3032f5059f1dcd3f6fce1830",
+      "last_event_post_hash": "59265192817e747dde8b83948f4a992dab04571a3032f5059f1dcd3f6fce1830",
+      "replay_matches_live": true,
+      "replay_state_hash": "59265192817e747dde8b83948f4a992dab04571a3032f5059f1dcd3f6fce1830"
+    }
+  },
+  "evidence_sha256": {
+    "after-tests.txt": "6a145783a5cbfd88733842418703ac7d87dd27ec619e724919231c769528467e",
+    "before-tests.txt": "048072fb1be186b1c68a8563fec003c0e27631056dd14f9a7471f15288cb083f",
+    "final-tests.txt": "a7c10c4300341e1667b797c73292bdf45c169798be9e35ab268770a3b011112d",
+    "integration-tests.txt": "698a14c31c703c9eb3b623babba30ee03fc49d3919cf1fd870e6686e752ffe9c"
+  },
+  "regression_test_lf_sha256": "96af26b7eae5afb9203affa855d0d94600ba591a63defb7043cf5c7772d40e40",
+  "verification": {
+    "baseline_regression": {
+      "failed": 3,
+      "passed": 1
+    },
+    "repaired_regression": {
+      "failed": 0,
+      "passed": 4
+    },
+    "final_integration": {
+      "failed": 0,
+      "passed": 289,
+      "skipped": 2
+    },
+    "skip_reason": "Windows account lacks symbolic-link creation privilege",
+    "evidence_line_endings": "normalized LF and trailing whitespace trimmed; test output otherwise unchanged"
+  }
+}

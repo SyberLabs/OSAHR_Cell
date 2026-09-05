@@ -68,7 +68,9 @@ experiments were not retrained, retuned, or reclassified as new measurements.
 - **GrokCell:** the existing assembly rule is reusable, but the live path changes
   `runtime.memory["components"]` after its recorded events. A fresh local probe
   confirmed that the last event hash and delta-replayed state both differ from
-  the final live runtime hash. This report does not claim that path is repaired.
+  the final live runtime hash. The subsequent
+  [maintenance case](cases/admission-replay/README.md) repairs this path by
+  removing the unrecorded cache write. It does not reconstruct old event logs.
   [Construction implementation](../grokcell/grokcell/construction.py).
 
 The common result worth retaining is separation of structural validity, model
@@ -270,8 +272,9 @@ that cannot be guaranteed, the adapter must obtain a new preview or refuse.
 The temporary OSAHR graph remains an evaluator. It must not become a second
 authoritative store beside Foundry. Likewise, a successful preview is not a
 human approval, code execution result, correctness theorem, or intervention
-effect. The existing GrokCell replay mismatch must be addressed separately before
-making claims about its complete live admission history.
+effect. The subsequent GrokCell repair supports replay of newly recorded admission
+events from an initial checkpoint. It does not establish complete historical
+replay or add historical event persistence to checkpoint restoration.
 
 ## 8. What has and has not been established
 
@@ -279,12 +282,13 @@ Established locally: real external vocabulary loading; a running RDF-to-OSAHR-
 to-RDF profile; unchanged upstream schema/rule reuse; exact-byte mismatch refusal;
 shape validation; a justified two-vertex footprint; structural agreement with
 full-context execution; small-graph delta replay; and native-SPARQL equivalence
-for the tested additive operation. The profile has 28 passing checks, alongside
-the unchanged kernel's 105 passing tests.
+for the tested additive operation. The initial research run had 28 profile checks
+alongside 105 kernel checks. Follow-up verification, including a failing-evidence
+negative control and the GrokCell surface, is recorded in the maintenance case.
 
 Not established: product-market fit, real-world causal accuracy, authenticated
 approval, safe execution of generated source, full ontology logical consistency,
-cross-platform commit atomicity, a repaired GrokCell admission history, or a live
+cross-platform commit atomicity, recovered historical GrokCell event logs, or a live
 Foundry deployment. No new stochastic or neural claim has been introduced.
 
 **Decision:** use a real external ontology and existing libraries with synthetic

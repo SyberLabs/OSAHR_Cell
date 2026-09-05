@@ -105,14 +105,24 @@ def test_bad_operator_suite_cannot_admit(tools, tmp_path, damage, reason):
 
 def test_symlink_contract_is_refused(tools, tmp_path):
     real = register_acceptance(tmp_path, "other.component")
-    (tmp_path / "acceptance" / "edge.ping").symlink_to(real, target_is_directory=True)
+    try:
+        (tmp_path / "acceptance" / "edge.ping").symlink_to(real, target_is_directory=True)
+    except OSError as exc:
+        if getattr(exc, "winerror", None) == 1314:
+            pytest.skip("Windows account lacks symbolic-link creation privilege")
+        raise
     propose(tools)
     assert drain(tools)["reason"] == "acceptance_suite_invalid"
 
 
 def test_invalid_configured_root_does_not_poison_queue(tools, tmp_path, monkeypatch):
     loop = tmp_path / "loop"
-    loop.symlink_to(loop)
+    try:
+        loop.symlink_to(loop)
+    except OSError as exc:
+        if getattr(exc, "winerror", None) == 1314:
+            pytest.skip("Windows account lacks symbolic-link creation privilege")
+        raise
     monkeypatch.setenv("GROKCELL_ACCEPTANCE_DIR", str(loop))
     propose(tools)
     assert drain(tools)["reason"] == "acceptance_suite_invalid"

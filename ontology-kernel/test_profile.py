@@ -1,4 +1,5 @@
 from dataclasses import replace
+from hashlib import sha256
 
 import pytest
 from rdflib import BNode, Graph, Literal, RDF, URIRef
@@ -90,6 +91,20 @@ def test_changed_bytes_refuse(profile, predicate):
     data.set((PROPOSAL, predicate, Literal("0" * 64)))
     with pytest.raises(ValueError, match="Exact bytes"):
         profile.preview(data, PROPOSAL, MODULE, EVIDENCE)
+
+
+def test_matching_failed_test_evidence_does_not_become_code_approval(profile):
+    # Negative control: byte binding says nothing about evidence quality. Neither
+    # an exception-raising module nor explicitly failed tests stop a pure preview.
+    module = b"raise RuntimeError('must never execute during preview')\n"
+    evidence = b'{"test_exit_code": 1, "passed": false}'
+    data = fixture()
+    data.set((PROPOSAL, EX.moduleDigest, Literal(sha256(module).hexdigest())))
+    data.set((PROPOSAL, EX.evidenceDigest, Literal(sha256(evidence).hexdigest())))
+    result = profile.preview(data, PROPOSAL, module, evidence)
+    assert result.receipt["claim"] == "candidate_transition_only"
+    assert result.receipt["live_action_executed"] is False
+    assert (CELL, PROV.hadMember, COMPONENT) in result.candidate
 
 
 @pytest.mark.parametrize("predicate,value", [

@@ -10,8 +10,8 @@ Push-Location -LiteralPath $repoPath
 try {
     $env:PYTHONPATH = "$repoPath;$repoPath\grokcell;$PSScriptRoot"
     $scratchPath = Join-Path $PSScriptRoot ('scratch\check-' + [guid]::NewGuid().ToString('N'))
-    & $pythonPath -m pytest ontology-kernel/test_profile.py -p no:cacheprovider "--basetemp=$scratchPath"
-    if ($LASTEXITCODE -ne 0) { throw 'Profile checks failed.' }
+    & $pythonPath -m pytest ontology-kernel/test_profile.py grokcell/tests/test_admission_replay.py -p no:cacheprovider "--basetemp=$scratchPath"
+    if ($LASTEXITCODE -ne 0) { throw 'Admission checks failed.' }
     & $pythonPath ontology-kernel/demo.py
     if ($LASTEXITCODE -ne 0) { throw 'Demo failed.' }
     if ($Benchmark) {
