@@ -1,0 +1,14 @@
+# Preserve byte-pinned Experiment 06 inputs across Windows checkouts.
+/liquid-osahr-experiment-06/artifacts/analysis.json text eol=lf
+/liquid-osahr-experiment-06/artifacts/FROZEN.json text eol=lf
+/liquid-osahr-experiment-06/osahr_cell/protocol.py text eol=lf
+/liquid-osahr-experiment-06/osahr_cell/vault.py text eol=lf
+/liquid-osahr-experiment-06/osahr_cell/junction.py text eol=lf
+/liquid-osahr-experiment-06/osahr_cell/anlf.py text eol=lf
+/liquid-osahr-experiment-06/osahr_cell/brain.py text eol=lf
+/liquid-osahr-experiment-06/osahr_cell/mcp_tools.py text eol=lf
+/liquid-osahr-experiment-05/liquid_osahr05/claims.py text eol=lf
+/liquid-osahr-experiment-06/vault/concepts/background.md text eol=lf
+/liquid-osahr-experiment-06/vault/concepts/critical.md text eol=lf
+/liquid-osahr-experiment-06/vault/concepts/load.md text eol=lf
+/liquid-osahr-experiment-06/vault/concepts/outage.md text eol=lf
