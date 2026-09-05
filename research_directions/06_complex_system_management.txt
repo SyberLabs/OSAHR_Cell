@@ -1,7 +1,7 @@
 06  COMPLEX SYSTEM MANAGEMENT
 =============================
-Grade: PROPOSED. This is the horizontal platform in
-Research_Directions.txt ("network of networks") restated as a
+Grade: PROPOSED. This is the horizontal platform
+("network of networks") restated as a
 direction that must stay compositional.
 
 What this direction is

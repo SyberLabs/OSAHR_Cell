@@ -19,7 +19,7 @@ This experiment does **not** claim that the synthetic teacher is a calibrated 6G
 - NumPy 2.3.5
 - SciPy 1.17.0
 - pandas 2.2.3
-- OSAHR 0.2 source vendored under `vendor/osahr`
+- OSAHR 0.2 from the repository root `osahr/` package
 - dataset seed: `20260817`
 - control-twin root seed: `80219`
 
@@ -67,10 +67,10 @@ Run project tests:
 python -m pytest -q
 ```
 
-Run the original OSAHR 0.2 tests against the vendored runtime if the upstream test directory is available:
+Kernel tests live at the repository root:
 
 ```bash
-PYTHONPATH="$PWD/vendor" python -m pytest -q /path/to/osahr/tests
+python -m pytest -q ../tests
 ```
 
 Re-train/evaluate identification models:
@@ -104,7 +104,6 @@ python scripts/analyze_identification_paired.py
 - `liquid_osahr/osahr_bridge.py` — 6G hypergraph twin + external neural-hazard updates
 - `scripts/` — release orchestration and analysis
 - `artifacts/` — checkpoints, raw results, generated trace bundle, logs
-- `vendor/osahr/` — OSAHR 0.2 runtime
 
 ## Read next
 

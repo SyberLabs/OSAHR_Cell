@@ -33,6 +33,9 @@ class RewriteResult:
 
 
 class RewriteEngine:
+    def __init__(self) -> None:
+        self._matcher = Matcher()
+
     def is_applicable(
         self,
         *,
@@ -78,7 +81,7 @@ class RewriteEngine:
         event_index: int,
         event_id: str,
     ) -> RewriteResult:
-        authoritative_match = Matcher().authoritative_rule_match(
+        authoritative_match = self._matcher.authoritative_rule_match(
             graph,
             rule,
             match,
@@ -89,6 +92,10 @@ class RewriteEngine:
         if authoritative_match is None:
             raise MatchError("Match is not valid for the authoritative graph and rule")
         match = authoritative_match
+        if not self.is_applicable(
+            graph=graph, boundary=boundary, rule=rule, match=match
+        ):
+            raise RewriteError("DPO dangling or boundary gluing condition failed")
 
         work_graph = graph.clone()
         work_boundary = boundary.clone()
@@ -103,28 +110,6 @@ class RewriteEngine:
         right_vertices = rule.right.vertex_map
         left_edges = rule.left.edge_map
         right_edges = rule.right.edge_map
-
-        deleted_vertex_ids = {
-            match.vertex_map[key] for key in rule.deleted_vertex_keys
-        }
-        deleted_edge_ids = {match.edge_map[key] for key in rule.deleted_edge_keys}
-
-        # DPO dangling condition.
-        for vertex_id in deleted_vertex_ids:
-            unmatched_incident = work_graph.incident_edges(vertex_id) - deleted_edge_ids
-            if unmatched_incident:
-                raise RewriteError(
-                    f"DPO dangling condition failed for {vertex_id}; incident edges not deleted: "
-                    f"{sorted(map(str, unmatched_incident))}"
-                )
-
-        # Boundary gluing condition.
-        effected_handles = {effect.handle_id: effect for effect in rule.boundary_effects}
-        for handle_id, handle in work_boundary.handles.items():
-            if handle.binding in deleted_vertex_ids and handle_id not in effected_handles:
-                raise RewriteError(
-                    f"Rule deletes boundary-bound vertex {handle.binding} without handling {handle_id!r}"
-                )
 
         pre_context = build_expression_context(
             graph,

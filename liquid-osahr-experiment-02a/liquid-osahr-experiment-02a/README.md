@@ -76,8 +76,6 @@ See `EXPERIMENT_REPORT.md` for the complete methods, results, limitations, and E
 python -m pytest -q
 ```
 
-The project bundles the OSAHR 0.2 reference runtime under `vendor/osahr` for exact reproduction.
-
 ## Key scripts
 
 ```text

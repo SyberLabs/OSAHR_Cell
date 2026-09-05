@@ -735,14 +735,14 @@ class Runtime:
                 self.pending_internal = None
                 self._pending_integrity = None
                 if kind == "external":
-                    record = self._process_external(item, draws, survival)
+                    record = process_external(self, item, draws, survival)
                     heapq.heappop(self.external_queue)
                     return StepResult(StepStatus.PROCESSED_EXTERNAL, event=record)
                 if kind == "adaptation":
-                    record = self._process_scheduled_adaptation(item, draws, survival)
+                    record = process_scheduled_adaptation(self, item, draws, survival)
                     heapq.heappop(self.adaptation_queue)
                     return StepResult(StepStatus.FIRED, event=record)
-                record = self._process_meta(item, draws, survival)
+                record = process_meta(self, item, draws, survival)
                 heapq.heappop(self.meta_queue)
                 return StepResult(StepStatus.FIRED, event=record)
 
@@ -863,30 +863,6 @@ class Runtime:
 
     def _fire_internal(self, pending: PendingInternalEvent) -> EventRecord:
         return fire_internal(self, pending)
-
-    def _process_external(
-        self,
-        event: ExternalEvent,
-        draws: list[RandomDraw],
-        survival_integral: float | None,
-    ) -> EventRecord:
-        return process_external(self, event, draws, survival_integral)
-
-    def _process_scheduled_adaptation(
-        self,
-        update: ScheduledAdaptation,
-        draws: list[RandomDraw],
-        survival_integral: float | None,
-    ) -> EventRecord:
-        return process_scheduled_adaptation(self, update, draws, survival_integral)
-
-    def _process_meta(
-        self,
-        event: MetaRuleEvent,
-        draws: list[RandomDraw],
-        survival_integral: float | None,
-    ) -> EventRecord:
-        return process_meta(self, event, draws, survival_integral)
 
     # ------------------------------------------------------------------
     # Persistence and replay

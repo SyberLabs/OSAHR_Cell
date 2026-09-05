@@ -2,15 +2,9 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from pathlib import Path
 from typing import Any, Mapping
 import copy
 import math
-import sys
-
-VENDOR = Path(__file__).resolve().parents[1] / "vendor"
-if str(VENDOR) not in sys.path:
-    sys.path.insert(0, str(VENDOR))
 
 from osahr import Runtime, RuntimeConfig, Model, SchedulerKind  # type: ignore
 from osahr.canonical import stable_hash  # type: ignore
