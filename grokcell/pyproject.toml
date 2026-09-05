@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "grokcell-surface"
-version = "0.1.1"
+version = "0.1.2"
 description = "Stateful GrokCell agentic surface over the frozen OSAHR kernel"
 requires-python = ">=3.11"
 license = "MIT"

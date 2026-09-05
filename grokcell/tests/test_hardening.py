@@ -12,13 +12,21 @@ from grokcell.artifact import Artifact, ArtifactStore
 from grokcell.construction import build_runtime
 from grokcell.fidelity import FidelityStore
 from grokcell.messages import Message
-from grokcell.runner import RunOutcome, pytest_suite, suite_hash
+from grokcell.runner import RunOutcome, pytest_suite, run_component, suite_hash
 from grokcell.snapshot import SnapshotStore, SurfaceSnapshot
 from grokcell.surface import GrokCellSurface
 from grokcell.tools import MUTATING_TOOLS, ToolRegistry
 from grokcell.vault import ConstraintVault
 
-from support import scored_surface
+from support import register_acceptance, scored_surface
+
+
+@pytest.fixture(autouse=True)
+def operator_contracts_for_generated_test_cases(tmp_path):
+    for name in (
+        "edge.broken", "edge.invalid", "edge.generated", "edge.rewriter", "edge.syntax",
+    ):
+        register_acceptance(tmp_path, name)
 
 
 def isolated_surface(tmp_path: Path) -> GrokCellSurface:
@@ -511,13 +519,8 @@ def test_complete_legacy_pair_survives_orphaned_migration_generation(
     )
     (store.root / f"kernel-{'a' * 32}.osahr.gz").write_bytes(b"partial")
 
-    pair = store.load_pair()
-    assert pair is not None
-    store.save(runtime, saved)
-    assert store.current_path.is_file()
-    assert not store.kernel_path.exists()
-    assert not store.surface_path.exists()
-    assert not (store.root / f"kernel-{'a' * 32}.osahr.gz").exists()
+    with pytest.raises(ValueError, match="incomplete"):
+        store.load_pair()
 
 
 def test_same_surface_concurrent_owner_registration_is_atomic(tmp_path: Path):
@@ -552,3 +555,147 @@ def test_same_surface_concurrent_skill_updates_do_not_get_lost(tmp_path: Path):
 
     assert all(result["decision"] == "accepted" for result in results)
     assert set(surface.runtime.memory["skills"]["edge-skills"]) == set(names)
+
+
+def test_pure_legacy_pair_still_loads_without_generation_files(tmp_path: Path) -> None:
+    store = SnapshotStore(tmp_path / "state")
+    store.root.mkdir(parents=True, exist_ok=True)
+    runtime = build_runtime()
+    saved = SurfaceSnapshot(seq=0, inject_seq=0, queued=[], held={})
+    save_checkpoint(store.kernel_path, runtime.snapshot())
+    store.surface_path.write_text(
+        json.dumps(saved.to_json()) + "\n",
+        encoding="utf-8",
+    )
+    pair = store.load_pair()
+    assert pair is not None
+    store.save(runtime, saved)
+    assert store.current_path.is_file()
+    assert not store.kernel_path.exists()
+    assert not store.surface_path.exists()
+
+
+def test_planted_legacy_pair_cannot_replace_a_pinned_generation(tmp_path: Path) -> None:
+    surface = isolated_surface(tmp_path)
+    assert surface.spawn_owner(bot_name="alice")["decision"] == "accepted"
+    state = tmp_path / "state"
+    current = state / "CURRENT.json"
+    current.unlink()
+    attacker = build_runtime()
+    attacker.memory["owners"] = ["MOUTH", "mallory"]
+    save_checkpoint(state / "kernel.osahr.gz", attacker.snapshot())
+    (state / "surface.json").write_text(
+        json.dumps(SurfaceSnapshot(seq=0, inject_seq=0, queued=[], held={}).to_json())
+        + "\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(ValueError, match="incomplete"):
+        GrokCellSurface.open(
+            vault=surface.vault,
+            fidelity=surface.fidelity,
+            state=state,
+        )
+
+
+def test_payload_cannot_clobber_frozen_suite_fidelity(tmp_path: Path) -> None:
+    fidelity = FidelityStore(tmp_path / "fidelity")
+    honest = run_component("core.api", store=fidelity)
+    assert honest.passed
+    tools = ToolRegistry(isolated_surface(tmp_path))
+    posted = tools.call(
+        "bus.post",
+        {
+            "source_owner": "MOUTH",
+            "kind": "forge.propose",
+            "priority": 1,
+            "payload": {
+                "name": "core.api",
+                "constraint": "unverified",
+                "depends_on": [],
+                "module": "def ping():\n    return 'nope'\n",
+                "tests": "def test_x():\n    assert False\n",
+            },
+        },
+    )
+    assert posted["queued"] is True
+    drained = tools.call("bus.drain", {})["results"][0]
+    assert drained["status"] == "reject"
+    record = fidelity.get("core.api")
+    assert record is not None
+    assert record.passed is True
+    assert record.suite_hash == honest.suite_hash
+    assert record.outcome == "pass"
+
+
+def test_frozen_suite_cannot_admit_as_unverified(tmp_path: Path) -> None:
+    tools = ToolRegistry(isolated_surface(tmp_path))
+    tools.call(
+        "bus.post",
+        {
+            "source_owner": "MOUTH",
+            "kind": "forge.propose",
+            "priority": 1,
+            "payload": {
+                "name": "core.api",
+                "constraint": "unverified",
+                "depends_on": [],
+            },
+        },
+    )
+    result = tools.call("bus.drain", {})["results"][0]
+    assert result["status"] == "reject"
+    assert tools.call("surface.inspect", {})["components"] == []
+
+
+def test_unadmitted_empty_license_cannot_be_published(tmp_path: Path) -> None:
+    surface = isolated_surface(tmp_path)
+    artifact = Artifact(
+        name="edge.planted",
+        files={"service.py": "x = 1\n", "test_service.py": ""},
+        source="payload",
+    )
+    dest = surface.artifacts.path_for(artifact.name)
+    dest.mkdir(parents=True)
+    (dest / "service.py").write_text("x = 1\n", encoding="utf-8")
+    (dest / "test_service.py").write_text("", encoding="utf-8")
+    (dest / "license.json").write_text(
+        json.dumps({"name": artifact.name, "license": "", "hash": artifact.digest()})
+        + "\n",
+        encoding="utf-8",
+    )
+    refused = surface.park_request(act="publish", name=artifact.name)
+    assert refused["decision"] == "refused"
+    assert refused["reason"] == "component_not_admitted"
+    assert surface.artifacts.list() == []
+
+
+def test_audit_only_checkpoint_reopens_as_a_live_kernel(tmp_path: Path) -> None:
+    surface = isolated_surface(tmp_path)
+    assert surface.spawn_owner(bot_name="alice")["decision"] == "accepted"
+    surface.runtime._continuation_allowed = False
+    surface.spawn_owner(bot_name="bob")
+    reopened = GrokCellSurface.open(
+        vault=surface.vault,
+        fidelity=surface.fidelity,
+        state=tmp_path / "state",
+    )
+    assert reopened.runtime._continuation_allowed is True
+    assert "alice" in reopened.owners()
+    record = run_component("core.api", store=reopened.fidelity)
+    assert record.passed
+    tools = ToolRegistry(reopened)
+    tools.call(
+        "bus.post",
+        {
+            "source_owner": "MOUTH",
+            "kind": "forge.propose",
+            "priority": 1,
+            "payload": {
+                "name": "core.api",
+                "constraint": "critical_module",
+                "depends_on": [],
+            },
+        },
+    )
+    drained = tools.call("bus.drain", {})["results"][0]
+    assert drained["status"] == "admit"

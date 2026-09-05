@@ -21,10 +21,13 @@ classifiers = [
 where = ["."]
 include = ["osahr", "osahr.*"]
 
+[project.optional-dependencies]
+benchmark = ["rdflib==7.6.0"]
+
 [tool.pytest.ini_options]
-testpaths = ["tests"]
+testpaths = ["tests", "workbench/tests"]
 addopts = "-q"
-pythonpath = ["."]
+pythonpath = [".", "liquid-osahr-experiment-06", "liquid-osahr-experiment-05"]
 
 [tool.setuptools.package-data]
 osahr = ["py.typed"]

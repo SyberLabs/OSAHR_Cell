@@ -2,12 +2,15 @@
 from __future__ import annotations
 
 import tempfile
+from dataclasses import replace
 from pathlib import Path
 
+from .acceptance import evaluate_acceptance, load_acceptance
 from .artifact import Artifact, resolve_artifact, stage_artifact
 from .fidelity import FidelityStore
 from .messages import DrainItem, Message
 from .mutant import kill_mutant
+from .protocol import SUITE_BY_COMPONENT
 from .runner import RunOutcome, pytest_suite, run_path, suite_hash
 from .vault import ConstraintVault
 
@@ -44,6 +47,10 @@ def classify(
     artifact = resolve_artifact(payload)
     if artifact is None:
         return "outcome_unknown", "missing_artifact", None
+    if artifact.source == "payload" and name in SUITE_BY_COMPONENT:
+        return "reject", "reserved_component_name", None
+    if artifact.source == "suite" and not concept.requires_fidelity:
+        return "reject", "suite_requires_fidelity", None
     if name in components:
         return "reject", "duplicate_component", None
     missing = [
@@ -53,6 +60,14 @@ def classify(
     ]
     if missing:
         return "hold_unresolved", "missing_dependency", None
+    acceptance = None
+    if artifact.source == "payload":
+        try:
+            acceptance = load_acceptance(name)
+        except ValueError as exc:
+            reason = str(exc)
+            status = "outcome_unknown" if reason == "acceptance_suite_missing" else "reject"
+            return status, reason, None
     expected_hash = artifact.digest()
     with tempfile.TemporaryDirectory(prefix="grokcell-stage-") as raw:
         staged = stage_artifact(artifact, Path(raw))
@@ -83,6 +98,11 @@ def classify(
         )
         if not killed:
             return "reject", mutant_reason, None
+    if acceptance is not None:
+        accepted, reason = evaluate_acceptance(artifact, acceptance)
+        if not accepted:
+            return "reject", reason, None
+        artifact = replace(artifact, acceptance_suite_hash=acceptance.digest)
     return "admit", "vault_legal", artifact
 
 

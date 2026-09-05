@@ -6,6 +6,9 @@ Not the kernel. Not confirmatory science.
 Experiment 06 (seed 260826) remains the last executed confirmatory
 record. This package is a prototype control plane.
 
+Product direction, system design, validation gates, and the reconciliation of
+issues #13/#15 are in [PRODUCT_PLAN.md](PRODUCT_PLAN.md).
+
 ## What it is
 
 A layer **above** grokbots.
@@ -32,6 +35,9 @@ set `GROKCELL_ALLOW_UNSANDBOXED_RUNNER=1` to execute them on the host; the
 runner still applies a hard timeout, bounded output, a minimal environment,
 content-integrity checks, and mutation testing. Frozen repository suites do not
 require this opt-in. Fail closed if the runner is absent or a mutant survives.
+
+Generated payloads additionally require a pinned operator-owned acceptance suite.
+Candidate tests alone cannot license admission. See the configuration below.
 
 **Chat is not the database.** `open()` resumes `vault/state/`
 (kernel checkpoint + surface queue/holds + admitted artifacts).
@@ -81,6 +87,69 @@ process can resume Gate B files.
   }
 }
 ```
+
+## Independent acceptance for generated components
+
+Before proposing generated code, the **operator** places independently authored
+tests at `$GROKCELL_ACCEPTANCE_DIR/<component>/test_acceptance.py` and the SHA-256
+of those exact bytes at `test_acceptance.sha256`. The environment variable is
+host configuration. Proposal fields cannot register a suite or replace its pin.
+There is no default acceptance suite for generated components.
+
+For example, a trusted development fixture for `edge.ping`:
+
+```bash
+export GROKCELL_ACCEPTANCE_DIR=/tmp/grokcell-acceptance
+mkdir -p "$GROKCELL_ACCEPTANCE_DIR/edge.ping"
+cat > "$GROKCELL_ACCEPTANCE_DIR/edge.ping/test_acceptance.py" <<'PY'
+from service import ping
+
+def test_operator_contract():
+    assert ping() == "pong"
+PY
+python - <<'PY'
+import hashlib, os
+from pathlib import Path
+suite = Path(os.environ["GROKCELL_ACCEPTANCE_DIR"]) / "edge.ping"
+digest = hashlib.sha256((suite / "test_acceptance.py").read_bytes()).hexdigest()
+(suite / "test_acceptance.sha256").write_text(digest + "\n", encoding="ascii")
+PY
+```
+
+This example is public test data, not a hidden evaluation. For trusted local
+development inputs, the existing `GROKCELL_ALLOW_UNSANDBOXED_RUNNER=1` opt-in is
+still needed. No sandbox is added by configuring an acceptance suite.
+
+Use the existing `bus.post` with `kind: forge.propose`, component `edge.ping`,
+`module`, `tests`, and `constraint: critical_module`, then `bus.drain`.
+The candidate suite runs first, followed by a separate directory containing only
+the candidate module and the operator tests. Each suite must pass and kill the
+existing AST mutant. A wrong `ping()` returning `"wrong"` with matching candidate
+tests is refused with `acceptance_failed`.
+
+| Result | Meaning |
+|---|---|
+| `acceptance_suite_missing` | `outcome_unknown`; no generated code is run without a configured contract |
+| `acceptance_suite_invalid` / `acceptance_suite_changed` | Invalid configuration or test bytes do not match the operator pin |
+| `acceptance_failed` | Operator tests failed |
+| `acceptance_mutant_survived` | Operator tests cannot detect the existing simple mutation |
+| `acceptance_timeout` / `acceptance_infrastructure` | Evaluation was not completed successfully |
+| `acceptance_modified_artifact` | Evaluation changed staged Python bytes |
+| `vault_legal` | Both prototype gates passed; existing DPO admission follows |
+
+Missing dependencies still hold without executing generated code. `park.request`
+re-evaluates held proposals against the current configured contract, including
+after restart. Admission writes `acceptance_suite_hash` alongside the exact
+artifact `hash` in `license.json`; inspection exposes that suite digest, and file
+action stamps preserve it. Operator tests themselves are not exported. Retain
+their original bytes separately if you need to reproduce evaluation later.
+Old admitted artifacts and frozen-suite proposals remain compatible. Generated
+payloads using a frozen component's name still require independent acceptance.
+
+**Boundary:** independent test authorship is not test secrecy or hostile-code
+isolation. A process with host access can read or alter these files; checksums are
+not authenticated signatures. This prototype cannot enforce a platform-wide write
+policy. Passing these checks does not authorize deployment or any external action.
 
 ## Tools
 

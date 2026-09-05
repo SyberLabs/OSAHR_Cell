@@ -17,3 +17,4 @@ for path in (ROOT, REPO):
 def isolate_grokcell_runtime_files(tmp_path, monkeypatch):
     monkeypatch.setattr("grokcell.protocol.STATE_DIR", tmp_path / "default-state")
     monkeypatch.setattr("grokcell.protocol.FIDELITY_DIR", tmp_path / "default-fidelity")
+    monkeypatch.setenv("GROKCELL_ACCEPTANCE_DIR", str(tmp_path / "acceptance"))

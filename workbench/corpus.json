@@ -1,0 +1,8 @@
+{
+  "packet_version": "osahr_workbench_v0",
+  "confirmatory_seed": 260826,
+  "analysis": "liquid-osahr-experiment-06/artifacts/analysis.json",
+  "freeze": "liquid-osahr-experiment-06/artifacts/FROZEN.json",
+  "analysis_sha256": "b31063d42626e5c05bcbf1f0f9c9c61de1fded38eb85e5b43817c5225bd5260b",
+  "freeze_sha256": "fa3afd17aa4917c5507b85159ca22df8622990442e564731868a77197ed8690d"
+}

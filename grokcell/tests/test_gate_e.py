@@ -8,6 +8,7 @@ from grokcell.fidelity import FidelityStore
 from grokcell.runner import run_component
 from grokcell.surface import GrokCellSurface
 from grokcell.tools import TOOL_SCHEMAS, ToolRegistry
+from support import register_acceptance
 
 
 MODULE_PING = "def ping() -> str:\n    return \"pong\"\n"
@@ -16,8 +17,10 @@ TESTS_WEAK = "def test_always_passes():\n    assert True\n"
 
 
 @pytest.fixture(autouse=True)
-def allow_trusted_generated_code(monkeypatch):
+def allow_trusted_generated_code(tmp_path, monkeypatch):
     monkeypatch.setenv("GROKCELL_ALLOW_UNSANDBOXED_RUNNER", "1")
+    for name in ("edge.weak", "edge.ping", "edge.crlf"):
+        register_acceptance(tmp_path, name)
 
 
 def _scored(tmp_path: Path, *names: str) -> tuple[FidelityStore, Path]:
@@ -208,4 +211,4 @@ def test_park_refuses_file_act_without_artifact(tmp_path: Path):
     refused = tools.call("park.request", {"act": "sign", "name": "core.api"})
     assert refused["decision"] == "refused"
     assert refused["bypasses_dpo"] is False
-    assert refused["reason"] == "missing_artifact"
+    assert refused["reason"] == "component_not_admitted"

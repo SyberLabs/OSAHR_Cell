@@ -1,10 +1,13 @@
 # OSAHR 0.2
 
+**This is the project:** [SyberLabs/OSAHR_Cell](https://github.com/SyberLabs/OSAHR_Cell).
+`sykosyber/osahr_project` is a private Cursor workspace, not a second OSAHR. See `CELL.md`.
+
 Exact open stochastic adaptive graph-rewrite over a typed directed hypergraph.
 Python 3.11+, no runtime dependencies.
 
 The kernel is `osahr/`. Experiments are confirmatory records on that kernel.
-Map of the tree: `CELL.md`. Invariants: `ARCHITECTURE.md`.
+Invariants: `ARCHITECTURE.md`. Licensed packets over Experiment 06: `workbench/`.
 
 ## Install
 
@@ -32,6 +35,13 @@ print(runtime.step().event.post_time, runtime.memory["last"])
 Schedulers: direct SSA, modified next-reaction, bounded thinning. Incremental matching is an optimization; the exhaustive matcher is the oracle. DPO-invalid embeddings are not stochastic channels.
 
 More examples: `examples/adaptive_signal.py`. API detail: `ARCHITECTURE.md`.
+
+```bash
+python -m workbench decide workbench/scenarios/03-long-outage.json --out /tmp/osahr-packet
+python -m workbench replay /tmp/osahr-packet/decision.json
+```
+
+Ontology execution probe (not a speed claim): `docs/VALIDATION_FRAMEWORK.md` and `benchmarks/ontology/README.md`.
 
 ## Experiments
 
