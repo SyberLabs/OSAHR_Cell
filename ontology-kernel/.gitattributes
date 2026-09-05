@@ -1,0 +1,5 @@
+# Source and ontology bytes participate in reproducibility receipts.
+* text eol=lf
+# Preserve the hash-pinned upstream ontology and RDFLib's generated formatting.
+vendor/prov-o.ttl -whitespace
+artifacts/*.ttl whitespace=-blank-at-eof

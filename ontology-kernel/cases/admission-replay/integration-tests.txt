@@ -1,0 +1,128 @@
+........................................................................ [ 24%]
+........................................................................ [ 49%]
+..........FF...................F........................................ [ 74%]
+........................................................................ [ 99%]
+..                                                                       [100%]
+================================== FAILURES ===================================
+______________________ test_symlink_contract_is_refused _______________________
+
+tools = <grokcell.tools.ToolRegistry object at 0x000001ED3E21FB90>
+tmp_path = WindowsPath('C:/Users/scarl/OneDrive/Documents/ChatGPT/OSAHR_CELL/repo/ontology-kernel/scratch/case-all-1/test_symlink_contract_is_refus0')
+
+    def test_symlink_contract_is_refused(tools, tmp_path):
+        real = register_acceptance(tmp_path, "other.component")
+>       (tmp_path / "acceptance" / "edge.ping").symlink_to(real, target_is_directory=True)
+
+grokcell\tests\test_acceptance.py:108:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/scarl/OneDrive/Documents/ChatGPT/OSAHR_CELL/repo/ontology-kernel/scratch/case-all-1/test_symlink_contract_is_refus0/acceptance/edge.ping')
+target = WindowsPath('C:/Users/scarl/OneDrive/Documents/ChatGPT/OSAHR_CELL/repo/ontology-kernel/scratch/case-all-1/test_symlink_contract_is_refus0/acceptance/other.component')
+target_is_directory = True
+
+    def symlink_to(self, target, target_is_directory=False):
+        """
+        Make this path a symlink pointing to the target path.
+        Note the order of arguments (link, target) is the reverse of os.symlink.
+        """
+        if not hasattr(os, "symlink"):
+            raise NotImplementedError("os.symlink() not available on this system")
+>       os.symlink(target, self, target_is_directory)
+E       OSError: [WinError 1314] A required privilege is not held by the client: 'C:\\Users\\scarl\\OneDrive\\Documents\\ChatGPT\\OSAHR_CELL\\repo\\ontology-kernel\\scratch\\case-all-1\\test_symlink_contract_is_refus0\\acceptance\\other.component' -> 'C:\\Users\\scarl\\OneDrive\\Documents\\ChatGPT\\OSAHR_CELL\\repo\\ontology-kernel\\scratch\\case-all-1\\test_symlink_contract_is_refus0\\acceptance\\edge.ping'
+
+C:\Users\scarl\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\pathlib.py:1386: OSError
+_____________ test_invalid_configured_root_does_not_poison_queue ______________
+
+tools = <grokcell.tools.ToolRegistry object at 0x000001ED3E21E270>
+tmp_path = WindowsPath('C:/Users/scarl/OneDrive/Documents/ChatGPT/OSAHR_CELL/repo/ontology-kernel/scratch/case-all-1/test_invalid_configured_root_d0')
+monkeypatch = <_pytest.monkeypatch.MonkeyPatch object at 0x000001ED3E21F1D0>
+
+    def test_invalid_configured_root_does_not_poison_queue(tools, tmp_path, monkeypatch):
+        loop = tmp_path / "loop"
+>       loop.symlink_to(loop)
+
+grokcell\tests\test_acceptance.py:115:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/scarl/OneDrive/Documents/ChatGPT/OSAHR_CELL/repo/ontology-kernel/scratch/case-all-1/test_invalid_configured_root_d0/loop')
+target = WindowsPath('C:/Users/scarl/OneDrive/Documents/ChatGPT/OSAHR_CELL/repo/ontology-kernel/scratch/case-all-1/test_invalid_configured_root_d0/loop')
+target_is_directory = False
+
+    def symlink_to(self, target, target_is_directory=False):
+        """
+        Make this path a symlink pointing to the target path.
+        Note the order of arguments (link, target) is the reverse of os.symlink.
+        """
+        if not hasattr(os, "symlink"):
+            raise NotImplementedError("os.symlink() not available on this system")
+>       os.symlink(target, self, target_is_directory)
+E       OSError: [WinError 1314] A required privilege is not held by the client: 'C:\\Users\\scarl\\OneDrive\\Documents\\ChatGPT\\OSAHR_CELL\\repo\\ontology-kernel\\scratch\\case-all-1\\test_invalid_configured_root_d0\\loop' -> 'C:\\Users\\scarl\\OneDrive\\Documents\\ChatGPT\\OSAHR_CELL\\repo\\ontology-kernel\\scratch\\case-all-1\\test_invalid_configured_root_d0\\loop'
+
+C:\Users\scarl\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\pathlib.py:1386: OSError
+____________________ test_unverified_critical_is_rejected _____________________
+
+tmp_path = WindowsPath('C:/Users/scarl/OneDrive/Documents/ChatGPT/OSAHR_CELL/repo/ontology-kernel/scratch/case-all-1/test_unverified_critical_is_re0')
+
+    def test_unverified_critical_is_rejected(tmp_path: Path):
+        from grokcell.fidelity import FidelityStore
+
+        surface = GrokCellSurface.open(fidelity=FidelityStore(tmp_path))
+        tools = ToolRegistry(surface)
+        tools.call(
+            "bus.post",
+            {
+                "source_owner": "MOUTH",
+                "kind": "forge.propose",
+                "priority": 10,
+                "payload": {
+                    "name": "core.api",
+                    "constraint": "critical_module",
+                    "verified": False,
+                    "depends_on": [],
+                },
+            },
+        )
+>       drained = tools.call("bus.drain", {})
+                  ^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+grokcell\tests\test_bus.py:105:
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+grokcell\grokcell\tools.py:162: in call
+    return self.handlers[name](arguments)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+grokcell\grokcell\tools.py:189: in _bus_drain
+    items = self.surface.drain()
+            ^^^^^^^^^^^^^^^^^^^^
+grokcell\grokcell\surface.py:154: in drain
+    results.append(self._transaction(commit))
+                   ^^^^^^^^^^^^^^^^^^^^^^^^^
+grokcell\grokcell\surface.py:115: in _transaction
+    self._persist()
+grokcell\grokcell\surface.py:93: in _persist
+    self.snapshots.save(
+grokcell\grokcell\snapshot.py:276: in save
+    current_tmp.replace(self.current_path)
+_ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _ _
+
+self = WindowsPath('C:/Users/scarl/OneDrive/Documents/ChatGPT/OSAHR_CELL/repo/ontology-kernel/scratch/case-all-1/test_unverified_critical_is_re0/default-state/.CURRENT-950ca46e8ef04e819a8975f6b3e379e0.json.tmp')
+target = WindowsPath('C:/Users/scarl/OneDrive/Documents/ChatGPT/OSAHR_CELL/repo/ontology-kernel/scratch/case-all-1/test_unverified_critical_is_re0/default-state/CURRENT.json')
+
+    def replace(self, target):
+        """
+        Rename this path to the target path, overwriting if that path exists.
+
+        The target path may be absolute or relative. Relative paths are
+        interpreted relative to the current working directory, *not* the
+        directory of the Path object.
+
+        Returns the new Path instance pointing to the target path.
+        """
+>       os.replace(self, target)
+E       PermissionError: [WinError 5] Access is denied: 'C:\\Users\\scarl\\OneDrive\\Documents\\ChatGPT\\OSAHR_CELL\\repo\\ontology-kernel\\scratch\\case-all-1\\test_unverified_critical_is_re0\\default-state\\.CURRENT-950ca46e8ef04e819a8975f6b3e379e0.json.tmp' -> 'C:\\Users\\scarl\\OneDrive\\Documents\\ChatGPT\\OSAHR_CELL\\repo\\ontology-kernel\\scratch\\case-all-1\\test_unverified_critical_is_re0\\default-state\\CURRENT.json'
+
+C:\Users\scarl\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\Lib\pathlib.py:1376: PermissionError
+=========================== short test summary info ===========================
+FAILED grokcell/tests/test_acceptance.py::test_symlink_contract_is_refused - ...
+FAILED grokcell/tests/test_acceptance.py::test_invalid_configured_root_does_not_poison_queue
+FAILED grokcell/tests/test_bus.py::test_unverified_critical_is_rejected - Per...
+3 failed, 287 passed in 49.86s

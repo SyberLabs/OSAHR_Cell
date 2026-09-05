@@ -32,6 +32,7 @@ Dynamic rule hashes are part of the canonical state identity. A meta-transition 
 | `pattern.py` | LHS patterns, RHS templates, graph conditions, rules, hazard contracts |
 | `expr.py` | Restricted deterministic expression language |
 | `matcher.py` | Exhaustive injective typed matching oracle |
+| `indexed_matcher.py` | Incidence-constrained enumeration of the same embedding relation |
 | `incremental.py` | Exact dependency-indexed localized match maintenance |
 | `rewrite.py` | Atomic DPO applicability and rewrite transaction execution |
 | `occurrence.py` | DPO-valid stochastic channels, hazards, bounds/integrals, weighted activity indices |
@@ -135,6 +136,13 @@ sorted(incremental_match_ids) == sorted(reference_match_ids)
 ```
 
 A mismatch is release-blocking.
+
+Verification also compares canonical variable bindings: identical match IDs
+alone cannot detect bindings that would change guards or hazards. The incremental
+backend now enumerates through `IndexedMatcher`, using existing type/incidence
+indices to constrain partial assignments while retaining complete incidence and
+attribute checks. The exhaustive backend remains unchanged. See
+[the correctness argument, complexity bounds, and reproduction commands](docs/INCIDENCE_MATCHING.md).
 
 ## 7. Incremental match maintenance
 

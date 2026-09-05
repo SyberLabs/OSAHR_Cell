@@ -1,0 +1,24 @@
+{
+  "profile": "osahr-ontology-admission-preview/1",
+  "claim": "candidate_transition_only",
+  "live_action_executed": false,
+  "proposal": "urn:fixture:proposal:ping",
+  "revision": "synthetic-revision-1",
+  "input_rdf": "e6a250181ccb5501df3323bd38ac1b052ab1ab56f7bbc31940d034b97372146c",
+  "candidate_rdf": "b2e569edfd3c725df9f204180459011fe5d93dc8edc9db053e8f9488ecd16b6d",
+  "shapes": "33ae72472ddfcb2a3a8e0882980228b5ad7412837f6e756473daf81ad4c8e215",
+  "external_ontology_sha256": "7d203989f67b38bca572253942acc5a1bf24ce3ccfece16f072dcb4be2b79a96",
+  "module_sha256": "ce6cfe02ba1c42e7b17e557328ed3ae47472467877014ffe75f034496ca27390",
+  "evidence_sha256": "a629d942b9412672ed3efe5a27c229747a80621a6d59a40f7b952121c1c00835",
+  "rule": "eb478689144821a428961fea0f7f8285de8672ef645b6fcd9be58bfa4c471856",
+  "schema": "9c623d8c1ae28b0136834a36e60b25a84832d54c4fed71a8ca7d76fce5a170a1",
+  "profile_source_sha256": "49cc8cdacf62ab7d3ef5214110a746c8ea36626a22831509f22b73cc1277241a",
+  "environment": {
+    "python": "3.12.14",
+    "rdflib": "7.6.0",
+    "pyshacl": "0.31.0"
+  },
+  "pre_graph": "9f0f646b9d6ac0164fe8e5e51813328930a38154eeb0ff6b9a2712bd511894e3",
+  "post_graph": "98831e1c110f70b10ea508424267021ede7f0ebb96f4a2b8d426531be86120e4",
+  "graph_scope": "Cell + Slot footprint; existing memberships are retained in RDF"
+}

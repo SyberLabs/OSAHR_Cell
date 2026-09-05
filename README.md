@@ -4,7 +4,7 @@
 `sykosyber/osahr_project` is a private Cursor workspace, not a second OSAHR. See `CELL.md`.
 
 Exact open stochastic adaptive graph-rewrite over a typed directed hypergraph.
-Python 3.11+, no runtime dependencies.
+Python 3.11+, no kernel runtime dependencies.
 
 The kernel is `osahr/`. Experiments are confirmatory records on that kernel.
 Invariants: `ARCHITECTURE.md`. Licensed packets over Experiment 06: `workbench/`.
@@ -13,10 +13,17 @@ Invariants: `ARCHITECTURE.md`. Licensed packets over Experiment 06: `workbench/`
 
 ```bash
 python -m pip install -e .
-python -m pytest
+python examples/adaptive_signal.py
 ```
 
 Or `python -m pip install osahr-0.2.1-py3-none-any.whl`.
+
+## What's here
+
+- **[Kernel](ARCHITECTURE.md):** typed hypergraph rewriting, three stochastic schedulers, incremental matching, adaptive parameters, and replay. Incidence-constrained search: `docs/INCIDENCE_MATCHING.md`.
+- **[Decision workbench](workbench/README.md):** reviewable evidence packets from frozen experiments.
+- **[GrokCell](grokcell/README.md):** prototype agent control plane.
+- **[Ontology profile](ontology-kernel/README.md):** bounded admission experiment against an ontology snapshot.
 
 ## Minimal CTMC
 
@@ -34,14 +41,15 @@ print(runtime.step().event.post_time, runtime.memory["last"])
 
 Schedulers: direct SSA, modified next-reaction, bounded thinning. Incremental matching is an optimization; the exhaustive matcher is the oracle. DPO-invalid embeddings are not stochastic channels.
 
-More examples: `examples/adaptive_signal.py`. API detail: `ARCHITECTURE.md`.
-
 ```bash
 python -m workbench decide workbench/scenarios/03-long-outage.json --out /tmp/osahr-packet
 python -m workbench replay /tmp/osahr-packet/decision.json
 ```
 
-Ontology execution probe (not a speed claim): `docs/VALIDATION_FRAMEWORK.md` and `benchmarks/ontology/README.md`.
+```bash
+python -m pip install -e ".[benchmark]" pytest
+python -m pytest
+```
 
 ## Experiments
 
@@ -70,3 +78,7 @@ Selected MEASURED results:
 
 `research_directions/` is PROPOSED notes, not science. Do not cite it as MEASURED.
 GrokCell (`grokcell/`) is a prototype control-plane host, not a confirmatory record.
+
+The ontology benchmark passed transition-law checks but was substantially slower than plain direct simulation. See `docs/VALIDATION_FRAMEWORK.md`.
+
+[Architecture](ARCHITECTURE.md) · [Changelog](CHANGELOG.md) · [Repository guide](CELL.md)

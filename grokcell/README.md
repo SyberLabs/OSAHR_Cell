@@ -17,6 +17,16 @@ grokbot -> bus.post / park.request / oda.* -> vault + junction
 Generated payloads also need a pinned operator-owned acceptance suite
 (`GROKCELL_ACCEPTANCE_DIR`). Details are in `PRODUCT_PLAN.md`.
 
+Component membership is read from the construction graph in stable allocation
+order. Admission makes no separate membership-cache write after its recorded
+events. The existing `Runtime.replay_deltas` can reproduce admission events from
+a retained initial checkpoint. Historical `memory["components"]` values remain
+checkpoint metadata and are ignored when listing members. This preserves model
+identity without pretending that previously incomplete event histories are fixed.
+Opening a checkpoint resumes state; it does not restore earlier event records.
+This guarantee covers admission, not every control-plane memory mutation.
+See the [replay regression case](../ontology-kernel/cases/admission-replay/README.md).
+
 ## Run
 
 ```bash

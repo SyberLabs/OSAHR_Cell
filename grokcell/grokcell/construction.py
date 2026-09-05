@@ -139,6 +139,7 @@ def construction_model() -> Model:
             "owners": [MOUTH_OWNER],
             "skills": {MOUTH_OWNER: []},
             "bots_spawned": 0,
+            # Retained for historical model identity; membership lives in the graph.
             "components": [],
         },
         model_id="grokcell-construction",
@@ -155,15 +156,13 @@ def runtime_from_snapshot(snapshot: object) -> Runtime:
 
 
 def graph_component_names(runtime: Runtime) -> list[str]:
-    names = [
+    # Construction uses one namespace and monotone IDs, so this is admission order
+    # even after snapshot loading changes dictionary order. Ignore legacy caches.
+    return [
         str(vertex.attributes["name"])
-        for vertex in runtime.graph.vertices.values()
+        for _, vertex in sorted(runtime.graph.vertices.items())
         if vertex.type_id == "Component"
     ]
-    log = [str(item) for item in runtime.memory.get("components", [])]
-    if log and set(log) == set(names):
-        return log
-    return sorted(names)
 
 
 def licensed_assemble(runtime: Runtime, *, name: str, constraint: str, seq: int) -> None:
@@ -188,6 +187,3 @@ def licensed_assemble(runtime: Runtime, *, name: str, constraint: str, seq: int)
         kind = assembled.event.kind.value
         rule = assembled.event.cause.get("rule_id")
         raise RuntimeError(f"expected assemble-component, got {kind} {rule}")
-    components = list(runtime.memory.get("components", []))
-    components.append(name)
-    runtime.memory["components"] = components

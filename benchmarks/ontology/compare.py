@@ -155,7 +155,7 @@ def source_manifest():
              *sorted(Path(__file__).parent.glob("*.py")), FIXTURE,
              ROOT / "benchmarks/ontology/README.md", ROOT / "pyproject.toml",
              ROOT / "tests/test_ontology_benchmark.py"]
-    hashes = {str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
+    hashes = {path.relative_to(ROOT).as_posix(): hashlib.sha256(path.read_bytes()).hexdigest() for path in paths}
     try:
         revision = subprocess.check_output(["git", "rev-parse", "HEAD"], cwd=ROOT, text=True).strip()
         dirty = bool(subprocess.check_output(["git", "status", "--porcelain"], cwd=ROOT, text=True))
