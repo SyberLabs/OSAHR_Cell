@@ -40,6 +40,7 @@ Ledger          research_directions/INDEX.txt  not science
 GrokCell skills .cursor/skills/
 GrokCell surface grokcell/                     prototype host grokbots run
 Workbench       workbench/                     licensed decision packets over exp 06
+Vision mock     vision/barn/                   PROPOSED picture of the raise
 
 The private osahr_project tree does not include workbench/. The two
 GitHub histories have diverged. Do not merge them without an explicit

@@ -8,3 +8,4 @@ Do not merge these notes into osahr/ kernel legality.
 The public project is https://github.com/SyberLabs/OSAHR_Cell
 (`sykosyber/osahr_project` is a private agent workspace, not a second tree).
 See ../CELL.md.
+Vision mock (not a product): ../vision/barn/index.html

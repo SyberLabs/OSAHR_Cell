@@ -1,0 +1,432 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Barn — vision mock</title>
+  <style>
+    :root {
+      --paper: #f3eee4;
+      --paper-2: #e7e0d2;
+      --ink: #1b1714;
+      --mute: #6b6458;
+      --line: #2a241c;
+      --hold: #8b1e1e;
+      --park: #8a6a2a;
+      --ok: #1f3d28;
+      --crew: #5c564c;
+    }
+    * { box-sizing: border-box; }
+    html, body {
+      margin: 0; height: 100%;
+      background: var(--paper);
+      color: var(--ink);
+      font: 16px/1.45 "Iowan Old Style", Palatino, "Palatino Linotype", Georgia, serif;
+    }
+    body { display: flex; flex-direction: column; min-height: 100%; }
+    header {
+      display: flex; align-items: baseline; justify-content: space-between;
+      padding: 0.9rem 1.4rem 0.6rem;
+      border-bottom: 1px solid var(--ink);
+    }
+    header strong { letter-spacing: 0.18em; font-size: 0.82rem; }
+    header span { font-size: 0.78rem; color: var(--mute); }
+    .stage {
+      flex: 1;
+      display: grid;
+      grid-template-columns: 17rem 1fr 15.5rem;
+      min-height: 0;
+    }
+    aside, .pack {
+      padding: 1rem 1.1rem;
+      background: var(--paper-2);
+      font-size: 0.88rem;
+    }
+    aside { border-right: 1px solid var(--ink); }
+    .pack { border-left: 1px solid var(--ink); }
+    h2 {
+      font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase;
+      margin: 0 0 0.8rem; font-weight: 700;
+    }
+    .chat { display: flex; flex-direction: column; gap: 0.7rem; }
+    .bubble {
+      border: 1px solid var(--ink);
+      padding: 0.55rem 0.65rem;
+      background: var(--paper);
+    }
+    .bubble.you { border-style: solid; }
+    .bubble.lunch { color: var(--mute); border-style: dashed; }
+    .who { font-size: 0.68rem; letter-spacing: 0.12em; text-transform: uppercase; margin-bottom: 0.2rem; }
+    .yard {
+      display: flex; flex-direction: column;
+      padding: 0.6rem 1.2rem 0;
+      min-width: 0;
+    }
+    .caption {
+      font-size: 0.95rem;
+      margin: 0.2rem 0 0.4rem;
+      min-height: 2.6rem;
+    }
+    .caption em { font-style: italic; color: var(--mute); }
+    svg.frame { width: 100%; height: auto; max-height: 52vh; }
+    .bay text { font-size: 11px; font-family: ui-monospace, "IBM Plex Mono", monospace; letter-spacing: 0.08em; }
+    .timber { fill: none; stroke: var(--line); stroke-width: 3; stroke-linecap: square; }
+    .ghost { stroke: #b9b09f; stroke-dasharray: 6 5; }
+    .hold { stroke: var(--hold); stroke-dasharray: 7 4; }
+    .admit { stroke: var(--ink); stroke-width: 4; }
+    .park { stroke: var(--park); stroke-width: 4.5; }
+    .reject { stroke: var(--hold); }
+    .peg { fill: none; stroke: var(--line); stroke-width: 1.5; }
+    .peg.on { fill: var(--ink); }
+    .peg.parked { fill: var(--park); }
+    .xmark { stroke: var(--hold); stroke-width: 2.5; opacity: 0; }
+    .reject .xmark { opacity: 1; }
+    .pulse { animation: pulse 1.4s ease-in-out infinite; }
+    @keyframes pulse { 50% { opacity: 0.35; } }
+    .product {
+      margin: 0.4rem 0 0.8rem;
+      border: 1px solid var(--ink);
+      background: #fffdf8;
+      padding: 0.7rem 0.85rem;
+      display: none;
+    }
+    .product.show { display: block; }
+    .product h3 { margin: 0 0 0.35rem; font-size: 0.95rem; }
+    .lock { color: var(--hold); font-size: 0.8rem; }
+    .live { color: var(--ok); }
+    .stamps { display: flex; gap: 0.4rem; flex-wrap: wrap; margin-top: 0.5rem; }
+    .stamp {
+      font-family: ui-monospace, "IBM Plex Mono", monospace;
+      font-size: 0.62rem; letter-spacing: 0.14em;
+      border: 1.5px solid; padding: 0.15rem 0.35rem;
+    }
+    .stamp.hold { color: var(--hold); border-color: var(--hold); }
+    .stamp.admit { color: var(--ok); border-color: var(--ok); }
+    .stamp.reject { color: var(--hold); border-color: var(--hold); }
+    .stamp.park { color: var(--park); border-color: var(--park); }
+    .stamp.empty { color: var(--mute); border-color: #b9b09f; }
+    .files { font-family: ui-monospace, ui-sans-serif, monospace; font-size: 0.75rem; }
+    .files div { margin: 0.25rem 0; }
+    .dead { color: var(--mute); }
+    footer {
+      display: flex; align-items: center; justify-content: space-between;
+      gap: 0.6rem; flex-wrap: wrap;
+      padding: 0.65rem 1.2rem;
+      border-top: 1px solid var(--ink);
+      background: var(--paper);
+    }
+    .steps { display: flex; gap: 0.25rem; flex-wrap: wrap; }
+    .steps button {
+      width: 1.35rem; height: 1.35rem; padding: 0;
+      border: 1px solid var(--ink); background: transparent;
+      font: 0.65rem/1 ui-monospace, monospace; cursor: pointer;
+    }
+    .steps button.now { background: var(--ink); color: var(--paper); }
+    .nav { display: flex; gap: 0.4rem; }
+    button.navbtn {
+      font: 0.8rem/1.2 "Iowan Old Style", Palatino, Georgia, serif;
+      border: 1px solid var(--ink); background: var(--paper);
+      padding: 0.35rem 0.7rem; cursor: pointer;
+    }
+    button.navbtn:hover { background: var(--ink); color: var(--paper); }
+    .wrong { display: none; margin: 0.6rem 0; padding: 0.6rem; border: 1px dashed var(--hold); color: var(--hold); font-size: 0.86rem; }
+    .wrong.show { display: block; }
+    .stills {
+      display: none; grid-template-columns: 1fr 1fr; gap: 0.5rem;
+      margin-top: 0.4rem;
+    }
+    .stills.show { display: grid; }
+    .stills img { width: 100%; border: 1px solid var(--ink); }
+    @media (max-width: 980px) {
+      .stage { grid-template-columns: 1fr; }
+      aside, .pack { border: 0; border-bottom: 1px solid var(--ink); }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>BARN</strong>
+    <span>Vision mock · not a product · not a dashboard you log into</span>
+  </header>
+
+  <div class="stage">
+    <aside>
+      <h2>Lunch</h2>
+      <p style="margin:0 0 0.8rem;color:var(--mute);font-size:0.8rem;">Chat is conversation. It is not the building.</p>
+      <div class="chat" id="chat"></div>
+    </aside>
+
+    <div class="yard">
+      <p class="caption" id="caption"></p>
+      <div class="wrong" id="wrong"></div>
+      <svg class="frame" viewBox="0 0 640 280" aria-label="Construction frame">
+        <line x1="40" y1="230" x2="600" y2="230" class="timber" />
+        <g id="bay-site" class="bay" data-bay="site">
+          <line class="post timber ghost" x1="90" y1="230" x2="90" y2="110" />
+          <line class="post timber ghost" x1="200" y1="230" x2="200" y2="110" />
+          <line class="plate timber ghost" x1="90" y1="110" x2="200" y2="110" />
+          <line class="sill timber ghost" x1="90" y1="200" x2="200" y2="200" />
+          <circle class="peg" cx="90" cy="200" r="4" />
+          <circle class="peg" cx="200" cy="200" r="4" />
+          <line class="xmark" x1="120" y1="130" x2="170" y2="190" />
+          <line class="xmark" x1="170" y1="130" x2="120" y2="190" />
+          <text x="145" y="255" text-anchor="middle">SITE</text>
+        </g>
+        <g id="bay-tests" class="bay" data-bay="tests">
+          <line class="post timber ghost" x1="200" y1="230" x2="200" y2="110" />
+          <line class="post timber ghost" x1="310" y1="230" x2="310" y2="110" />
+          <line class="plate timber ghost" x1="200" y1="110" x2="310" y2="110" />
+          <line class="sill timber ghost" x1="200" y1="200" x2="310" y2="200" />
+          <circle class="peg" cx="200" cy="200" r="4" />
+          <circle class="peg" cx="310" cy="200" r="4" />
+          <line class="xmark" x1="230" y1="130" x2="280" y2="190" />
+          <line class="xmark" x1="280" y1="130" x2="230" y2="190" />
+          <text x="255" y="255" text-anchor="middle">TESTS</text>
+        </g>
+        <g id="bay-email" class="bay" data-bay="email">
+          <line class="post timber ghost" x1="310" y1="230" x2="310" y2="110" />
+          <line class="post timber ghost" x1="420" y1="230" x2="420" y2="110" />
+          <line class="plate timber ghost" x1="310" y1="110" x2="420" y2="110" />
+          <line class="rafter timber ghost" x1="310" y1="110" x2="365" y2="48" />
+          <line class="rafter timber ghost" x1="420" y1="110" x2="365" y2="48" />
+          <circle class="peg" cx="365" cy="48" r="4" />
+          <line class="xmark" x1="340" y1="70" x2="400" y2="150" />
+          <line class="xmark" x1="400" y1="70" x2="340" y2="150" />
+          <text x="365" y="255" text-anchor="middle">EMAIL</text>
+        </g>
+        <g id="bay-charge" class="bay" data-bay="charge">
+          <line class="post timber ghost" x1="420" y1="230" x2="420" y2="110" />
+          <line class="post timber ghost" x1="530" y1="230" x2="530" y2="110" />
+          <line class="plate timber ghost" x1="420" y1="110" x2="530" y2="110" />
+          <line class="rafter timber ghost" x1="420" y1="110" x2="475" y2="48" />
+          <line class="rafter timber ghost" x1="530" y1="110" x2="475" y2="48" />
+          <circle class="peg" cx="475" cy="48" r="4" />
+          <line class="xmark" x1="450" y1="70" x2="500" y2="150" />
+          <line class="xmark" x1="500" y1="70" x2="450" y2="150" />
+          <text x="475" y="255" text-anchor="middle">CHARGE</text>
+        </g>
+      </svg>
+      <div class="stamps" id="stamps"></div>
+      <div class="product" id="product">
+        <h3>Shop waitlist</h3>
+        <div id="productBody"></div>
+      </div>
+      <div class="stills" id="stills">
+        <img src="stills/barn-ask.jpg" alt="Ask still" />
+        <img src="stills/barn-repair.jpg" alt="Repair still" />
+        <img src="stills/barn-session-finished.jpg" alt="Session still" />
+        <img src="stills/barn-raising-day.jpg" alt="Raising day still" />
+      </div>
+    </div>
+
+    <div class="pack">
+      <h2>The pack</h2>
+      <p style="margin:0 0 0.8rem;color:var(--mute);font-size:0.8rem;">Files are the record. Kill the chat; this remains.</p>
+      <div class="files" id="files"></div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="steps" id="steps"></div>
+    <div class="nav">
+      <button class="navbtn" id="back" type="button">Back</button>
+      <button class="navbtn" id="play" type="button">Play</button>
+      <button class="navbtn" id="next" type="button">Next</button>
+    </div>
+  </footer>
+
+  <script>
+    const scenes = [
+      {
+        title: "Delete the mesh",
+        caption: "The picture that unlocked the product is a <em>raise</em>, not a network of agents chatting. Crew stands on the yard. The frame is the coordinator. Park is raising day.",
+        wrong: "Deleted: glowing agent graph, dispatcher board, owners as vertices, Jira for bots, LLM-to-LLM as the safety object.",
+        chat: [
+          { who: "Landowner", cls: "you", text: "(nothing yet)" }
+        ],
+        joints: { site: "empty", tests: "empty", email: "empty", charge: "empty" },
+        files: ["empty lot"],
+        product: null,
+        stills: false
+      },
+      {
+        title: "Ask",
+        caption: "You submit a project the way Grok already starts: you say it. You do not become the boss carpenter.",
+        chat: [
+          { who: "Landowner", cls: "you", text: "Waitlist for the shop. The page can go up. Email and charges cannot until I say raise." }
+        ],
+        joints: { site: "enabled", tests: "empty", email: "empty", charge: "empty" },
+        files: ["intent.txt  waitlist. page ≠ email ≠ charge"],
+        product: null,
+        stills: false
+      },
+      {
+        title: "The frame exists",
+        caption: "Work does not hop between bots. Enabled joints light on the <em>frame</em>. Site can be lifted. Roof joints are not enabled. That is the network: adaptive, resource-aware, error-aware.",
+        chat: [
+          { who: "Landowner", cls: "you", text: "Waitlist for the shop. The page can go up. Email and charges cannot until I say raise." },
+          { who: "Lunch", cls: "lunch", text: "Crew is on the yard. Nobody is sequencing anybody." }
+        ],
+        joints: { site: "enabled", tests: "empty", email: "empty", charge: "empty" },
+        files: ["intent.txt", "frame  site enabled · email not · charge not"],
+        product: null,
+        stills: false
+      },
+      {
+        title: "One shot — site",
+        caption: "Among everything legal and enabled, one next act commits. Not a chat vote. Not a model dispatcher. The sill is in.",
+        chat: [
+          { who: "Landowner", cls: "you", text: "Waitlist for the shop. The page can go up. Email and charges cannot until I say raise." }
+        ],
+        joints: { site: "admit", tests: "enabled", email: "empty", charge: "empty" },
+        files: ["site.py", "site_test.py  runner-owned", "hash  a1…"],
+        product: null,
+        stills: false
+      },
+      {
+        title: "Repair",
+        caption: "A crooked plate stops that line. Tests proposed. A mutant lived. Reject. You do not ship the roof because someone is optimistic.",
+        chat: [
+          { who: "Lunch", cls: "lunch", text: "Don't argue the chat. Look at the plate." }
+        ],
+        joints: { site: "admit", tests: "reject", email: "empty", charge: "empty" },
+        files: ["site.py", "tests.py  REJECT  mutant lived", "note  do not roof"],
+        product: null,
+        stills: false
+      },
+      {
+        title: "Tests admit",
+        caption: "Second propose. Mutant dies. Admit writes files. Parallel was always legal for independent joints. Sequence is which joints exist, not a standup.",
+        chat: [
+          { who: "Landowner", cls: "you", text: "Waitlist for the shop. The page can go up. Email and charges cannot until I say raise." }
+        ],
+        joints: { site: "admit", tests: "admit", email: "hold", charge: "hold" },
+        files: ["site.py", "tests.py  mutant died", "email.py  HOLD  irreversible", "charge.py  HOLD  irreversible"],
+        product: { site: true, email: false, charge: false },
+        stills: false
+      },
+      {
+        title: "The page can stand",
+        caption: "A finished-looking product can be up while the dangerous joints stay held. That is withhold-and-act. The landowner still has not raised.",
+        chat: [
+          { who: "Landowner", cls: "you", text: "Waitlist for the shop. The page can go up. Email and charges cannot until I say raise." },
+          { who: "Lunch", cls: "lunch", text: "Looks like a shop. It cannot write to a customer or a card." }
+        ],
+        joints: { site: "admit", tests: "admit", email: "hold", charge: "hold" },
+        files: ["vault/artifacts/site.py", "vault/artifacts/tests.py", "email  HOLD", "charge  HOLD", "snapshot  open() would resume"],
+        product: { site: true, email: false, charge: false },
+        stills: false
+      },
+      {
+        title: "Raising day",
+        caption: "Holds that were waiting on the landowner. Park is the raise — send, not a stamp pretending to be mail. Charge stays down. One irreversible act, named.",
+        chat: [
+          { who: "Landowner", cls: "you", text: "Raise email. Do not raise charges." }
+        ],
+        joints: { site: "admit", tests: "admit", email: "park", charge: "hold" },
+        files: ["site.py", "tests.py", "email  PARK send", "charge  HOLD", "pack  hashes + snapshot"],
+        product: { site: true, email: true, charge: false },
+        stills: false
+      },
+      {
+        title: "The barn is up",
+        caption: "Finished product: a waitlist that can exist, can mail because you raised it, and still cannot take money. Lunch was conversation. The frame is the record.",
+        chat: [
+          { who: "Landowner", cls: "you", text: "That's the shop I asked for." }
+        ],
+        joints: { site: "admit", tests: "admit", email: "park", charge: "hold" },
+        files: ["the pack  remains if chat dies", "charge still not enabled"],
+        product: { site: true, email: true, charge: false },
+        stills: false
+      }
+    ];
+
+    let i = 0;
+    let timer = null;
+    const start = Number(new URLSearchParams(location.search).get("s"));
+    if (Number.isInteger(start) && start >= 0 && start < scenes.length) i = start;
+
+    function paintJoint(name, state) {
+      const g = document.getElementById("bay-" + name);
+      g.classList.remove("reject");
+      g.querySelectorAll(".timber").forEach((el) => {
+        el.classList.remove("ghost", "hold", "admit", "park", "pulse");
+        if (state === "empty") el.classList.add("ghost");
+        if (state === "enabled") { el.classList.add("ghost", "pulse"); }
+        if (state === "hold") el.classList.add("hold");
+        if (state === "admit") el.classList.add("admit");
+        if (state === "park") el.classList.add("park");
+        if (state === "reject") el.classList.add("admit");
+      });
+      if (state === "reject") g.classList.add("reject");
+      g.querySelectorAll(".peg").forEach((p) => {
+        p.classList.toggle("on", state === "admit" || state === "park");
+        p.classList.toggle("parked", state === "park");
+      });
+    }
+
+    function render() {
+      const s = scenes[i];
+      document.getElementById("caption").innerHTML = "<strong>" + (i) + " · " + s.title + ".</strong> " + s.caption;
+      const wrong = document.getElementById("wrong");
+      wrong.textContent = s.wrong || "";
+      wrong.classList.toggle("show", !!s.wrong);
+      const chat = document.getElementById("chat");
+      chat.innerHTML = s.chat.map((c) =>
+        "<div class='bubble " + c.cls + "'><div class='who'>" + c.who + "</div>" + c.text + "</div>"
+      ).join("");
+      Object.entries(s.joints).forEach(([k, v]) => paintJoint(k, v));
+      const stamps = document.getElementById("stamps");
+      stamps.innerHTML = Object.entries(s.joints).map(([k, v]) =>
+        "<span class='stamp " + v + "'>" + k.toUpperCase() + " " + v.toUpperCase() + "</span>"
+      ).join("");
+      document.getElementById("files").innerHTML = s.files.map((f) =>
+        "<div" + (f.toLowerCase().includes("empty") || f.includes("HOLD") ? " class='dead'" : "") + ">" + f + "</div>"
+      ).join("");
+      const prod = document.getElementById("product");
+      const body = document.getElementById("productBody");
+      if (s.product) {
+        prod.classList.add("show");
+        body.innerHTML =
+          "<div class='" + (s.product.site ? "live" : "lock") + "'>Page " + (s.product.site ? "is up" : "not built") + "</div>" +
+          "<div class='" + (s.product.email ? "live" : "lock") + "'>Email " + (s.product.email ? "raised (send licensed)" : "cannot send") + "</div>" +
+          "<div class='" + (s.product.charge ? "live" : "lock") + "'>Charge " + (s.product.charge ? "licensed" : "cannot take money") + "</div>";
+      } else {
+        prod.classList.remove("show");
+      }
+      document.getElementById("stills").classList.toggle("show", !!s.stills);
+      document.querySelectorAll(".steps button").forEach((b, n) => b.classList.toggle("now", n === i));
+      if (location.search !== "?s=" + i) {
+        history.replaceState(null, "", "?s=" + i);
+      }
+    }
+
+    document.querySelectorAll("#stills img").forEach((img) => {
+      img.addEventListener("error", () => { img.remove(); });
+    });
+
+    document.getElementById("steps").innerHTML = scenes.map((_, n) =>
+      "<button type='button' data-i='" + n + "'>" + n + "</button>"
+    ).join("");
+    document.getElementById("steps").addEventListener("click", (e) => {
+      const b = e.target.closest("button"); if (!b) return;
+      i = Number(b.dataset.i); render();
+    });
+    document.getElementById("next").onclick = () => { i = Math.min(scenes.length - 1, i + 1); render(); };
+    document.getElementById("back").onclick = () => { i = Math.max(0, i - 1); render(); };
+    document.getElementById("play").onclick = () => {
+      if (timer) { clearInterval(timer); timer = null; document.getElementById("play").textContent = "Play"; return; }
+      document.getElementById("play").textContent = "Pause";
+      timer = setInterval(() => {
+        if (i >= scenes.length - 1) { clearInterval(timer); timer = null; document.getElementById("play").textContent = "Play"; return; }
+        i += 1; render();
+      }, 2600);
+    };
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "ArrowRight" || e.key === " ") { e.preventDefault(); i = Math.min(scenes.length - 1, i + 1); render(); }
+      if (e.key === "ArrowLeft") { i = Math.max(0, i - 1); render(); }
+    });
+    render();
+  </script>
+</body>
+</html>
