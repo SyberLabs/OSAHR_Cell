@@ -47,6 +47,9 @@ class McpServer:
             params = message.get("params") or {}
             owner = str(params.get("owner") or "").strip()
             if owner:
+                current = self.tools.bound_owner
+                if current is not None and owner != current:
+                    return _error(msg_id, -32602, "Session already bound")
                 bound = self.tools.bind(owner)
                 if bound["decision"] != "accepted":
                     return _error(msg_id, -32602, f"Unknown owner: {owner}")
