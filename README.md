@@ -16,6 +16,10 @@ versus an independent direct-SSA implementation, with transition-generator gates
 before timing. It requires no Foundry access. This is development infrastructure,
 not evidence of competitive superiority or real-world usefulness.
 
+[Initial measured result](benchmarks/ontology/RESULTS.md): transition-law checks
+pass, but plain SSA is substantially faster on the easy control. No speed
+advantage is established.
+
 The framework also includes a [RISE external-study contractor brief](docs/RISE_EXTERNAL_VALIDATION_BRIEF.md);
 no contractor engagement or expenditure is implied by that document.
 

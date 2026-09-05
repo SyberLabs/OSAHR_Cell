@@ -1,0 +1,357 @@
+{
+  "claim_status": "development_probe_only",
+  "correctness": {
+    "passed": true,
+    "states": 8,
+    "transitions": 24
+  },
+  "cpu_count": 9,
+  "first_jump": {
+    "engines": {
+      "direct_ssa": {
+        "channel_counts": [
+          68,
+          30,
+          158
+        ],
+        "expected_wait": 1.25,
+        "mean_wait": 1.3118064481210892,
+        "passed": true
+      },
+      "osahr": {
+        "channel_counts": [
+          55,
+          31,
+          170
+        ],
+        "expected_wait": 1.25,
+        "mean_wait": 1.3879379536817824,
+        "passed": true
+      }
+    },
+    "frequency_tolerance": 0.17842856374160265,
+    "samples_per_engine": 256,
+    "seed_start": 730000
+  },
+  "fixture": {
+    "routes": [
+      {
+        "failure": 0.2,
+        "repair": 0.8,
+        "source": "urn:syberlabs:benchmark:A",
+        "target": "urn:syberlabs:benchmark:B",
+        "up": true,
+        "uri": "urn:syberlabs:benchmark:AB"
+      },
+      {
+        "failure": 0.1,
+        "repair": 0.4,
+        "source": "urn:syberlabs:benchmark:A",
+        "target": "urn:syberlabs:benchmark:C",
+        "up": true,
+        "uri": "urn:syberlabs:benchmark:AC"
+      },
+      {
+        "failure": 0.5,
+        "repair": 0.5,
+        "source": "urn:syberlabs:benchmark:B",
+        "target": "urn:syberlabs:benchmark:C",
+        "up": false,
+        "uri": "urn:syberlabs:benchmark:BC"
+      }
+    ],
+    "sites": [
+      "urn:syberlabs:benchmark:A",
+      "urn:syberlabs:benchmark:B",
+      "urn:syberlabs:benchmark:C"
+    ]
+  },
+  "limitations": [
+    "Not Foundry integration or comparison",
+    "No real-world calibration or user-value evidence",
+    "OSAHR retains richer native audits than the baseline",
+    "Fixed-event timings, not equal simulated-time ensembles",
+    "Three timing repetitions; no superiority inference",
+    "Memory and model-change engineering effort not measured"
+  ],
+  "measurements": [
+    {
+      "copies": 1,
+      "median_total_seconds": {
+        "direct_ssa": 0.000176128,
+        "osahr": 0.733294437
+      },
+      "osahr_over_baseline_total_ratio": 4163.417724609375,
+      "routes": 3,
+      "runs": {
+        "direct_ssa": [
+          {
+            "events": 100,
+            "final_up": 2,
+            "output_sha256": "bc25e5d0dcf348eba20893ab1613e303d9964720a80c88ea8d5a5dc6c5cc0f2b",
+            "prepare_seconds": 0.000195679,
+            "run_seconds": 0.00027909,
+            "seed": 26090501,
+            "simulation_time": 109.41119701922636,
+            "total_seconds": 0.000474769
+          },
+          {
+            "events": 100,
+            "final_up": 2,
+            "output_sha256": "5f57db24f11228a55101c3a07849cf112fecc9d35f5a0e911cce6f92634154f6",
+            "prepare_seconds": 0.000020542,
+            "run_seconds": 0.000155586,
+            "seed": 26090502,
+            "simulation_time": 90.71549290155521,
+            "total_seconds": 0.000176128
+          },
+          {
+            "events": 100,
+            "final_up": 2,
+            "output_sha256": "3684335cd94b5acf297f06a4bba25be9ce79147d0d516f5394fb40598b45ee59",
+            "prepare_seconds": 0.000008592,
+            "run_seconds": 0.000138209,
+            "seed": 26090503,
+            "simulation_time": 102.10533821596638,
+            "total_seconds": 0.000146801
+          }
+        ],
+        "osahr": [
+          {
+            "events": 100,
+            "final_up": 2,
+            "output_sha256": "ea96b767eed72a441dad5e75bbfc5ed25a187cf577ef66982a5c3e60b299e9aa",
+            "prepare_seconds": 0.00448467,
+            "run_seconds": 0.728809767,
+            "seed": 26090501,
+            "simulation_time": 91.53185862122501,
+            "total_seconds": 0.733294437
+          },
+          {
+            "events": 100,
+            "final_up": 2,
+            "output_sha256": "baf26fb2a323c5af2f65cc4251516188feea0479622778b2fc652bbff5da0a9a",
+            "prepare_seconds": 0.004077402,
+            "run_seconds": 0.709952099,
+            "seed": 26090502,
+            "simulation_time": 126.60497172818074,
+            "total_seconds": 0.714029501
+          },
+          {
+            "events": 100,
+            "final_up": 2,
+            "output_sha256": "c9344a71f729a2d2b2446871159cd669407f54161b2cfd937e024d19e1807c0a",
+            "prepare_seconds": 0.007764079,
+            "run_seconds": 0.825938811,
+            "seed": 26090503,
+            "simulation_time": 108.93245710859519,
+            "total_seconds": 0.83370289
+          }
+        ]
+      }
+    },
+    {
+      "copies": 4,
+      "median_total_seconds": {
+        "direct_ssa": 0.000313651,
+        "osahr": 1.322227461
+      },
+      "osahr_over_baseline_total_ratio": 4215.600973693691,
+      "routes": 12,
+      "runs": {
+        "direct_ssa": [
+          {
+            "events": 100,
+            "final_up": 8,
+            "output_sha256": "98227835200a6519f8578d663ec31b3b91a7b4e1875f467e23e29e1b645eeee4",
+            "prepare_seconds": 0.000015205,
+            "run_seconds": 0.000298446,
+            "seed": 26090501,
+            "simulation_time": 28.00439083010847,
+            "total_seconds": 0.000313651
+          },
+          {
+            "events": 100,
+            "final_up": 8,
+            "output_sha256": "ee0e8fa36fb6ef31e114ae8b3bd366b9b219496bd58644e8254375e4f620a6e1",
+            "prepare_seconds": 0.000017279,
+            "run_seconds": 0.000334931,
+            "seed": 26090502,
+            "simulation_time": 23.162408921686158,
+            "total_seconds": 0.00035221
+          },
+          {
+            "events": 100,
+            "final_up": 8,
+            "output_sha256": "27ee0882dbfe9eecc9400f208c184533db1336fdeb16f72f1fd247e1678ccb0e",
+            "prepare_seconds": 0.000009361,
+            "run_seconds": 0.000250746,
+            "seed": 26090503,
+            "simulation_time": 26.783446912691222,
+            "total_seconds": 0.000260107
+          }
+        ],
+        "osahr": [
+          {
+            "events": 100,
+            "final_up": 10,
+            "output_sha256": "03c8afebc1dfb7f00c0ea8a78552ac7546e44ebf1590f66f0ca94710fd86110c",
+            "prepare_seconds": 0.011985774,
+            "run_seconds": 1.429199649,
+            "seed": 26090501,
+            "simulation_time": 22.196639041268472,
+            "total_seconds": 1.441185423
+          },
+          {
+            "events": 100,
+            "final_up": 10,
+            "output_sha256": "11103575c7c304fccc656f07affdb824f7b10ac1e00db08a8dcc7b85902ef17c",
+            "prepare_seconds": 0.013092331,
+            "run_seconds": 1.23447781,
+            "seed": 26090502,
+            "simulation_time": 30.482490874721226,
+            "total_seconds": 1.247570141
+          },
+          {
+            "events": 100,
+            "final_up": 8,
+            "output_sha256": "6fd7e00ed523e5acc67e5fa040c60a645faf7a5605102c34e3d25da068f0c425",
+            "prepare_seconds": 0.009270511,
+            "run_seconds": 1.31295695,
+            "seed": 26090503,
+            "simulation_time": 30.185952663179673,
+            "total_seconds": 1.322227461
+          }
+        ]
+      }
+    },
+    {
+      "copies": 16,
+      "median_total_seconds": {
+        "direct_ssa": 0.000687719,
+        "osahr": 3.380619247
+      },
+      "osahr_over_baseline_total_ratio": 4915.698485864139,
+      "routes": 48,
+      "runs": {
+        "direct_ssa": [
+          {
+            "events": 100,
+            "final_up": 36,
+            "output_sha256": "614cb98960fa96427b5595c12469de2aa08714fdc070dfc090062f24ed1cfb47",
+            "prepare_seconds": 0.000016482,
+            "run_seconds": 0.000695644,
+            "seed": 26090501,
+            "simulation_time": 7.11417230306704,
+            "total_seconds": 0.000712126
+          },
+          {
+            "events": 100,
+            "final_up": 32,
+            "output_sha256": "d6fac1e2efee3382e80a0c9c027e2a453b0e166e8855059931bb730e3692f7c4",
+            "prepare_seconds": 0.000020083,
+            "run_seconds": 0.000667636,
+            "seed": 26090502,
+            "simulation_time": 5.723500792630536,
+            "total_seconds": 0.000687719
+          },
+          {
+            "events": 100,
+            "final_up": 38,
+            "output_sha256": "23c25dc9577a17b6dd8219bfd04157220a1d38c6ef0a6ca02b7159ff8e8117e7",
+            "prepare_seconds": 0.000010513,
+            "run_seconds": 0.000656055,
+            "seed": 26090503,
+            "simulation_time": 7.115713729657746,
+            "total_seconds": 0.000666568
+          }
+        ],
+        "osahr": [
+          {
+            "events": 100,
+            "final_up": 40,
+            "output_sha256": "1331d57a18fb8543a9d1f545ad710c587ba5a616e24b98f3eb657498d5e684d0",
+            "prepare_seconds": 0.02956169,
+            "run_seconds": 4.281482665,
+            "seed": 26090501,
+            "simulation_time": 5.8267031927098625,
+            "total_seconds": 4.311044355
+          },
+          {
+            "events": 100,
+            "final_up": 32,
+            "output_sha256": "245c856a3718cf9f0f0ee6bc5789b27f12fe40ee11222da7c51e104b7553c4a9",
+            "prepare_seconds": 0.023646736,
+            "run_seconds": 3.356972511,
+            "seed": 26090502,
+            "simulation_time": 7.848539232926676,
+            "total_seconds": 3.380619247
+          },
+          {
+            "events": 100,
+            "final_up": 34,
+            "output_sha256": "4bcf8ae45cb5571a941d62d4995ea9860b368109b834cec51595c7fb81b909d0",
+            "prepare_seconds": 0.027765908,
+            "run_seconds": 3.151432901,
+            "seed": 26090503,
+            "simulation_time": 7.6475139738747036,
+            "total_seconds": 3.179198809
+          }
+        ]
+      }
+    }
+  ],
+  "ontology_load_seconds": 0.003401865,
+  "platform": "Linux-6.18.35-x86_64-with-glibc2.39",
+  "processor": "x86_64",
+  "protocol": "ontology-route-control-v1",
+  "python": "3.12.13",
+  "rdflib": "7.6.0",
+  "requested_events": 100,
+  "source": {
+    "git_dirty": false,
+    "git_revision": "11261437a7c6ba811269c4663d7c0893bbf62364",
+    "sha256": {
+      "benchmarks/ontology/README.md": "ffd1c7e8b4e2976a3d384bb57098c0f83ea1d73a85c766a9270e8161918dd8fe",
+      "benchmarks/ontology/__init__.py": "d7f489c537910610b882253849a61282a76862bf3526bb4d68f4bdea10e9513c",
+      "benchmarks/ontology/__main__.py": "dfd2f75d98f8888c27042c9daaf5fa6d0a64535dc1339d19eb2842e1cc9e07ea",
+      "benchmarks/ontology/baseline.py": "a2ba9c617881fb8a98853c73aa6a8ecc75e5a9177110dd4278c46f8a47ac7822",
+      "benchmarks/ontology/compare.py": "eb60bde04712d29acd22ad8058d15503893306fb5baae1fb3f115b562839ceb4",
+      "benchmarks/ontology/model.py": "b3967b9e5d039c0e3e38607fc030c482d918e6c1f299393952260777927357bc",
+      "benchmarks/ontology/routes.ttl": "1d974cf9c79105eccaefa88e398992ed73033b0101319bbd9aa1102195e763e7",
+      "osahr/__init__.py": "45606e07dde3ace19b23f22a06c1354185b4ae52337945885aa140bca467d444",
+      "osahr/adaptive.py": "770187163685737c635e14f8d930c3befdcc0e6c32955b8506d4e7b1d3dd0d7b",
+      "osahr/analysis.py": "70b5e40875be0b1b8ffb1f3406ce30c4237bb92188de138b253a9601b4e825bf",
+      "osahr/boundary.py": "d2fb478acdcf3c50ed541ad6d6e71db71103d48c125560dfcb339b33cbfd9480",
+      "osahr/canonical.py": "43270872f14c362014e89e266830859639516760f415210c265cbf7523c85db6",
+      "osahr/causal.py": "1b104244f65bd12165bd0282d7eb3cc664296433fd3569c04492b5b8a9b4577c",
+      "osahr/commit.py": "419aa636aeeadfb137b891dac27d08ec53f15687c0903d4ede5df79372a571eb",
+      "osahr/composition.py": "7f767c45ca8203bf07e72c1778c626011e0da8591638c6cfceece7f499cc6194",
+      "osahr/errors.py": "84e5c1dab45d3d782aa48b84556ade72e4ae627dec270b25beb032059141055f",
+      "osahr/events.py": "f19e63b8896f61f8dba7c265723455d3a8e2a770a621fcd96e92c4b2d213b216",
+      "osahr/expr.py": "0dfa3b3091bc87d3ddb8c9d884ff1e330991621d7ef12ea4476d587240b5ebf6",
+      "osahr/graph.py": "578f4de3be0d0d57a464b2dd63d543eadb5d9e0e1e4e7df64110524070fa96b4",
+      "osahr/ids.py": "2afc49dd28b3f99277e0feaf88e2c0956f1cafda18381bf2333a406475078dfd",
+      "osahr/incremental.py": "5a13efe7c1f6464af1d48e7db05fb4655903f4471f10e2d691ca1d2b3b8d5f8f",
+      "osahr/matcher.py": "8906ac602a5bc9a649dd625fec29649deadc26025dac9ac76cc102becb875ae8",
+      "osahr/meta.py": "8b33b9649eeff0d06d7a02f6721f61a1c0db9edf6065cc1a292dd790097e286b",
+      "osahr/model.py": "663548a4673dfc0c3399ebee1b68d0f1910553d9e0500ec83d464b0d9bb67617",
+      "osahr/observables.py": "098fd5b2ba57cc18e55a3f560fedbfad869a45b3f147894a7d147829fabb7b53",
+      "osahr/occurrence.py": "cf27806c1659702363e88e82651501763c3479bce697b3a5c4d650f5289e5d7f",
+      "osahr/pattern.py": "ec1da433ebaa68f86f7824c8cf927f1ee88a71aa75225138c23b961d8df922a6",
+      "osahr/pending_validation.py": "38c71f18a13016422b1e3c1893f1cfe7fab0085ca86fbce700cd08433351c013",
+      "osahr/persistence.py": "f61d71b135db6536cbc5a9b4a6714dbf7b7e1ca809b663e99d5cb256baf87b43",
+      "osahr/rewrite.py": "07e43062144a6b1b36589170bfba08c328eed983c9ef136025926fd4ba98c66d",
+      "osahr/rng.py": "84809d7ed78f5e8bae575b279df079fbd576e6ef06218206a02c863a8e286761",
+      "osahr/runtime.py": "b9f347f2639e096254a9bd261d4c0eaf4cbc88cc98e6d9d0543d22a7b4abbee3",
+      "osahr/runtime_state.py": "778eba2528f394b83b3cc64643425bc6b1a7754434662a2d2af9b1e0d8e18251",
+      "osahr/schedulers.py": "a5a04798e42f8a18ccdd4cf3db3db7ddb5eec3fd2826fddf493bff9a05673208",
+      "osahr/schema.py": "f05a36606dd49bc236f7087baf6b4a3f849ac06373eb0e73ec067e4c5f12e03f",
+      "osahr/snapshot_restore.py": "efe13327718f1cbabeec7390d680a7179a7baab5fdfefd2b5d25f5a2c9d63af2",
+      "osahr/weighted.py": "cb8c740ad2a6293624e834dca756e8096a15d63b6dd5cce761bc0a85836cb9ff",
+      "pyproject.toml": "fa855f9bfdbaff44ab349daf00dd97270789da3d902e1953d547c1732bd88c6c",
+      "tests/test_ontology_benchmark.py": "bc5d90c97319ddd71036c7a18b5af631fdc0beb62033eb24077918b9d1d43a55"
+    }
+  },
+  "timer_resolution_seconds": 1e-9
+}
