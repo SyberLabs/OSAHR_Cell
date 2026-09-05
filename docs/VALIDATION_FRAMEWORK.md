@@ -37,7 +37,6 @@ are a conceptual reference, not capabilities that RDF alone provides.
 | Better raw simulation efficiency | Same law, workload, outputs and stopping condition; actual simpler alternatives | A slower result defeats a speed claim for that workload; report it |
 | Lower cost of changing a useful model | Independently scored, counterbalanced model-change tasks against maintained alternatives | No practical effort reduction means use the simpler tool |
 | Useful organizational decisions | Held-out real observations/interventions and the user's current decision process | Miscalibration or no decision improvement blocks product promotion |
-| RISE solves an external user's problem | Independent sessions against the user's current reading workflow | Recurrent failure or no concrete reason to switch means simplify, reposition or stop |
 
 Neither a repository, a demo, test coverage nor a mathematically well-defined
 process is evidence of customer value. No theoretical novelty or general
@@ -111,18 +110,6 @@ Validate a real user's decision quality and integration burden. Implement a
 read-only adapter to their actual ontology, not necessarily Foundry. Foundry
 contract tests, authorization and operational action execution require real
 access and separate approval. A fake adapter cannot establish these properties.
-
-## RISE: external study, not internal applause
-
-Use the [contractor brief](RISE_EXTERNAL_VALIDATION_BRIEF.md). Start with one
-experienced human moderator and three independent adults for a diagnostic pilot.
-Assess the product alongside an ordinary reading workflow; pay equally for
-negative findings. A larger effectiveness study requires a specified outcome,
-power/precision planning and a separate decision to fund it.
-
-No researcher has been engaged or paid by creating these documents. Outreach,
-contractor selection, fees and access await the director's budget/channel
-approval. RISE's device, acoustic and privacy release gates remain separate.
 
 ## Reusable decision record — one per bet, not one more platform
 

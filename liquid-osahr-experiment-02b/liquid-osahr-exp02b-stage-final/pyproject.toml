@@ -17,9 +17,9 @@ dependencies = [
 ]
 
 [tool.setuptools.packages.find]
-where = [".", "vendor"]
-include = ["liquid_osahr02b*", "osahr*"]
+where = ["."]
+include = ["liquid_osahr02b*"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
-pythonpath = [".", "vendor"]
+pythonpath = [".", "../.."]

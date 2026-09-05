@@ -30,9 +30,12 @@ from pathlib import Path
 from typing import Any
 
 # Allow running directly from a source checkout.
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+_here = Path(__file__).resolve().parent
+for _parent in (_here, *_here.parents):
+    if (_parent / "osahr" / "__init__.py").exists():
+        if str(_parent) not in sys.path:
+            sys.path.insert(0, str(_parent))
+        break
 
 from osahr import (
     AttributeSpec,

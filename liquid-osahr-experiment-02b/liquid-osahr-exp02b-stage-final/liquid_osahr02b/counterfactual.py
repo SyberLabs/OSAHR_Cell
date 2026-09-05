@@ -2,17 +2,13 @@
 from __future__ import annotations
 
 from dataclasses import dataclass, asdict
-from pathlib import Path
 import math
-import sys
 import copy
 
 import numpy as np
 import pandas as pd
 import torch
 
-VENDOR = Path(__file__).resolve().parents[1] / "vendor"
-if str(VENDOR) not in sys.path: sys.path.insert(0,str(VENDOR))
 from osahr import RuntimeConfig,SchedulerKind  # type: ignore
 from osahr.rng import derive_seed  # type: ignore
 
