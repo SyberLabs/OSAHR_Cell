@@ -1,5 +1,10 @@
 # OSAHR Python 0.2
 
+> **This is the project.** Public tree: [SyberLabs/OSAHR_Cell](https://github.com/SyberLabs/OSAHR_Cell)
+>
+> `sykosyber/osahr_project` is a **private Cursor agent workspace**, not a second OSAHR.
+> Collaborators and Codex commit **here**. See `CELL.md`.
+
 **OSAHR** is a correctness-first kernel for an **open stochastic adaptive graph-rewrite system over a typed directed hypergraph**.
 
 Version 0.2 moves the project beyond a reference Gillespie simulator into a multi-backend stochastic rewriting engine with exact incremental match maintenance, sparse next-reaction scheduling, exact bounded thinning for time-varying hazards, adaptive parameter contracts, trajectory likelihoods, deterministic ensembles, and safe finite meta-rewriting.
