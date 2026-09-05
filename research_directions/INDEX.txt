@@ -32,5 +32,6 @@ Ledger (one file each)
 15_barn_vision.txt             PROPOSED picture of the raise; not a UI SKU
 
 Canonical GitHub: https://github.com/SyberLabs/OSAHR_Cell
+(`osahr_project` is a private Cursor workspace, not a second project).
 Older ranking of OSAHR application attractiveness (not this
 ledger): ../Research_Directions.txt

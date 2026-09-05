@@ -21,6 +21,9 @@ classifiers = [
 where = ["."]
 include = ["osahr", "osahr.*"]
 
+[project.optional-dependencies]
+benchmark = ["rdflib==7.6.0"]
+
 [tool.pytest.ini_options]
 testpaths = ["tests", "workbench/tests"]
 addopts = "-q"

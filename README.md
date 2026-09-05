@@ -1,10 +1,32 @@
 # OSAHR Python 0.2
 
+> **This is the project.** Public tree: [SyberLabs/OSAHR_Cell](https://github.com/SyberLabs/OSAHR_Cell)
+>
+> `sykosyber/osahr_project` is a **private Cursor agent workspace**, not a second OSAHR.
+> Collaborators and Codex commit **here**. See `CELL.md`.
+
 **OSAHR** is a correctness-first kernel for an **open stochastic adaptive graph-rewrite system over a typed directed hypergraph**.
 
 Version 0.2 moves the project beyond a reference Gillespie simulator into a multi-backend stochastic rewriting engine with exact incremental match maintenance, sparse next-reaction scheduling, exact bounded thinning for time-varying hazards, adaptive parameter contracts, trajectory likelihoods, deterministic ensembles, and safe finite meta-rewriting.
 
 The implementation is dependency-free at runtime and targets Python 3.11+.
+
+## Product validation: executable mechanisms behind an ontology
+
+The current product hypothesis is a stochastic execution component inside a
+Foundry-type ontological system, not a replacement ontology platform. Start with
+the [validation framework](docs/VALIDATION_FRAMEWORK.md) and the
+[open-RDF comparison probe](benchmarks/ontology/README.md): an actual OSAHR model
+versus an independent direct-SSA implementation, with transition-generator gates
+before timing. It requires no Foundry access. This is development infrastructure,
+not evidence of competitive superiority or real-world usefulness.
+
+[Initial measured result](benchmarks/ontology/RESULTS.md): transition-law checks
+pass, but plain SSA is substantially faster on the easy control. No speed
+advantage is established.
+
+The framework also includes a [RISE external-study contractor brief](docs/RISE_EXTERNAL_VALIDATION_BRIEF.md);
+no contractor engagement or expenditure is implied by that document.
 
 ## Experiments
 
