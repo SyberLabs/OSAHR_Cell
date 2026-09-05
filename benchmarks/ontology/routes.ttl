@@ -1,0 +1,12 @@
+@prefix ex: <urn:syberlabs:benchmark:> .
+
+# Synthetic, independent route availability. Rates are per simulation hour.
+ex:A a ex:Site .
+ex:B a ex:Site .
+ex:C a ex:Site .
+ex:AB a ex:Route ; ex:source ex:A ; ex:target ex:B ;
+    ex:up true ; ex:failureRate 0.2 ; ex:repairRate 0.8 .
+ex:BC a ex:Route ; ex:source ex:B ; ex:target ex:C ;
+    ex:up false ; ex:failureRate 0.5 ; ex:repairRate 0.5 .
+ex:AC a ex:Route ; ex:source ex:A ; ex:target ex:C ;
+    ex:up true ; ex:failureRate 0.1 ; ex:repairRate 0.4 .

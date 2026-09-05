@@ -6,6 +6,19 @@ Version 0.2 moves the project beyond a reference Gillespie simulator into a mult
 
 The implementation is dependency-free at runtime and targets Python 3.11+.
 
+## Product validation: executable mechanisms behind an ontology
+
+The current product hypothesis is a stochastic execution component inside a
+Foundry-type ontological system, not a replacement ontology platform. Start with
+the [validation framework](docs/VALIDATION_FRAMEWORK.md) and the
+[open-RDF comparison probe](benchmarks/ontology/README.md): an actual OSAHR model
+versus an independent direct-SSA implementation, with transition-generator gates
+before timing. It requires no Foundry access. This is development infrastructure,
+not evidence of competitive superiority or real-world usefulness.
+
+The framework also includes a [RISE external-study contractor brief](docs/RISE_EXTERNAL_VALIDATION_BRIEF.md);
+no contractor engagement or expenditure is implied by that document.
+
 ## Experiments
 
 The kernel is the substrate. Everything below is built on it and lives in this repository.
