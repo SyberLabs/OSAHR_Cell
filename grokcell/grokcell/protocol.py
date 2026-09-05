@@ -18,7 +18,7 @@ VAULT_DIR = (
 CLAIMS_NOTES_DIR = VAULT_DIR / "claims"
 
 MOUTH_OWNER = "MOUTH"
-SURFACE_VERSION = "grokcell_surface_v6"
+SURFACE_VERSION = "grokcell_surface_v7"
 MCP_SCHEMA_VERSION = "grokcell_mcp_v6"
 CONSTRUCTION_RULE_ID = "assemble-component"
 ROOT_SEED = 260904

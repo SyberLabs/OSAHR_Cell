@@ -2,8 +2,10 @@
 from __future__ import annotations
 
 import tempfile
+from dataclasses import replace
 from pathlib import Path
 
+from .acceptance import evaluate_acceptance, load_acceptance
 from .artifact import Artifact, resolve_artifact, stage_artifact
 from .fidelity import FidelityStore
 from .messages import DrainItem, Message
@@ -58,6 +60,14 @@ def classify(
     ]
     if missing:
         return "hold_unresolved", "missing_dependency", None
+    acceptance = None
+    if artifact.source == "payload":
+        try:
+            acceptance = load_acceptance(name)
+        except ValueError as exc:
+            reason = str(exc)
+            status = "outcome_unknown" if reason == "acceptance_suite_missing" else "reject"
+            return status, reason, None
     expected_hash = artifact.digest()
     with tempfile.TemporaryDirectory(prefix="grokcell-stage-") as raw:
         staged = stage_artifact(artifact, Path(raw))
@@ -88,6 +98,11 @@ def classify(
         )
         if not killed:
             return "reject", mutant_reason, None
+    if acceptance is not None:
+        accepted, reason = evaluate_acceptance(artifact, acceptance)
+        if not accepted:
+            return "reject", reason, None
+        artifact = replace(artifact, acceptance_suite_hash=acceptance.digest)
     return "admit", "vault_legal", artifact
 
 

@@ -74,6 +74,7 @@ class Artifact:
     name: str
     files: dict[str, str]
     source: str
+    acceptance_suite_hash: str | None = None
 
     def __post_init__(self) -> None:
         object.__setattr__(self, "files", normalize_files(dict(self.files)))
@@ -138,6 +139,8 @@ class ArtifactStore:
             if (
                 license_payload.get("name") == artifact.name
                 and license_payload.get("hash") == digest
+                and license_payload.get("acceptance_suite_hash")
+                == artifact.acceptance_suite_hash
                 and self._current_digest(dest) == digest
             ):
                 return dest
@@ -151,6 +154,7 @@ class ArtifactStore:
                 name=artifact.name,
                 license="admitted",
                 digest=digest,
+                acceptance_suite_hash=artifact.acceptance_suite_hash,
             )
             temporary.replace(dest)
         finally:
@@ -178,7 +182,10 @@ class ArtifactStore:
             if not license_name or not payload.get("hash"):
                 continue
             files = [item.relative_to(child).as_posix() for item in python_files(child)]
-            items.append({"name": name, "license": license_name, "files": files})
+            item = {"name": name, "license": license_name, "files": files}
+            if payload.get("acceptance_suite_hash"):
+                item["acceptance_suite_hash"] = payload["acceptance_suite_hash"]
+            items.append(item)
         return items
 
     def names(self) -> set[str]:
@@ -244,6 +251,7 @@ class ArtifactStore:
             name=owner,
             license=license_by_act[verb],
             digest=digest,
+            acceptance_suite_hash=payload.get("acceptance_suite_hash"),
         )
         return {
             "decision": "accepted",
@@ -269,9 +277,19 @@ class ArtifactStore:
         }
         return hash_bytes(files)
 
-    def _write_license(self, dest: Path, *, name: str, license: str, digest: str) -> None:
+    def _write_license(
+        self,
+        dest: Path,
+        *,
+        name: str,
+        license: str,
+        digest: str,
+        acceptance_suite_hash: str | None = None,
+    ) -> None:
         dest.mkdir(parents=True, exist_ok=True)
         payload = {"name": name, "license": license, "hash": digest}
+        if acceptance_suite_hash is not None:
+            payload["acceptance_suite_hash"] = acceptance_suite_hash
         path = dest / LICENSE_NAME
         temporary = path.with_suffix(path.suffix + ".tmp")
         temporary.write_text(

@@ -18,7 +18,15 @@ from grokcell.surface import GrokCellSurface
 from grokcell.tools import MUTATING_TOOLS, ToolRegistry
 from grokcell.vault import ConstraintVault
 
-from support import scored_surface
+from support import register_acceptance, scored_surface
+
+
+@pytest.fixture(autouse=True)
+def operator_contracts_for_generated_test_cases(tmp_path):
+    for name in (
+        "edge.broken", "edge.invalid", "edge.generated", "edge.rewriter", "edge.syntax",
+    ):
+        register_acceptance(tmp_path, name)
 
 
 def isolated_surface(tmp_path: Path) -> GrokCellSurface:
