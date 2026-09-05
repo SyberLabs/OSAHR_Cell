@@ -12,8 +12,10 @@ from __future__ import annotations
 from dataclasses import dataclass, field
 from typing import Any, Iterable
 
+from .canonical import canonical_equal
 from .graph import GraphDelta, Hypergraph
 from .ids import EntityId
+from .indexed_matcher import IndexedMatcher
 from .matcher import Match, Matcher, build_expression_context
 from .pattern import Rule
 
@@ -159,6 +161,7 @@ class IncrementalMatcher:
 
     def __init__(self, reference: Matcher | None = None) -> None:
         self.reference = reference or Matcher()
+        self.indexed = IndexedMatcher()
         self.signatures: dict[str, RuleDependencySignature] = {}
         self.caches: dict[str, RuleMatchCache] = {}
         self.last_deltas: dict[str, MatchDelta] = {}
@@ -193,7 +196,7 @@ class IncrementalMatcher:
     ) -> RuleMatchCache:
         old = self.caches.get(rule.rule_id)
         old_ids = set() if old is None else set(old.matches)
-        matches = self.reference.find_rule_matches(
+        matches = self.indexed.find_rule_matches(
             graph, rule, parameters=parameters, memory=memory, time=time
         )
         cache = old or RuleMatchCache(rule.rule_id)
@@ -269,7 +272,7 @@ class IncrementalMatcher:
                         vertex.type_id, spec.type_id, allow_subtypes=spec.allow_subtypes
                     ):
                         continue
-                    candidates = self.reference.find_pattern_matches(
+                    candidates = self.indexed.find_pattern_matches(
                         graph,
                         rule.left,
                         rule_id=rule.rule_id,
@@ -289,7 +292,7 @@ class IncrementalMatcher:
                 for key, spec in left_edges.items():
                     if edge.type_id != spec.type_id:
                         continue
-                    candidates = self.reference.find_pattern_matches(
+                    candidates = self.indexed.find_pattern_matches(
                         graph,
                         rule.left,
                         rule_id=rule.rule_id,
@@ -369,8 +372,6 @@ class IncrementalMatcher:
         invalid_ids: set[str] = set()
         for entity_id in affected:
             invalid_ids.update(cache.entity_to_matches.get(entity_id, ()))
-        old_ids = set(cache.matches)
-
         for match_id in invalid_ids:
             cache.remove_match(match_id)
 
@@ -386,15 +387,19 @@ class IncrementalMatcher:
             memory=memory,
             time=time,
         )
+        local_ids = set(local)
+        # Only local IDs are needed to classify this delta. Do not copy the
+        # entire cached relation on every sparse graph edit.
+        retained_ids = {match_id for match_id in local_ids if match_id in cache.matches}
+        old_local_ids = retained_ids | (local_ids & invalid_ids)
         for match in local.values():
             cache.set_match(match)
 
-        local_ids = set(local)
         cache.graph_epoch = graph.epoch
         self.last_deltas[rule.rule_id] = MatchDelta(
-            added=frozenset(local_ids - old_ids),
-            removed=frozenset((invalid_ids & old_ids) - local_ids),
-            revalidated=frozenset(local_ids & old_ids),
+            added=frozenset(local_ids - old_local_ids),
+            removed=frozenset(invalid_ids - local_ids),
+            revalidated=frozenset(old_local_ids),
         )
         self.localized_recomputations += 1
         return cache
@@ -443,3 +448,9 @@ class IncrementalMatcher:
                 f"Incremental matcher diverged for rule {rule.rule_id!r}: "
                 f"actual={len(actual_ids)} expected={len(expected_ids)}"
             )
+        for match in expected:
+            if not canonical_equal(cache.matches[match.match_id].bindings, match.bindings):
+                raise AssertionError(
+                    f"Incremental bindings diverged for rule {rule.rule_id!r}, "
+                    f"match {match.match_id!r}"
+                )
