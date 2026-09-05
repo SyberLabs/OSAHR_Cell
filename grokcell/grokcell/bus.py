@@ -68,6 +68,9 @@ def classify(
             reason = str(exc)
             status = "outcome_unknown" if reason == "acceptance_suite_missing" else "reject"
             return status, reason, None
+        accepted, reason = evaluate_acceptance(artifact, acceptance)
+        if not accepted:
+            return "reject", reason, None
     expected_hash = artifact.digest()
     with tempfile.TemporaryDirectory(prefix="grokcell-stage-") as raw:
         staged = stage_artifact(artifact, Path(raw))
@@ -99,9 +102,6 @@ def classify(
         if not killed:
             return "reject", mutant_reason, None
     if acceptance is not None:
-        accepted, reason = evaluate_acceptance(artifact, acceptance)
-        if not accepted:
-            return "reject", reason, None
         artifact = replace(artifact, acceptance_suite_hash=acceptance.digest)
     return "admit", "vault_legal", artifact
 

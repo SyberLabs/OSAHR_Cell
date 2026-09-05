@@ -283,8 +283,6 @@ def build_packet(
     oracle_sign = int(claim["oracle_sign"])
     action_license, claim_license = _licenses(status)
     recommendation = _recommend(status, oracle_sign)
-    if recommendation["arm"] == "scalar_semantic":
-        raise WorkbenchError("scalar_semantic cannot be the recommended arm")
     packet = {
         "packet_version": PACKET_VERSION,
         "job": {
