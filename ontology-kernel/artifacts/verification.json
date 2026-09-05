@@ -1,0 +1,22 @@
+{
+  "core_tests": {
+    "passed": 105,
+    "seconds": 12.09,
+    "source": "observed core suite run in this session"
+  },
+  "profile_tests": {
+    "passed": 28,
+    "seconds": 0.61,
+    "source": "verification-output.txt"
+  },
+  "fresh_process_receipt_identity": true,
+  "serialized_rdf_fingerprints_match": true,
+  "markdown_local_links_exist": true,
+  "external_ontology_triples": 1146,
+  "live_foundry_tested": false,
+  "real_customer_workflow_tested": false,
+  "existing_grokcell_replay_probe": {
+    "last_event_matches_runtime": false,
+    "replayed_matches_runtime": false
+  }
+}

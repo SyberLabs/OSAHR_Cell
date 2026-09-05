@@ -1,0 +1,20 @@
+@prefix ex: <urn:osahr:admission:> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+
+<urn:osahr:snapshot:b2e569edfd3c725df9f204180459011fe5d93dc8edc9db053e8f9488ecd16b6d> a prov:Entity,
+        ex:CandidateSnapshot ;
+    prov:wasDerivedFrom <urn:osahr:snapshot:e6a250181ccb5501df3323bd38ac1b052ab1ab56f7bbc31940d034b97372146c> ;
+    prov:wasGeneratedBy <urn:osahr:preview:0ce71837a39eb7464a9f2c4c4362f0f7f9229f98e028ad49926b71a5d546465e> .
+
+<urn:osahr:preview:0ce71837a39eb7464a9f2c4c4362f0f7f9229f98e028ad49926b71a5d546465e> a prov:Activity,
+        ex:Preview ;
+    prov:used <urn:osahr:snapshot:e6a250181ccb5501df3323bd38ac1b052ab1ab56f7bbc31940d034b97372146c>,
+        <urn:sha256:a629d942b9412672ed3efe5a27c229747a80621a6d59a40f7b952121c1c00835>,
+        <urn:sha256:ce6cfe02ba1c42e7b17e557328ed3ae47472467877014ffe75f034496ca27390> .
+
+<urn:sha256:a629d942b9412672ed3efe5a27c229747a80621a6d59a40f7b952121c1c00835> a prov:Entity .
+
+<urn:sha256:ce6cfe02ba1c42e7b17e557328ed3ae47472467877014ffe75f034496ca27390> a prov:Entity .
+
+<urn:osahr:snapshot:e6a250181ccb5501df3323bd38ac1b052ab1ab56f7bbc31940d034b97372146c> a prov:Entity .
+

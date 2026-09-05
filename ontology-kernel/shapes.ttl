@@ -1,0 +1,32 @@
+@prefix sh: <http://www.w3.org/ns/shacl#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix ex: <urn:osahr:admission:> .
+
+# This is a local operational profile, not a replacement for PROV-O.
+# No OWL closure is presumed. Required types are asserted explicitly.
+ex:CellShape a sh:NodeShape ; sh:targetClass ex:Cell ;
+    sh:nodeKind sh:IRI ; sh:class prov:Collection ;
+    sh:property [ sh:path ex:membershipComplete ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:datatype xsd:boolean ; sh:hasValue true ] ;
+    sh:property [ sh:path ex:snapshotRevision ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:datatype xsd:string ; sh:minLength 1 ] ;
+    sh:property [ sh:path prov:hadMember ; sh:nodeKind sh:IRI ; sh:class ex:Component ] .
+
+ex:ComponentShape a sh:NodeShape ; sh:targetClass ex:Component ;
+    sh:nodeKind sh:IRI ; sh:class prov:Entity ;
+    sh:property [ sh:path ex:name ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:datatype xsd:string ; sh:minLength 1 ] ;
+    sh:property [ sh:path ex:moduleDigest ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:datatype xsd:string ; sh:pattern "^[0-9a-f]{64}$" ] .
+
+ex:ProposalShape a sh:NodeShape ; sh:targetClass ex:Proposal ;
+    sh:nodeKind sh:IRI ; sh:class prov:Entity ;
+    sh:property [ sh:path ex:component ; sh:minCount 1 ; sh:maxCount 1 ; sh:nodeKind sh:IRI ] ;
+    sh:property [ sh:path ex:name ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:datatype xsd:string ; sh:minLength 1 ] ;
+    sh:property [ sh:path ex:moduleDigest ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:datatype xsd:string ; sh:pattern "^[0-9a-f]{64}$" ] ;
+    sh:property [ sh:path ex:evidenceDigest ; sh:minCount 1 ; sh:maxCount 1 ;
+                  sh:datatype xsd:string ; sh:pattern "^[0-9a-f]{64}$" ] ;
+    sh:property [ sh:path ex:dependsOn ; sh:nodeKind sh:IRI ; sh:class ex:Component ] .

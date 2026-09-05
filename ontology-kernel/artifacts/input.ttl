@@ -1,0 +1,23 @@
+@prefix ex: <urn:osahr:admission:> .
+@prefix prov: <http://www.w3.org/ns/prov#> .
+@prefix xsd: <http://www.w3.org/2001/XMLSchema#> .
+
+<urn:fixture:cell> a prov:Collection,
+        ex:Cell ;
+    prov:hadMember <urn:fixture:component:existing-000000> ;
+    ex:membershipComplete true ;
+    ex:snapshotRevision "synthetic-revision-1" .
+
+<urn:fixture:proposal:ping> a prov:Entity,
+        ex:Proposal ;
+    ex:component <urn:fixture:component:ping> ;
+    ex:dependsOn <urn:fixture:component:existing-000000> ;
+    ex:evidenceDigest "a629d942b9412672ed3efe5a27c229747a80621a6d59a40f7b952121c1c00835" ;
+    ex:moduleDigest "ce6cfe02ba1c42e7b17e557328ed3ae47472467877014ffe75f034496ca27390" ;
+    ex:name "edge.ping" .
+
+<urn:fixture:component:existing-000000> a prov:Entity,
+        ex:Component ;
+    ex:moduleDigest "dae67da4e16569a875626fbcd81c26b389173bf687059bf27cdd67e8e1dc5081" ;
+    ex:name "existing.0" .
+
