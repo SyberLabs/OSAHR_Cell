@@ -315,11 +315,7 @@ def test_invalid_module_is_a_rejection_not_a_poisoned_queue(tmp_path: Path, monk
     )
     result = tools.call("bus.drain", {})["results"][0]
     assert result["status"] == "reject"
-    assert result["reason"] in {
-        "acceptance_failed",
-        "acceptance_infrastructure",
-        "mutant_untestable",
-    }
+    assert result["reason"] == "acceptance_infrastructure"
     assert tools.call("surface.inspect", {})["queued"] == 0
 
 
