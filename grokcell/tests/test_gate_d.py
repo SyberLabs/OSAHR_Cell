@@ -167,6 +167,65 @@ def test_mcp_initialize_binds_a_registered_owner(tmp_path: Path):
     assert body["queued"] is True
 
 
+def test_mcp_cannot_rebind_to_another_owner(tmp_path: Path):
+    server = _mcp(tmp_path)
+    init = server.handle(
+        _request(
+            "initialize",
+            params={
+                "protocolVersion": "2025-03-26",
+                "capabilities": {},
+                "clientInfo": {"name": "test", "version": "0"},
+                "owner": "MOUTH",
+            },
+        )
+    )
+    assert init is not None
+    assert init["result"]["session"]["owner"] == "MOUTH"
+    spawn = server.handle(
+        _request(
+            "tools/call",
+            msg_id=2,
+            params={"name": "oda.spawn", "arguments": {"bot_name": "edge-sensor"}},
+        )
+    )
+    assert spawn is not None
+    assert _tool_text(spawn)["decision"] == "accepted"
+    rebound = server.handle(
+        _request(
+            "initialize",
+            msg_id=3,
+            params={
+                "protocolVersion": "2025-03-26",
+                "capabilities": {},
+                "clientInfo": {"name": "test", "version": "0"},
+                "owner": "edge-sensor",
+            },
+        )
+    )
+    assert rebound is not None
+    assert rebound["error"]["code"] == -32602
+    assert "already bound" in rebound["error"]["message"]
+    posted = server.handle(
+        _request(
+            "tools/call",
+            msg_id=4,
+            params={
+                "name": "bus.post",
+                "arguments": {
+                    "source_owner": "MOUTH",
+                    "kind": "oda.spawn",
+                    "priority": 1,
+                    "payload": {"bot_name": "leaf"},
+                },
+            },
+        )
+    )
+    assert posted is not None
+    body = _tool_text(posted)
+    assert body["queued"] is True
+
+
 def test_mcp_cannot_connect_as_an_unregistered_owner(tmp_path: Path):
     server = _mcp(tmp_path)
     init = server.handle(

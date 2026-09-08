@@ -132,10 +132,11 @@ still needed. No sandbox is added by configuring an acceptance suite.
 
 Use the existing `bus.post` with `kind: forge.propose`, component `edge.ping`,
 `module`, `tests`, and `constraint: critical_module`, then `bus.drain`.
-The candidate suite runs first, followed by a separate directory containing only
-the candidate module and the operator tests. Each suite must pass and kill the
+The operator suite is evaluated first, in a separate directory containing only
+the candidate module and the operator tests. Candidate-authored tests run only
+after that contract passes. Each suite must pass and kill the
 existing AST mutant. A wrong `ping()` returning `"wrong"` with matching candidate
-tests is refused with `acceptance_failed`.
+tests is refused with `acceptance_failed` and never executes those candidate tests.
 
 | Result | Meaning |
 |---|---|
@@ -185,7 +186,7 @@ policy. Passing these checks does not authorize deployment or any external actio
 | `verified` from python_tests runner | Gate A (12); bot cannot set it |
 | File snapshot; `open()` resumes | Gate B (12); not an MCP tool |
 | MCP stdio over existing tools | Gate C (12); not a second API |
-| Session bind; registered `source_owner` | Gate D (12); not a new tool |
+| Session bind; registered `source_owner` | Gate D (12); not a new tool; initialize cannot rebind |
 | One artifact type; mutants die | Gate E (12); park stamps files |
 
 Deleted as unowned: no-swarm cap, one-mouth cap, spawn always refused.
