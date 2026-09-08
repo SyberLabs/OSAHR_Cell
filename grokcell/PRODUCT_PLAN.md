@@ -65,7 +65,7 @@ flowchart TD
   P["Generated module + candidate tests"] --> Q["Existing proposal queue"]
   Q --> D{"Dependencies present?"}
   D -->|No| H["Hold; re-evaluate on park"]
-  D -->|Yes| E["Candidate tests + operator acceptance tests"]
+  D -->|Yes| E["Operator acceptance, then candidate tests"]
   O["Operator-owned suite and checksum"] --> E
   E --> J{"Tests pass; mutants fail; bytes intact?"}
   J -->|No| R["Refuse with reason"]
@@ -92,8 +92,8 @@ flowchart TD
   Existing file-act stamps retain that metadata.
 - Existing fidelity records still describe candidate-suite execution; they are
   not independent acceptance or admission records. Only the classifier combines
-  both gates before materialization. A failed acceptance run may leave a passing
-  candidate fidelity record, but never an admitted component or artifact.
+  both gates before materialization. A failed acceptance run does not execute
+  candidate tests and cannot write a candidate fidelity record or admit an artifact.
 - Held messages use the current operator contract when they become eligible,
   including after restart. Previously admitted artifacts retain the contract
   digest used at admission; changing a suite does not retroactively re-license

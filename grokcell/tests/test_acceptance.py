@@ -137,9 +137,19 @@ def test_operator_suite_is_snapshotted_before_candidate_execution(tools, tmp_pat
         register_acceptance(tmp_path, "edge.ping", PING_ACCEPTANCE.replace("pong", "wrong"))
         return original(*args, **kwargs)
     monkeypatch.setattr(bus, "run_path", change_contract_during_candidate_run)
+    propose(tools)
+    assert drain(tools)["status"] == "admit"
+
+
+def test_failed_acceptance_does_not_execute_candidate_tests(tools, tmp_path, monkeypatch):
+    register_acceptance(tmp_path, "edge.ping")
+    def must_not_run(*args, **kwargs):
+        raise AssertionError("candidate executed after operator contract failed")
+    monkeypatch.setattr("grokcell.bus.run_path", must_not_run)
     propose(tools, module=MODULE.replace("pong", "wrong"),
             tests=CANDIDATE_TESTS.replace("pong", "wrong"))
-    assert drain(tools)["reason"] == "acceptance_failed"
+    result = drain(tools)
+    assert (result["status"], result["reason"]) == ("reject", "acceptance_failed")
 
 
 def test_exact_artifact_and_acceptance_digest_survive_restart_and_file_acts(tools, tmp_path):

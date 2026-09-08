@@ -21,7 +21,7 @@ SUPPORTED_PROTOCOL_VERSIONS = ("2024-11-05", "2025-03-26", "2025-06-18")
 
 
 def _encode(payload: dict[str, Any]) -> str:
-    return json.dumps(payload, separators=(",", ":"), ensure_ascii=True)
+    return json.dumps(payload, separators=(',', ':'), ensure_ascii=True)
 
 
 def _ok(msg_id: Any, result: dict[str, Any]) -> dict[str, Any]:
@@ -47,6 +47,9 @@ class McpServer:
             params = message.get("params") or {}
             owner = str(params.get("owner") or "").strip()
             if owner:
+                current = self.tools.bound_owner
+                if current is not None and owner != current:
+                    return _error(msg_id, -32602, "Session already bound")
                 bound = self.tools.bind(owner)
                 if bound["decision"] != "accepted":
                     return _error(msg_id, -32602, f"Unknown owner: {owner}")
@@ -114,7 +117,7 @@ class McpServer:
             )
         return _ok(
             msg_id,
-            {"content": [{"type": "text", "text": json.dumps(result, separators=(",", ":"))}]},
+            {"content": [{"type": "text", "text": json.dumps(result, separators=(',', ':'))}]},
         )
 
 

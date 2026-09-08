@@ -315,7 +315,7 @@ def test_invalid_module_is_a_rejection_not_a_poisoned_queue(tmp_path: Path, monk
     )
     result = tools.call("bus.drain", {})["results"][0]
     assert result["status"] == "reject"
-    assert result["reason"] == "mutant_untestable"
+    assert result["reason"] == "acceptance_infrastructure"
     assert tools.call("surface.inspect", {})["queued"] == 0
 
 
@@ -324,6 +324,10 @@ def test_unresolved_dependency_does_not_execute_payload(tmp_path: Path, monkeypa
     monkeypatch.setattr(
         "grokcell.bus.run_path",
         lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("runner called")),
+    )
+    monkeypatch.setattr(
+        "grokcell.bus.evaluate_acceptance",
+        lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("acceptance called")),
     )
     tools.call(
         "bus.post",
