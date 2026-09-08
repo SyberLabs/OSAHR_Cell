@@ -325,6 +325,10 @@ def test_unresolved_dependency_does_not_execute_payload(tmp_path: Path, monkeypa
         "grokcell.bus.run_path",
         lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("runner called")),
     )
+    monkeypatch.setattr(
+        "grokcell.bus.evaluate_acceptance",
+        lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("acceptance called")),
+    )
     tools.call(
         "bus.post",
         {
