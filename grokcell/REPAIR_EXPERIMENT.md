@@ -24,12 +24,17 @@ python -m grokcell.repair_experiment --live --resume --budget budget.json --prio
 The unscored seed episode creates public repair evidence on a distinct input.
 The paired pilot
 shuffles five frozen variants across A (Qwen routing), B (deterministic), C
-(Jev), D (Jev with simple retrieval), and E (Jev-Mem). E is currently reported
-as **blocked** because Jev-Mem's nested provider usage cannot yet be metered
-and reserved under the same hard budget. `results.jsonl`, `run_config.json`,
-and `summary.json` are the machine-readable evidence. Resume skips fully
-recorded episodes; an interrupted episode stops for operator reconciliation
-before any call or admission is replayed.
+(Jev), D (Jev with simple retrieval), and E (Jev-Mem). E stays **blocked**:
+Jev-Mem nested provider usage cannot be hard-capped and fully costed under the
+same budget. `results.jsonl`, `run_config.json`, and `summary.json` are the
+machine-readable evidence. Resume skips fully recorded episodes. A provider
+call left `started` is closed without a second send and that episode is blocked
+with unknown cost, which stops later episodes. A `proposal_ready` attempt with
+no admission intent continues from the on-disk proposal and does not call the
+provider again. An admission intent is reused only when that exact revision is
+already admitted; otherwise it is not posted again. A torn final `results.jsonl`
+line is recovered from `repair_terminal.json`. Any other interrupted episode
+stops for operator reconciliation before a call or admission is replayed.
 
 Routing is deterministic when there is at most one productive legal action;
 the always-present escalation option does not by itself justify a model call.

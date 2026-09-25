@@ -74,6 +74,24 @@ def _public_diagnostic(result) -> str:
                        "stderr_truncated": result.stderr_truncated})
 
 
+def _failure_signature(detail: str) -> str:
+    """Keep the diagnostic object _read_prior accepts, and wrap every other string."""
+    required = {"outcome", "exit_code", "diagnostic", "stdout_truncated", "stderr_truncated"}
+    try:
+        parsed = json.loads(detail)
+    except (json.JSONDecodeError, TypeError):
+        parsed = None
+    if (isinstance(parsed, dict) and set(parsed) == required
+            and parsed.get("outcome") == "tests_failed"
+            and isinstance(parsed.get("diagnostic"), str)
+            and len(parsed["diagnostic"]) <= 6000):
+        return detail
+    text = detail if isinstance(detail, str) else ""
+    return json.dumps({"outcome": "tests_failed", "exit_code": 1,
+                       "diagnostic": text[:6000], "stdout_truncated": False,
+                       "stderr_truncated": False})
+
+
 def _strict_json(raw: str):
     return json.loads(raw, parse_constant=lambda value: (_ for _ in ()).throw(
         ValueError("nonfinite_json_number")))
@@ -230,7 +248,8 @@ class _BudgetedChoice:
 
 class Episode:
     def __init__(self, *, variant: str, arm: str, root: Path, budget: Budget,
-                 prior_records: list[dict], contracts: dict[str, str]) -> None:
+                 prior_records: list[dict], contracts: dict[str, str],
+                 resume: bool = False) -> None:
         if os.environ.get(SANDBOX_IMAGE_ENV) != budget.config["sandbox_image"]:
             raise RuntimeError("experiment_requires_pinned_sandbox")
         self.variant, self.arm, self.root, self.budget = variant, arm, root, budget
@@ -238,7 +257,11 @@ class Episode:
         self.state_root = root / "state"
         self.acceptance_root = root / "operator_acceptance"
         self.attempts = AttemptStore(self.state_root)
-        if self.attempts.unfinished():
+        unfinished = self.attempts.unfinished()
+        # A started attempt may already have been sent. Resume closes it without
+        # constructing this episode; proposal_ready can continue only explicitly.
+        if any(item.get("status") == "started" for item in unfinished) or (
+                any(item.get("status") == "proposal_ready" for item in unfinished) and not resume):
             raise RuntimeError("interrupted_attempt_requires_operator_review")
         self.surface = GrokCellSurface.open(
             fidelity=FidelityStore(root / "fidelity"), state=self.state_root)
@@ -251,9 +274,14 @@ class Episode:
         self.manifest: dict[str, str] = {}
         self.observations: list[dict] = []
         self.attempt_history: list[dict] = []
-        self.prior_records = list(prior_records) if ARMS[arm][1] != "none" else []
+        self.prior_records = list(prior_records) if ARMS[arm][1] == "simple" else []
+        self.evaluation_binding_inputs = None
         self.recalled: list[dict] = []
         for prior in self.prior_records:
+            if self.attempts.path_for(prior["id"]).exists():
+                if self.attempts.read(prior["id"]) != prior:
+                    raise ValueError("prior_attempt_changed")
+                continue
             self.attempts.write(prior)
         self.oracle = json.loads(self._frozen_text(HELD_CASES))
         self.retrievals = 0
@@ -354,14 +382,26 @@ class Episode:
             return "hold_unresolved", "missing_dependency_revision"
         artifact, revision, contract_hash = binding
         depends = [self.manifest[dep] for dep in DEPENDENCIES[component]]
+        artifact_digest = artifact.digest()
+        intent = self._read_admission_intent()
+        if intent is not None:
+            # A previous process may already have posted. Never post again unless
+            # the surface license is this exact admitted revision.
+            if (intent.get("component") == component and intent.get("revision") == revision
+                    and intent.get("artifact_digest") == artifact_digest
+                    and intent.get("contract_hash") == contract_hash
+                    and self._exact_admitted(component, revision, artifact_digest, contract_hash)):
+                self.manifest[component] = revision
+                return "admit", "already_admitted_exact_revision"
+            return "outcome_unknown", "admission_outcome_unknown"
         if revision in self.surface.components():
             stored = self.surface.artifacts.path_for(revision)
             license_record = self.surface.artifacts._read_license(stored)
             if (not stored.is_dir()
-                    or self.surface.artifacts._current_digest(stored) != artifact.digest()
+                    or self.surface.artifacts._current_digest(stored) != artifact_digest
                     or license_record.get("name") != revision
                     or license_record.get("license") != "admitted"
-                    or license_record.get("hash") != artifact.digest()
+                    or license_record.get("hash") != artifact_digest
                     or license_record.get("acceptance_suite_hash") != contract_hash):
                 raise RuntimeError("admitted_revision_changed")
             self.manifest[component] = revision
@@ -370,6 +410,9 @@ class Episode:
         # for 30 seconds plus container cleanup. Reserve before posting.
         self.budget.reserve_executor(180, require_full=True)
         self._stage_operator_contract(component, revision)
+        self._write_admission_intent(component=component, revision=revision,
+                                     artifact_digest=artifact_digest,
+                                     contract_hash=contract_hash)
         message = Message(source_owner="MOUTH", kind="forge.propose", priority=1,
                           payload={"name": revision, "module": self.sources[component],
                                    "tests": self.candidate_tests[component],
@@ -390,6 +433,9 @@ class Episode:
         self.budget.executor(int((time.monotonic() - started) * 1000))
         if result.status == "admit":
             self.manifest[component] = revision
+        if not any(item.get("target") == component and item.get("status") == "proposal_ready"
+                   for item in self.attempt_history):
+            self._clear_admission_intent()
         return result.status, result.reason
 
     def _current_revision(self, component: str) -> str | None:
@@ -405,6 +451,7 @@ class Episode:
                 record["revision"] = self.manifest.get(component)
                 record["status"] = "finished"
                 self.attempts.write(record, expected_status="proposal_ready")
+                self._clear_admission_intent()
                 return
 
     def _end_to_end(self) -> tuple[str, str, str]:
@@ -417,18 +464,188 @@ class Episode:
                                  public=False)
         if hidden == "pass":
             hidden, _ = self._host_oracle()
-        binding = digest({"manifest": self.manifest,
-                          "sources": {key: hashlib.sha256(value.encode()).hexdigest()
-                                      for key, value in sources.items()},
-                          "component_contracts": {key: self.contracts[
-                              CONTRACT_FILES[key].relative_to(CONTRACT_ROOT).as_posix()]
-                              for key in COMPONENTS},
-                          "end_to_end_suite": self.contracts[
-                              HELD_E2E.relative_to(CONTRACT_ROOT).as_posix()],
-                          "host_oracle": self.contracts[
-                              HELD_CASES.relative_to(CONTRACT_ROOT).as_posix()],
-                          "environment": self.budget.config["sandbox_image"]})
+        payload = {"manifest": dict(self.manifest),
+                   "sources": {key: hashlib.sha256(value.encode()).hexdigest()
+                               for key, value in sources.items()},
+                   "component_contracts": {key: self.contracts[
+                       CONTRACT_FILES[key].relative_to(CONTRACT_ROOT).as_posix()]
+                       for key in COMPONENTS},
+                   "end_to_end_suite": self.contracts[
+                       HELD_E2E.relative_to(CONTRACT_ROOT).as_posix()],
+                   "host_oracle": self.contracts[
+                       HELD_CASES.relative_to(CONTRACT_ROOT).as_posix()],
+                   "environment": self.budget.config["sandbox_image"]}
+        self.evaluation_binding_inputs = payload
+        binding = digest(payload)
         return hidden, "held_out_end_to_end_" + hidden, binding
+
+    def _admission_intent_path(self) -> Path:
+        return self.state_root / "admission_intent.json"
+
+    def _read_admission_intent(self) -> dict | None:
+        path = self._admission_intent_path()
+        if not path.is_file():
+            return None
+        try:
+            payload = _strict_json(path.read_text(encoding="utf-8"))
+        except (OSError, UnicodeError, json.JSONDecodeError, ValueError):
+            return {"unreadable": True}
+        return payload if isinstance(payload, dict) else {"unreadable": True}
+
+    def _write_admission_intent(self, *, component: str, revision: str,
+                                artifact_digest: str, contract_hash: str) -> None:
+        path = self._admission_intent_path()
+        if path.exists():
+            raise RuntimeError("admission_intent_already_exists")
+        temporary = path.with_suffix(".json.tmp")
+        payload = {"component": component, "revision": revision,
+                   "artifact_digest": artifact_digest, "contract_hash": contract_hash}
+        with temporary.open("w", encoding="utf-8", newline="") as handle:
+            json.dump(payload, handle, sort_keys=True, allow_nan=False)
+            handle.write("\n")
+            handle.flush()
+            os.fsync(handle.fileno())
+        temporary.replace(path)
+
+    def _clear_admission_intent(self) -> None:
+        path = self._admission_intent_path()
+        if path.is_file():
+            path.unlink()
+
+    def _exact_admitted(self, component: str, revision: str, artifact_digest: str,
+                        contract_hash: str) -> bool:
+        """True only for a license GrokCellSurface already admitted. Never writes one."""
+        if component not in COMPONENTS or not revision or not artifact_digest:
+            return False
+        expected = self.contracts[
+            CONTRACT_FILES[component].relative_to(CONTRACT_ROOT).as_posix()]
+        if contract_hash != expected:
+            return False
+        try:
+            if revision not in self.surface.components():
+                return False
+            stored = self.surface.artifacts.path_for(revision)
+            if not stored.is_dir():
+                return False
+            license_record = self.surface.artifacts._read_license(stored)
+            return (self.surface.artifacts._current_digest(stored) == artifact_digest
+                    and license_record.get("name") == revision
+                    and license_record.get("license") == "admitted"
+                    and license_record.get("hash") == artifact_digest
+                    and license_record.get("acceptance_suite_hash") == contract_hash)
+        except (AttributeError, OSError, TypeError, ValueError):
+            return False
+
+    def _restore_worker_attempts(self) -> None:
+        prior_ids = {item.get("id") for item in self.prior_records}
+        self.worker_attempts = sum(
+            1 for item in self.attempts.all()
+            if item.get("id") not in prior_ids and item.get("action") in {
+                "REPAIR_COMPONENT", "REIMPLEMENT_COMPONENT"})
+
+    def _proposal_files(self, record: dict) -> dict[str, str]:
+        relative = record.get("proposal_dir")
+        if not isinstance(relative, str) or not relative:
+            raise RuntimeError("interrupted_proposal_missing")
+        folder = (self.state_root / relative).resolve()
+        if not folder.is_relative_to(self.state_root.resolve()):
+            raise RuntimeError("interrupted_proposal_escaped_state")
+        proposal = {"module": read_text_exact(folder / "service.py"),
+                    "tests": read_text_exact(folder / "test_service.py")}
+        if digest(proposal) != record.get("candidate_hash"):
+            raise RuntimeError("interrupted_proposal_changed")
+        validate_module(proposal["module"])
+        return proposal
+
+    def _restore_pending_proposal(self, record: dict) -> None:
+        proposal = self._proposal_files(record)
+        target = record.get("target")
+        if target not in COMPONENTS:
+            raise RuntimeError("interrupted_proposal_target_invalid")
+        self.sources[target] = proposal["module"]
+        self.candidate_tests[target] = proposal["tests"]
+        manifest = dict(record.get("dependency_manifest") or {})
+        manifest.pop(target, None)
+        for downstream in COMPONENTS:
+            if target in DEPENDENCIES[downstream] or any(
+                    dep not in manifest for dep in DEPENDENCIES[downstream]):
+                manifest.pop(downstream, None)
+        self.manifest = manifest
+        self.attempt_history.append(dict(record))
+
+    def _close_pending(self, record: dict, outcome: str, revision: str) -> None:
+        updated = dict(record)
+        updated["status"] = "finished"
+        updated["observed_outcome"] = outcome
+        updated["revision"] = revision
+        self.attempts.write(updated, expected_status="proposal_ready")
+        for index, item in enumerate(self.attempt_history):
+            if item.get("id") == record.get("id"):
+                self.attempt_history[index] = updated
+                return
+        self.attempt_history.append(updated)
+
+    def _blocked_episode(self, reason: str, attempts: list[dict] | None = None) -> dict:
+        return {"variant": self.variant, "arm": self.arm, "status": "blocked",
+                "reason": reason, "manifest": dict(self.manifest),
+                "evaluation_binding": "", "worker_attempts": self.worker_attempts,
+                "retrieval_rounds": self.retrievals, "observations": [],
+                "decisions": [], "attempts": list(attempts or []),
+                "budget": self.budget.summary()}
+
+    def _restart_disposition(self) -> dict | None:
+        """Continue a proposal already on disk, or block an unresolved admission."""
+        unfinished = self.attempts.unfinished()
+        if any(item.get("status") == "started" for item in unfinished):
+            raise RuntimeError("interrupted_attempt_requires_operator_review")
+        pending = [item for item in unfinished if item.get("status") == "proposal_ready"]
+        if len(pending) > 1:
+            raise RuntimeError("interrupted_attempt_requires_operator_review")
+        intent = self._read_admission_intent()
+        if intent is None:
+            if pending:
+                self._restore_pending_proposal(pending[0])
+            return None
+        if not self._intent_matches_license(intent):
+            return self._blocked_episode("admission_outcome_unknown", pending)
+        component = intent.get("component")
+        revision = intent.get("revision")
+        if not isinstance(component, str) or not isinstance(revision, str):
+            return self._blocked_episode("admission_outcome_unknown", pending)
+        if pending and pending[0].get("target") != component:
+            return self._blocked_episode("admission_outcome_unknown", pending)
+        try:
+            stored = self.surface.artifacts.path_for(revision)
+            module = read_text_exact(stored / "service.py")
+            tests = read_text_exact(stored / "test_service.py")
+            validate_module(module)
+        except (AttributeError, OSError, UnicodeError, ValueError, RuntimeError):
+            return self._blocked_episode("admission_outcome_unknown", pending)
+        if pending:
+            manifest = dict(pending[0].get("dependency_manifest") or {})
+            manifest.pop(component, None)
+            for downstream in COMPONENTS:
+                if component in DEPENDENCIES[downstream] or any(
+                        dep not in manifest for dep in DEPENDENCIES[downstream]):
+                    manifest.pop(downstream, None)
+            self.manifest = manifest
+            self.attempt_history.append(dict(pending[0]))
+            self._close_pending(pending[0], "admit", revision)
+        self.sources[component] = module
+        self.candidate_tests[component] = tests
+        self.manifest[component] = revision
+        self._clear_admission_intent()
+        return None
+
+    def _intent_matches_license(self, intent: dict) -> bool:
+        component = intent.get("component")
+        revision = intent.get("revision")
+        artifact_digest = intent.get("artifact_digest")
+        contract_hash = intent.get("contract_hash")
+        if (not isinstance(component, str) or not isinstance(revision, str)
+                or not isinstance(artifact_digest, str) or not isinstance(contract_hash, str)):
+            return False
+        return self._exact_admitted(component, revision, artifact_digest, contract_hash)
 
     def run(self) -> dict:
         previous = os.environ.get(DEADLINE_ENV)
@@ -445,14 +662,18 @@ class Episode:
     def _run(self) -> dict:
         policy, retrieval = ARMS[self.arm]
         self.budget.start_task()
+        self._restore_worker_attempts()
         os.environ[DEADLINE_ENV] = str(time.monotonic() + self.budget.remaining_seconds())
         decisions: list[dict] = []
         if retrieval == "jev_mem":
             return {"variant": self.variant, "arm": self.arm, "status": "blocked",
                     "reason": "jev_mem_nested_usage_unmetered", "manifest": {},
-                    "evaluation_binding": "", "worker_attempts": 0,
+                    "evaluation_binding": "", "worker_attempts": self.worker_attempts,
                     "retrieval_rounds": 0, "observations": [], "decisions": [],
                     "budget": self.budget.summary()}
+        restarted = self._restart_disposition()
+        if restarted is not None:
+            return restarted
         status, reason, binding = "incomplete", "", ""
         limit = (int(self.budget.config["max_worker_attempts"]) +
                  int(self.budget.config["max_retrieval_rounds"]) + 3)
@@ -586,7 +807,7 @@ class Episode:
                               "contract_hash": digest(self.contracts),
                               "environment_hash": hashlib.sha256(
                                   self.budget.config["sandbox_image"].encode()).hexdigest(),
-                              "failure_signature": target_diagnostic,
+                              "failure_signature": _failure_signature(target_diagnostic),
                               "route": route}
             self.attempts.write(started_record)
             diagnostic = target_diagnostic
@@ -644,6 +865,7 @@ class Episode:
             status, reason = "escalated", "iteration_limit"
         return {"variant": self.variant, "arm": self.arm, "status": status,
                 "reason": reason, "manifest": self.manifest, "evaluation_binding": binding,
+                "evaluation_binding_inputs": self.evaluation_binding_inputs,
                 "worker_attempts": self.worker_attempts, "retrieval_rounds": self.retrievals,
                 "observations": self.observations, "decisions": decisions,
                 "attempts": self.attempt_history,
@@ -793,6 +1015,35 @@ def verify_terminal(root: Path, row: dict, contracts: dict[str, str],
         raise ValueError("accepted_evaluation_binding_changed")
 
 
+def _binding_verified(item: dict) -> bool:
+    """An acceptance counts only when its binding recomputes from frozen contracts."""
+    payload = item.get("evaluation_binding_inputs")
+    claimed = item.get("evaluation_binding")
+    manifest = item.get("manifest")
+    if (not isinstance(payload, dict) or not isinstance(claimed, str) or not claimed
+            or not isinstance(manifest, dict) or set(manifest) != set(COMPONENTS)
+            or payload.get("manifest") != manifest):
+        return False
+    sources = payload.get("sources")
+    if (not isinstance(sources, dict)
+            or set(sources) != {f"{name}.py" for name in COMPONENTS}
+            or any(not isinstance(value, str) or len(value) != 64 for value in sources.values())):
+        return False
+    try:
+        frozen = verify_contracts()
+        expected = {name: frozen[CONTRACT_FILES[name].relative_to(CONTRACT_ROOT).as_posix()]
+                    for name in COMPONENTS}
+        if (payload.get("component_contracts") != expected
+                or payload.get("end_to_end_suite") != frozen[
+                    HELD_E2E.relative_to(CONTRACT_ROOT).as_posix()]
+                or payload.get("host_oracle") != frozen[
+                    HELD_CASES.relative_to(CONTRACT_ROOT).as_posix()]):
+            return False
+        return digest(payload) == claimed
+    except (OSError, ValueError, TypeError):
+        return False
+
+
 def summarize(results: list[dict], *, prior_creation_estimated_usd: float = 0.0) -> dict:
     """Descriptive pilot score only; no small pilot licenses deployment."""
     by_arm = {}
@@ -808,12 +1059,14 @@ def summarize(results: list[dict], *, prior_creation_estimated_usd: float = 0.0)
                       [decision["route"] for row in rows
                        for decision in row.get("decisions", [])
                        if decision.get("route", {}).get("source") == "qwen"
-                       and decision["route"].get("model")])
+                       and decision["route"].get("model")
+                       and not decision["route"].get("fallback")])
         revisions = sorted({item.get("revision") for item in qwen_calls
                             if isinstance(item.get("revision"), str) and item["revision"]})
         jev_routes = [decision["route"] for row in rows
                       for decision in row.get("decisions", [])
-                      if decision.get("route", {}).get("source") == "jev"]
+                      if decision.get("route", {}).get("source") == "jev"
+                      and not decision["route"].get("fallback")]
         jev_models = sorted({route.get("model") for route in jev_routes
                              if isinstance(route.get("model"), str) and route["model"]})
         by_arm[arm] = {
@@ -835,9 +1088,8 @@ def summarize(results: list[dict], *, prior_creation_estimated_usd: float = 0.0)
             "jev_model_known": bool(jev_routes) and len(jev_models) == 1 and all(
                 route.get("model") == jev_models[0] for route in jev_routes),
             "observed_false_acceptances": sum(
-                item.get("status") == "accepted" and (
-                    not item.get("evaluation_binding") or
-                    len(item.get("manifest", {})) != len(COMPONENTS)) for item in rows),
+                item.get("status") == "accepted" and not _binding_verified(item)
+                for item in rows),
         }
     comparisons = {}
     for label, baseline, challenger in (("C_vs_A", "A", "C"),
@@ -889,6 +1141,118 @@ def summarize(results: list[dict], *, prior_creation_estimated_usd: float = 0.0)
             "prior_creation_estimated_usd": prior_creation_estimated_usd,
             "arms": by_arm, "comparisons": comparisons,
             "interpretation": "pilot_only_no_production_promotion"}
+
+
+def _cost_unknown(result: dict) -> bool:
+    budget = result.get("budget") or {}
+    return bool(budget.get("cost_unknown")) or budget.get("estimated_total_usd") is None
+
+
+def _load_recorded_results(path: Path) -> tuple[list[dict], bool]:
+    """Return parsed rows and whether they should replace a torn or unterminated file.
+
+    An incomplete trailing line is omitted only in memory. The caller rewrites the
+    file after the kept rows match their terminals. A complete row is never dropped.
+    """
+    if not path.exists():
+        return [], False
+    raw = path.read_text(encoding="utf-8")
+    if raw == "":
+        return [], False
+    rewrite = not raw.endswith("\n")
+    lines = raw.splitlines()
+    if rewrite and lines:
+        try:
+            parsed = _strict_json(lines[-1])
+        except (json.JSONDecodeError, UnicodeError, ValueError):
+            parsed = None
+        if not isinstance(parsed, dict):
+            lines = lines[:-1]
+    rows = []
+    for line in lines:
+        if not line.strip():
+            continue
+        parsed = _strict_json(line)
+        if not isinstance(parsed, dict):
+            raise ValueError("invalid_result_row")
+        rows.append(parsed)
+    return rows, rewrite
+
+
+def _write_recorded_results(path: Path, rows: list[dict]) -> None:
+    payload = "".join(json.dumps(row, sort_keys=True, allow_nan=False) + "\n" for row in rows)
+    temporary = path.with_name(path.name + ".tmp")
+    with temporary.open("w", encoding="utf-8", newline="") as handle:
+        handle.write(payload)
+        handle.flush()
+        os.fsync(handle.fileno())
+    temporary.replace(path)
+
+
+def _append_result(handle, result: dict) -> None:
+    handle.write(json.dumps(result, sort_keys=True, allow_nan=False) + "\n")
+    handle.flush()
+    os.fsync(handle.fileno())
+
+
+def _close_interrupted_provider(episode_root: Path, variant: str, arm: str,
+                                budget_config: dict) -> dict | None:
+    """A durable status=started attempt may have been billed. Do not send it again."""
+    attempts_dir = episode_root / "state" / "repair_attempts"
+    if not attempts_dir.is_dir():
+        return None
+    store = AttemptStore(episode_root / "state")
+    records = store.all()
+    started = [item for item in records if item.get("status") == "started"]
+    already_closed = any(
+        item.get("status") == "finished" and item.get("observed_outcome") == "proposal_failed"
+        and item.get("error") == "interrupted_provider_call_not_replayed" for item in records)
+    if not started and not already_closed:
+        return None
+    for record in started:
+        updated = dict(record)
+        updated["status"] = "finished"
+        updated["observed_outcome"] = "proposal_failed"
+        updated["error"] = "interrupted_provider_call_not_replayed"
+        store.write(updated, expected_status="started")
+    budget = Budget(budget_config)
+    budget.unknown_cost = True
+    return {"variant": variant, "arm": arm, "status": "blocked",
+            "reason": "interrupted_provider_call_not_replayed",
+            "manifest": {}, "evaluation_binding": "",
+            "worker_attempts": 0, "retrieval_rounds": 0,
+            "observations": [], "decisions": [],
+            "attempts": store.all(), "budget": budget.summary()}
+
+
+def _existing_episode(episode_root: Path, variant: str, arm: str,
+                      budget_config: dict) -> dict | str | None:
+    """Terminal row, 'run' to continue on disk, or None when the operator must stop."""
+    terminal = episode_root / "state" / "repair_terminal.json"
+    if terminal.is_file():
+        row = _strict_json(terminal.read_text(encoding="utf-8"))
+        if not isinstance(row, dict) or [row.get("variant"), row.get("arm")] != [variant, arm]:
+            raise SystemExit("resume terminal identity changed")
+        return row
+    interrupted = _close_interrupted_provider(episode_root, variant, arm, budget_config)
+    if interrupted is not None:
+        write_terminal(episode_root, interrupted)
+        return interrupted
+    state = episode_root / "state"
+    pending = []
+    if (state / "repair_attempts").is_dir():
+        pending = [item for item in AttemptStore(state).unfinished()
+                   if item.get("status") == "proposal_ready"]
+    if (state / "admission_intent.json").is_file() or pending:
+        return "run"
+    return None
+
+
+def _write_summary(output: Path, results: list[dict], prior_creation_estimated_usd: float) -> None:
+    (output / "summary.json").write_text(
+        json.dumps(summarize(results, prior_creation_estimated_usd=prior_creation_estimated_usd),
+                   indent=2, allow_nan=False) + "\n",
+        encoding="utf-8")
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -954,21 +1318,25 @@ def main(argv: list[str] | None = None) -> int:
         "prior_records_hash": digest(prior),
         "prior_creation_estimated_usd": prior_creation_estimated_usd}
     config_path = args.output / "run_config.json"
+    comparable_config = {**run_config, "order": [[variant, arm] for variant, arm in order]}
     if args.resume:
-        if _strict_json(config_path.read_text(encoding="utf-8")) != run_config:
+        if _strict_json(config_path.read_text(encoding="utf-8")) != comparable_config:
             raise SystemExit("resume configuration or prior evidence changed")
     else:
-        config_path.write_text(json.dumps(run_config, indent=2) + "\n", encoding="utf-8")
+        config_path.write_text(json.dumps(comparable_config, indent=2) + "\n", encoding="utf-8")
     evidence = args.output / "results.jsonl"
-    results = ([_strict_json(line) for line in evidence.read_text(encoding="utf-8").splitlines()]
-               if args.resume and evidence.exists() else [])
-    completed = [(item.get("variant"), item.get("arm")) for item in results]
-    if completed != order[:len(completed)]:
-        raise SystemExit("resume result order or identity changed")
+    results, rewrite_results = (_load_recorded_results(evidence)
+                                if args.resume and evidence.exists() else ([], False))
     for item in results:
         verify_terminal(args.output / item["variant"] / item["arm"], item,
-                        contracts, budget_config["sandbox_image"])
-    if any(item.get("budget", {}).get("estimated_total_usd") is None for item in results):
+                        contracts, budget_config["sandbox_image"], allow_unknown=True)
+    if rewrite_results:
+        _write_recorded_results(evidence, results)
+    completed = [[item.get("variant"), item.get("arm")] for item in results]
+    if completed != [[variant, arm] for variant, arm in order[:len(completed)]]:
+        raise SystemExit("resume result order or identity changed")
+    if any(_cost_unknown(item) for item in results):
+        _write_summary(args.output, results, prior_creation_estimated_usd)
         raise SystemExit("resume blocked: completed episode has unknown external cost")
     total_spent = sum(item["budget"]["estimated_total_usd"] for item in results)
     totals = {"max_total_calls": sum(item["budget"]["calls"] for item in results),
@@ -976,37 +1344,47 @@ def main(argv: list[str] | None = None) -> int:
               "max_total_worker_attempts": sum(item.get("worker_attempts", 0) for item in results),
               "max_total_retrieval_rounds": sum(item.get("retrieval_rounds", 0) for item in results)}
     run_started = time.monotonic()
-    with evidence.open("a" if args.resume else "w", encoding="utf-8") as handle:
+
+    def run_episode(episode_root: Path, variant: str, arm: str, *, resume_episode: bool) -> dict:
+        budget = Budget(budget_config)
+        episode = Episode(variant=variant, arm=arm, root=episode_root, budget=budget,
+                          prior_records=list(prior), contracts=contracts, resume=resume_episode)
+        try:
+            return episode.run()
+        except Exception as exc:
+            result = {"variant": variant, "arm": arm, "status": "blocked",
+                      "reason": type(exc).__name__ + ": " + str(exc)[:120],
+                      "budget": budget.summary()}
+            write_terminal(episode_root, result)
+            return result
+
+    with evidence.open("a" if args.resume and evidence.exists() else "w", encoding="utf-8") as handle:
         for variant, arm in order[len(results):]:
             episode_root = args.output / variant / arm
             if episode_root.exists():
-                unfinished = AttemptStore(episode_root / "state").unfinished()
-                detail = ("uncertain external attempt: " + ",".join(item["id"] for item in unfinished)
-                          if unfinished else "admission or usage may have committed before result")
-                raise SystemExit("resume blocked at interrupted episode; " + detail)
-            budget = Budget(budget_config)
-            episode = Episode(variant=variant, arm=arm, root=episode_root,
-                              budget=budget, prior_records=list(prior), contracts=contracts)
-            try:
-                result = episode.run()
-            except Exception as exc:
-                result = {"variant": variant, "arm": arm, "status": "blocked",
-                          "reason": type(exc).__name__ + ": " + str(exc)[:120],
-                          "budget": budget.summary()}
-                write_terminal(episode_root, result)
+                existing = _existing_episode(episode_root, variant, arm, budget_config)
+                if existing is None:
+                    unfinished = (AttemptStore(episode_root / "state").unfinished()
+                                  if (episode_root / "state" / "repair_attempts").is_dir() else [])
+                    detail = ("uncertain external attempt: " + ",".join(item["id"] for item in unfinished)
+                              if unfinished else "admission or usage may have committed before result")
+                    raise SystemExit("resume blocked at interrupted episode; " + detail)
+                result = (run_episode(episode_root, variant, arm, resume_episode=True)
+                          if existing == "run" else existing)
+            else:
+                result = run_episode(episode_root, variant, arm, resume_episode=False)
+            limit_breached = bool(result.get("budget", {}).get("limit_breached"))
             verify_terminal(episode_root, result, contracts,
                             budget_config["sandbox_image"], allow_unknown=True)
-            handle.write(json.dumps(result, sort_keys=True, allow_nan=False) + "\n")
-            handle.flush()
-            os.fsync(handle.fileno())
+            _append_result(handle, result)
             results.append(result)
-            if budget.unknown_cost or budget.limit_breached:
+            if _cost_unknown(result) or limit_breached:
                 break
-            total_spent += budget.total_usd
+            total_spent += result["budget"]["estimated_total_usd"]
             if total_spent > budget_config["max_total_usd"]:
                 raise RuntimeError("portfolio_dollar_limit_breached")
-            for field, used in (("max_total_calls", budget.calls),
-                                ("max_total_output_tokens", budget.output_tokens),
+            for field, used in (("max_total_calls", result["budget"]["calls"]),
+                                ("max_total_output_tokens", result["budget"]["output_tokens"]),
                                 ("max_total_worker_attempts", result.get("worker_attempts", 0)),
                                 ("max_total_retrieval_rounds", result.get("retrieval_rounds", 0))):
                 totals[field] += used
@@ -1014,11 +1392,7 @@ def main(argv: list[str] | None = None) -> int:
                     raise RuntimeError("portfolio_limit_breached:" + field)
             if time.monotonic() - run_started > budget_config["max_elapsed_seconds"]:
                 break
-    (args.output / "summary.json").write_text(
-        json.dumps(summarize(results,
-                             prior_creation_estimated_usd=prior_creation_estimated_usd),
-                   indent=2, allow_nan=False) + "\n",
-        encoding="utf-8")
+    _write_summary(args.output, results, prior_creation_estimated_usd)
     print(str(evidence))
     return 0
 
