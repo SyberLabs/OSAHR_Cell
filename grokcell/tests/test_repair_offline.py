@@ -240,8 +240,8 @@ def test_prior_only_enters_memory_arms_after_retrieval(tmp_path, monkeypatch):
                           budget=Budget(values), prior_records=prior,
                           contracts=verify_contracts())
         assert episode.recalled == []
-        assert bool(episode.prior_records) == (arm in "DE")
-        assert bool(episode.attempts.all()) == (arm in "DE")
+        assert bool(episode.prior_records) == (arm == "D")
+        assert bool(episode.attempts.all()) == (arm == "D")
         if arm == "E":
             monkeypatch.setenv("GROKCELL_EXPERIMENT_DEADLINE", "prior-value")
             assert episode.run()["status"] == "blocked"
