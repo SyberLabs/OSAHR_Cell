@@ -1,0 +1,25 @@
+{
+  "$schema": "node_modules/wrangler/config-schema.json",
+  "name": "osahr-grokcell-preflight",
+  "main": "./deploy/cloudflare/worker.js",
+  "compatibility_date": "2026-09-25",
+  "workers_dev": true,
+  "preview_urls": false,
+  "containers": [
+    {
+      "class_name": "GrokCellPreflight",
+      "image": "./deploy/cloudflare/Dockerfile",
+      "image_build_context": ".",
+      "instance_type": "lite",
+      "max_instances": 1
+    }
+  ],
+  "durable_objects": {
+    "bindings": [
+      { "name": "GROKCELL_PREFLIGHT", "class_name": "GrokCellPreflight" }
+    ]
+  },
+  "migrations": [
+    { "tag": "v1", "new_sqlite_classes": ["GrokCellPreflight"] }
+  ]
+}
