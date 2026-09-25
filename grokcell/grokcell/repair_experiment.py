@@ -281,7 +281,7 @@ class Episode:
                 (folder / name).write_text(content, encoding="utf-8", newline="")
             result = pytest_suite(folder, untrusted=True)
         self.budget.executor(result.elapsed_ms)
-        if not public and result.outcome is not RunOutcome.PASS:
+        if not public:
             # Hidden text stays in this trusted process and is never logged to prompts.
             return result.outcome.value
         return result
