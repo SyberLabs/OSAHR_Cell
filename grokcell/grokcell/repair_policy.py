@@ -101,6 +101,7 @@ def select_action(state: DecisionState, policy: str, chooser=None) -> tuple[Cand
         return fallback, {"source": "deterministic", "fallback": False}
     if policy not in {"jev", "qwen"} or chooser is None:
         raise ValueError("invalid routing policy")
+    reply = None
     try:
         reply = chooser.choose(
             state={"manifest": state.manifest, "observations": state.observations[-4:],
@@ -114,11 +115,15 @@ def select_action(state: DecisionState, policy: str, chooser=None) -> tuple[Cand
         if not validate_choice(state, choice):
             raise ValueError("stale_or_invalid_choice")
         return choice, {"source": policy, "fallback": False,
-                        "model": reply.model, "usage": reply.usage,
-                        "elapsed_ms": reply.elapsed_ms,
-                        "request_id": reply.request_id,
-                        "revision": getattr(reply, "revision", None),
-                        "confidence": reply.confidence,
-                        "probabilities": reply.probabilities}
+                        **_reply_evidence(reply)}
     except (RuntimeError, ValueError, StopIteration, TypeError) as exc:
-        return fallback, {"source": policy, "fallback": True, "reason": str(exc)}
+        return fallback, {"source": policy, "fallback": True, "reason": str(exc),
+                          **(_reply_evidence(reply) if reply is not None else {})}
+
+
+def _reply_evidence(reply) -> dict:
+    return {"model": reply.model, "usage": reply.usage,
+            "elapsed_ms": reply.elapsed_ms, "request_id": reply.request_id,
+            "revision": getattr(reply, "revision", None),
+            "confidence": reply.confidence,
+            "probabilities": reply.probabilities}

@@ -8,7 +8,8 @@ import pytest
 
 from grokcell.repair_adapters import JevChoice, QwenBuilder, QWEN_MODEL, _NoRedirect
 from grokcell.repair_experiment import (Budget, Episode, _read_prior, revision_name,
-                                        summarize, verify_contracts)
+                                        summarize, verify_contracts, verify_terminal,
+                                        write_terminal)
 from grokcell.repair_fixture import COMPONENTS, SEED_SOURCES, SEED_VARIANT, VARIANTS
 from grokcell.repair_guard import validate_module
 from grokcell.repair_memory import AttemptStore, simple_retrieve
@@ -86,6 +87,8 @@ def test_low_confidence_and_invalid_jev_choice_are_visible_fallbacks():
     choice, route = select_action(_state(), "jev", LowConfidence())
     assert choice.action == "REPAIR_COMPONENT"
     assert route["fallback"] and route["reason"] == "jev_low_confidence"
+    assert route["model"] == "jev-1" and route["confidence"] == 0.2
+    assert route["usage"] == {"input_tokens": 1, "output_tokens": 1}
 
 
 def test_jev_adapter_uses_documented_choice_and_rejects_invalid_probability(monkeypatch):
@@ -199,7 +202,7 @@ def test_budget_requires_explicit_prices_and_marks_failed_external_call_unknown(
     with pytest.raises(RuntimeError):
         budget.call("qwen", 100, lambda: (_ for _ in ()).throw(RuntimeError("outage")))
     assert budget.summary()["calls"] == 1
-    assert budget.summary()["total_usd"] is None
+    assert budget.summary()["estimated_total_usd"] is None
     for key, value in (("max_task_usd", math.nan), ("max_elapsed_seconds", math.inf),
                        ("qwen_input_usd_per_million", math.inf), ("max_calls", 2.5)):
         with pytest.raises(ValueError):
@@ -239,6 +242,10 @@ def test_prior_only_enters_memory_arms_after_retrieval(tmp_path, monkeypatch):
         assert episode.recalled == []
         assert bool(episode.prior_records) == (arm in "DE")
         assert bool(episode.attempts.all()) == (arm in "DE")
+        if arm == "E":
+            monkeypatch.setenv("GROKCELL_EXPERIMENT_DEADLINE", "prior-value")
+            assert episode.run()["status"] == "blocked"
+            assert __import__("os").environ["GROKCELL_EXPERIMENT_DEADLINE"] == "prior-value"
 
 
 def test_self_hashed_prior_without_completed_episode_is_rejected(tmp_path):
@@ -252,7 +259,7 @@ def test_self_hashed_prior_without_completed_episode_is_rejected(tmp_path):
 
 def test_unmeasured_memory_arm_cannot_earn_retention():
     rows = [{"arm": "E", "variant": variant, "status": "blocked",
-             "budget": {"total_usd": 0, "wall_seconds": 0}}
+             "budget": {"estimated_total_usd": 0, "wall_seconds": 0}}
             for variant in VARIANTS]
     scored = summarize(rows)
     assert not scored["comparisons"]["E_vs_D"]["comparable"]
@@ -267,8 +274,8 @@ def test_prior_record_is_bound_to_completed_episode_and_seed_cost(tmp_path):
     folder.mkdir()
     proposal = {"module": "def apply_event(state, event):\n    return state\n",
                 "tests": "def test_candidate():\n    assert True\n"}
-    (folder / "service.py").write_text(proposal["module"], encoding="utf-8")
-    (folder / "test_service.py").write_text(proposal["tests"], encoding="utf-8")
+    (folder / "service.py").write_text(proposal["module"], encoding="utf-8", newline="")
+    (folder / "test_service.py").write_text(proposal["tests"], encoding="utf-8", newline="")
     signature = json.dumps({"outcome": "tests_failed", "exit_code": 1,
                             "diagnostic": "public failure", "stdout_truncated": False,
                             "stderr_truncated": False})
@@ -279,18 +286,60 @@ def test_prior_record_is_bound_to_completed_episode_and_seed_cost(tmp_path):
               "candidate_hash": digest(proposal), "proposal_dir": "repair_attempts/seed.a1"}
     store.write(record)
     (state.parent.parent.parent / "run_config.json").write_text(
-        json.dumps({"contract_hashes": contracts}), encoding="utf-8")
+        json.dumps({"contract_hashes": contracts, "seed_prior": True,
+                    "budget": {"sandbox_image": "image"}}), encoding="utf-8")
+    row = {"variant": SEED_VARIANT, "arm": "B", "status": "escalated",
+           "attempts": [record],
+           "budget": {"estimated_total_usd": 0.25, "calls": 1, "output_tokens": 10,
+                      "executor_seconds": 1.0, "wall_seconds": 2.0,
+                      "cost_basis": "configured_token_tariffs_plus_executor_time_estimate"}}
+    write_terminal(state.parent, row)
     (state.parent.parent.parent / "results.jsonl").write_text(
-        json.dumps({"variant": SEED_VARIANT, "arm": "B", "attempts": [record],
-                    "budget": {"total_usd": 0.25}}) + "\n", encoding="utf-8")
+        json.dumps(row) + "\n", encoding="utf-8")
     prior, cost = _read_prior(state, contracts)
     assert cost == 0.25 and prior[0]["patch_source"] == proposal["module"]
     altered = dict(record, failure_signature=signature.replace("public failure", "secret hint"))
     store.write(altered, expected_status="finished")
     with pytest.raises(ValueError, match="prior_attempt_not_in_completed_evidence"):
         _read_prior(state, contracts)
+    with pytest.raises(ValueError, match="run_row_differs_from_terminal_state"):
+        verify_terminal(state.parent, {**row, "status": "accepted"}, contracts, "image")
+    with pytest.raises(ValueError, match="run_row_differs_from_terminal_state"):
+        verify_terminal(state.parent, {**row, "budget": {**row["budget"],
+                                                 "estimated_total_usd": math.nan}}, contracts, "image")
+    (state.parent.parent.parent / "run_config.json").write_text(
+        json.dumps({"contract_hashes": contracts, "seed_prior": False,
+                    "budget": {"sandbox_image": "image"}}), encoding="utf-8")
+    with pytest.raises(ValueError, match="prior_must_be_separate_unscored_seed"):
+        _read_prior(state, contracts)
 
 
 def test_redirect_handler_never_forwards_authorization():
     assert _NoRedirect().redirect_request(None, None, 302, "Moved", {},
                                           "https://other.example/path") is None
+
+
+def test_score_labels_estimated_cost_and_rejects_model_drift():
+    rows = []
+    for variant in VARIANTS:
+        for arm in ("A", "B", "C"):
+            route = ({"source": "qwen", "model": QWEN_MODEL,
+                      "revision": "r1" if variant != "release_decoy" else "r2"}
+                     if arm == "A" else
+                     {"source": "jev", "model": "jev-v1" if variant != "release_decoy"
+                      else "jev-v2", "revision": None} if arm == "C" else
+                     {"source": "deterministic"})
+            rows.append({"variant": variant, "arm": arm, "status": "accepted",
+                         "manifest": dict.fromkeys(COMPONENTS, "revision"),
+                         "evaluation_binding": "binding",
+                         "attempts": [{"qwen": {"model": QWEN_MODEL, "revision": "r1"}}],
+                         "decisions": [{"route": route}],
+                         "budget": {"estimated_total_usd": 1.0, "wall_seconds": 1.0,
+                                    "limit_breached": False}})
+    scored = summarize(rows, prior_creation_estimated_usd=0.5)
+    assert scored["primary_metric"].endswith("estimated_usd")
+    assert scored["cost_basis"] == "configured_token_tariffs_plus_executor_time_estimate"
+    assert scored["prior_creation_estimated_usd"] == 0.5
+    assert not scored["comparisons"]["C_vs_A"]["comparable"]
+    assert not scored["comparisons"]["C_vs_B"]["comparable"]
+    assert not scored["comparisons"]["C_vs_B"]["retention_supported"]

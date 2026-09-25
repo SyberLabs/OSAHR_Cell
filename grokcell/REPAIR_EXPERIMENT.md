@@ -40,13 +40,17 @@ provides host isolation; hostile-code claims require a live adversarial run in
 the approved image.
 
 The predeclared worthwhile threshold is 20% more independently accepted
-complete repairs per measured dollar, without lower completion or an observed
-false acceptance. A five-task pilot is descriptive and cannot authorize
-production promotion. Unknown cost blocks comparison.
+complete repairs per **estimated** dollar, without lower completion or an
+observed false acceptance. The estimate uses measured token counts, configured
+provider prices, and an executor-second rate. The seed cost is reported
+separately and included in the fully loaded D/E rate. A five-task pilot is
+descriptive and cannot authorize production promotion. Unknown cost blocks
+comparison.
 
 References: [Qwen3-Coder-Next](https://huggingface.co/Qwen/Qwen3-Coder-Next)
 (repository revision `a7fbcb5c0e12d62a448eaa0e260346bf5dcc0feb`, Apache-2.0),
 [TypeSafe API](https://docs.typesafe.ai/api), and
 [Jev-Mem](https://github.com/libingzheren/Jev-Mem)
-(pinned commit `81574eb23f3fd8d1a6c4d54a1e7d6f2dd539e9bb`, MIT).
+(source inspected at commit `81574eb23f3fd8d1a6c4d54a1e7d6f2dd539e9bb`, MIT;
+not installed in the runnable path).
 Provider-served runtime revisions and prices remain unverified until a live run.

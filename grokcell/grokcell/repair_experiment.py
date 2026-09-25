@@ -13,7 +13,7 @@ import tempfile
 import time
 from pathlib import Path
 
-from .artifact import Artifact
+from .artifact import Artifact, read_text_exact
 from .fidelity import FidelityStore
 from .messages import Message
 from .repair_adapters import JevChoice, QwenBuilder
@@ -72,6 +72,11 @@ def _public_diagnostic(result) -> str:
     return json.dumps({"outcome": result.outcome.value, "exit_code": result.exit_code,
                        "diagnostic": raw, "stdout_truncated": result.stdout_truncated,
                        "stderr_truncated": result.stderr_truncated})
+
+
+def _strict_json(raw: str):
+    return json.loads(raw, parse_constant=lambda value: (_ for _ in ()).throw(
+        ValueError("nonfinite_json_number")))
 
 
 class Budget:
@@ -140,10 +145,15 @@ class Budget:
                 max_output * self.config[f"{prefix}_output_usd_per_million"]) / 1_000_000
 
     def can_call(self, provider: str, max_output: int) -> bool:
-        if self.remaining_calls() < 1 or self.remaining_output_tokens() < max_output:
+        return self.can_bundle(((provider, max_output),))
+
+    def can_bundle(self, calls: tuple[tuple[str, int], ...]) -> bool:
+        if (self.remaining_calls() < len(calls) or
+                self.remaining_output_tokens() < sum(output for _, output in calls)):
             return False
         try:
-            self._limit(self._worst_call_cost(provider, max_output))
+            self._limit(sum(self._worst_call_cost(provider, output)
+                            for provider, output in calls))
         except RuntimeError:
             return False
         return True
@@ -196,7 +206,8 @@ class Budget:
                     self.config["executor_usd_per_second"])
 
     def summary(self) -> dict:
-        return {"total_usd": None if self.unknown_cost else self.total_usd,
+        return {"estimated_total_usd": None if self.unknown_cost else self.total_usd,
+                "cost_basis": "configured_token_tariffs_plus_executor_time_estimate",
                 "calls": self.calls, "output_tokens": self.output_tokens,
                 "executor_seconds": self.executor_seconds,
                 "wall_seconds": time.monotonic() - self.task_started,
@@ -266,7 +277,7 @@ class Episode:
         with tempfile.TemporaryDirectory(prefix="grokcell-repair-") as raw:
             folder = Path(raw)
             for name, content in files.items():
-                (folder / name).write_text(content, encoding="utf-8")
+                (folder / name).write_text(content, encoding="utf-8", newline="")
             result = pytest_suite(folder, untrusted=True)
         self.budget.executor(result.elapsed_ms)
         if not public and result.outcome is not RunOutcome.PASS:
@@ -286,7 +297,7 @@ class Episode:
         with tempfile.TemporaryDirectory(prefix="grokcell-oracle-") as raw:
             folder = Path(raw)
             for name, source in source_files.items():
-                (folder / name).write_text(source, encoding="utf-8")
+                (folder / name).write_text(source, encoding="utf-8", newline="")
             for item in cases:
                 self.budget.reserve_executor(8)
                 if component:
@@ -420,6 +431,18 @@ class Episode:
         return hidden, "held_out_end_to_end_" + hidden, binding
 
     def run(self) -> dict:
+        previous = os.environ.get(DEADLINE_ENV)
+        try:
+            result = self._run()
+            write_terminal(self.root, result)
+            return result
+        finally:
+            if previous is None:
+                os.environ.pop(DEADLINE_ENV, None)
+            else:
+                os.environ[DEADLINE_ENV] = previous
+
+    def _run(self) -> dict:
         policy, retrieval = ARMS[self.arm]
         self.budget.start_task()
         os.environ[DEADLINE_ENV] = str(time.monotonic() + self.budget.remaining_seconds())
@@ -487,8 +510,7 @@ class Episode:
                 break
             route_tokens = 128 if policy == "qwen" else 512
             route_policy = ("deterministic" if policy == "deterministic" or
-                            self.budget.remaining_calls() <= 1 or
-                            self.budget.remaining_output_tokens() < 2048 + route_tokens
+                            not self.budget.can_bundle(((policy, route_tokens), ("qwen", 2048)))
                             else policy)
             state = DecisionState(
                 manifest=dict(self.manifest), observations=tuple(self.observations),
@@ -506,7 +528,8 @@ class Episode:
                 self.qwen if policy == "qwen" else self.jev, self.budget, policy)
             choice, route = select_action(state, route_policy, chooser)
             if route_policy != policy:
-                route = {**route, "fallback": True, "reason": "routing_call_not_affordable"}
+                route = {**route, "fallback": True,
+                         "reason": "routing_and_worker_reservation_unaffordable"}
             decisions.append({"step": step, "action": choice.action,
                               "target": choice.target, "route": route})
             if self.budget.unknown_cost or self.budget.limit_breached:
@@ -579,6 +602,8 @@ class Episode:
                                      "patch_source": item.get("patch_source")}
                                     for item in self.recalled[:3]], max_tokens=2048))
                 proposal = reply.value
+                proposal = {key: value.replace("\r\n", "\n").replace("\r", "\n")
+                            for key, value in proposal.items()}
                 validate_module(proposal["module"])
                 compile(proposal["module"], "service.py", "exec")
                 compile(proposal["tests"], "test_service.py", "exec")
@@ -595,8 +620,10 @@ class Episode:
                         self.manifest.pop(downstream, None)
                 proposal_dir = self.state_root / "repair_attempts" / record_id
                 proposal_dir.mkdir()
-                (proposal_dir / "service.py").write_text(proposal["module"], encoding="utf-8")
-                (proposal_dir / "test_service.py").write_text(proposal["tests"], encoding="utf-8")
+                (proposal_dir / "service.py").write_text(
+                    proposal["module"], encoding="utf-8", newline="")
+                (proposal_dir / "test_service.py").write_text(
+                    proposal["tests"], encoding="utf-8", newline="")
                 started_record.update({"status": "proposal_ready", "candidate_hash": candidate_hash,
                                        "observed_outcome": "proposed_pending_evaluation",
                                        "predecessor_revision": predecessor,
@@ -631,15 +658,20 @@ def _read_prior(path: Path | None, contracts: dict[str, str]) -> tuple[list[dict
         raise ValueError("prior state must be a separate GrokCell state directory")
     episode_root = state_root.parent
     run_root = episode_root.parent.parent
-    configuration = json.loads((run_root / "run_config.json").read_text(encoding="utf-8"))
+    configuration = _strict_json((run_root / "run_config.json").read_text(encoding="utf-8"))
     if configuration.get("contract_hashes") != contracts:
         raise ValueError("prior_run_contracts_changed")
-    completed_rows = [json.loads(line) for line in
+    if (configuration.get("seed_prior") is not True or
+            episode_root.parent.name != SEED_VARIANT or episode_root.name != "B"):
+        raise ValueError("prior_must_be_separate_unscored_seed")
+    completed_rows = [_strict_json(line) for line in
                       (run_root / "results.jsonl").read_text(encoding="utf-8").splitlines()]
     matched = [row for row in completed_rows if row.get("variant") == episode_root.parent.name
                and row.get("arm") == episode_root.name]
-    if len(matched) != 1 or matched[0].get("budget", {}).get("total_usd") is None:
+    if len(matched) != 1 or matched[0].get("budget", {}).get("estimated_total_usd") is None:
         raise ValueError("prior_episode_not_recorded")
+    verify_terminal(episode_root, matched[0], contracts,
+                    configuration["budget"]["sandbox_image"])
     recorded = {item.get("id"): item for item in matched[0].get("attempts", [])}
     records = AttemptStore(state_root).all()
     usable = []
@@ -669,8 +701,8 @@ def _read_prior(path: Path | None, contracts: dict[str, str]) -> tuple[list[dict
         folder = (state_root / proposal_dir).resolve()
         if not folder.is_relative_to(state_root):
             raise ValueError("prior_proposal_escaped_state")
-        proposal = {"module": (folder / "service.py").read_text(encoding="utf-8"),
-                    "tests": (folder / "test_service.py").read_text(encoding="utf-8")}
+        proposal = {"module": read_text_exact(folder / "service.py"),
+                    "tests": read_text_exact(folder / "test_service.py")}
         if digest(proposal) != item.get("candidate_hash"):
             raise ValueError("prior_candidate_changed")
         validate_module(proposal["module"])
@@ -681,42 +713,126 @@ def _read_prior(path: Path | None, contracts: dict[str, str]) -> tuple[list[dict
             "observed_outcome", "candidate_hash", "revision")}
         safe["patch_source"] = proposal["module"][:4000]
         usable.append(safe)
-    return usable, float(matched[0]["budget"]["total_usd"])
+    return usable, float(matched[0]["budget"]["estimated_total_usd"])
 
 
-def summarize(results: list[dict], *, prior_creation_usd: float = 0.0) -> dict:
+def write_terminal(root: Path, result: dict) -> None:
+    """A completed episode gets one durable result before the run-level row."""
+    target = root / "state" / "repair_terminal.json"
+    target.parent.mkdir(parents=True, exist_ok=True)
+    if target.exists():
+        raise RuntimeError("terminal_result_already_exists")
+    temporary = target.with_suffix(".tmp")
+    with temporary.open("w", encoding="utf-8", newline="") as handle:
+        json.dump(result, handle, sort_keys=True, allow_nan=False)
+        handle.write("\n")
+        handle.flush()
+        os.fsync(handle.fileno())
+    temporary.replace(target)
+
+
+def verify_terminal(root: Path, row: dict, contracts: dict[str, str],
+                    image: str, *, allow_unknown: bool = False) -> None:
+    target = root / "state" / "repair_terminal.json"
+    stored = _strict_json(target.read_text(encoding="utf-8"))
+    if stored != row:
+        raise ValueError("run_row_differs_from_terminal_state")
+    budget = row.get("budget", {})
+    if budget.get("cost_unknown") and not allow_unknown:
+        raise ValueError("unknown_terminal_cost")
+    for key in ("calls", "output_tokens"):
+        value = budget.get(key)
+        if type(value) is not int or value < 0:
+            raise ValueError("invalid_terminal_usage")
+    if budget.get("cost_basis") != "configured_token_tariffs_plus_executor_time_estimate":
+        raise ValueError("terminal_cost_basis_changed")
+    for key in ("estimated_total_usd", "executor_seconds", "wall_seconds"):
+        value = budget.get(key)
+        if value is None and key == "estimated_total_usd" and allow_unknown:
+            continue
+        if (isinstance(value, bool) or not isinstance(value, (int, float))
+                or not math.isfinite(value) or value < 0):
+            raise ValueError("invalid_terminal_cost")
+    if row.get("status") != "accepted":
+        return
+    if budget.get("cost_unknown") or budget.get("limit_breached"):
+        raise ValueError("accepted_under_uncertain_budget")
+    manifest = row.get("manifest", {})
+    if set(manifest) != set(COMPONENTS):
+        raise ValueError("accepted_manifest_incomplete")
+    from .artifact import ArtifactStore
+    artifacts = ArtifactStore(root / "state" / "artifacts")
+    sources = {}
+    for component in COMPONENTS:
+        revision = manifest[component]
+        path = artifacts.path_for(revision)
+        license_record = artifacts._read_license(path)
+        suite_hash = contracts[CONTRACT_FILES[component].relative_to(CONTRACT_ROOT).as_posix()]
+        artifact_hash = artifacts._current_digest(path)
+        if (license_record.get("name") != revision
+                or license_record.get("license") != "admitted"
+                or license_record.get("hash") != artifact_hash
+                or license_record.get("acceptance_suite_hash") != suite_hash
+                or revision != revision_name(component, artifact_hash,
+                                             [manifest[dep] for dep in DEPENDENCIES[component]],
+                                             suite_hash, image)):
+            raise ValueError("accepted_artifact_binding_changed")
+        sources[f"{component}.py"] = read_text_exact(path / "service.py")
+    binding = digest({"manifest": manifest,
+                      "sources": {key: hashlib.sha256(value.encode()).hexdigest()
+                                  for key, value in sources.items()},
+                      "component_contracts": {key: contracts[
+                          CONTRACT_FILES[key].relative_to(CONTRACT_ROOT).as_posix()]
+                          for key in COMPONENTS},
+                      "end_to_end_suite": contracts[
+                          HELD_E2E.relative_to(CONTRACT_ROOT).as_posix()],
+                      "host_oracle": contracts[
+                          HELD_CASES.relative_to(CONTRACT_ROOT).as_posix()],
+                      "environment": image})
+    if row.get("evaluation_binding") != binding:
+        raise ValueError("accepted_evaluation_binding_changed")
+
+
+def summarize(results: list[dict], *, prior_creation_estimated_usd: float = 0.0) -> dict:
     """Descriptive pilot score only; no small pilot licenses deployment."""
     by_arm = {}
     for arm in ARMS:
         rows = [item for item in results if item["arm"] == arm]
-        known = all(item.get("budget", {}).get("total_usd") is not None for item in rows)
-        cost = sum(item["budget"]["total_usd"] for item in rows) if known else None
+        known = all(item.get("budget", {}).get("estimated_total_usd") is not None for item in rows)
+        cost = sum(item["budget"]["estimated_total_usd"] for item in rows) if known else None
         accepted = sum(item.get("status") == "accepted" for item in rows)
-        construction = prior_creation_usd if arm in {"D", "E"} else 0.0
+        construction = prior_creation_estimated_usd if arm in {"D", "E"} else 0.0
         fully_loaded = cost + construction if cost is not None else None
-        proposals = [attempt.get("qwen", {}) for row in rows
-                     for attempt in row.get("attempts", []) if attempt.get("qwen")]
-        revisions = sorted({item.get("revision") for item in proposals
+        qwen_calls = ([attempt["qwen"] for row in rows
+                       for attempt in row.get("attempts", []) if attempt.get("qwen")] +
+                      [decision["route"] for row in rows
+                       for decision in row.get("decisions", [])
+                       if decision.get("route", {}).get("source") == "qwen"
+                       and decision["route"].get("model")])
+        revisions = sorted({item.get("revision") for item in qwen_calls
                             if isinstance(item.get("revision"), str) and item["revision"]})
-        jev_models = sorted({decision.get("route", {}).get("model")
-                             for row in rows for decision in row.get("decisions", [])
-                             if decision.get("route", {}).get("source") == "jev"
-                             and decision.get("route", {}).get("model")})
+        jev_routes = [decision["route"] for row in rows
+                      for decision in row.get("decisions", [])
+                      if decision.get("route", {}).get("source") == "jev"]
+        jev_models = sorted({route.get("model") for route in jev_routes
+                             if isinstance(route.get("model"), str) and route["model"]})
         by_arm[arm] = {
             "episodes": len(rows), "accepted": accepted,
             "completion_rate": accepted / len(rows) if rows else None,
-            "pilot_usd": cost, "prior_creation_usd": construction,
-            "fully_loaded_usd": fully_loaded,
-            "repairs_per_usd": accepted / fully_loaded if fully_loaded else None,
+            "pilot_estimated_usd": cost, "prior_creation_estimated_usd": construction,
+            "fully_loaded_estimated_usd": fully_loaded,
+            "repairs_per_estimated_usd": accepted / fully_loaded if fully_loaded else None,
             "escalations": sum(item.get("status") == "escalated" for item in rows),
             "blocked": sum(item.get("status") == "blocked" for item in rows),
             "worker_attempts": sum(item.get("worker_attempts", 0) for item in rows),
             "wall_seconds": sum(item.get("budget", {}).get("wall_seconds", 0) for item in rows),
             "limit_breaches": sum(bool(item.get("budget", {}).get("limit_breached")) for item in rows),
             "qwen_revisions": revisions,
-            "qwen_revision_known": bool(proposals) and len(revisions) == 1 and all(
-                item.get("revision") == revisions[0] for item in proposals),
+            "qwen_revision_known": bool(qwen_calls) and len(revisions) == 1 and all(
+                item.get("revision") == revisions[0] for item in qwen_calls),
             "jev_models": jev_models,
+            "jev_model_known": bool(jev_routes) and len(jev_models) == 1 and all(
+                route.get("model") == jev_models[0] for route in jev_routes),
             "observed_false_acceptances": sum(
                 item.get("status") == "accepted" and (
                     not item.get("evaluation_binding") or
@@ -740,18 +856,19 @@ def summarize(results: list[dict], *, prior_creation_usd: float = 0.0) -> dict:
             paired[bucket] += 1
         versions_match = (left["qwen_revision_known"] and right["qwen_revision_known"]
                           and left["qwen_revisions"] == right["qwen_revisions"]
+                          and (baseline not in {"C", "D", "E"} or left["jev_model_known"])
+                          and (challenger not in {"C", "D", "E"} or right["jev_model_known"])
                           and (label not in {"D_vs_C", "E_vs_D"} or
-                               (len(left["jev_models"]) == len(right["jev_models"]) == 1
-                                and left["jev_models"] == right["jev_models"])))
+                               left["jev_models"] == right["jev_models"]))
         complete = (set(left_rows) == set(right_rows) == set(VARIANTS)
                     and left["episodes"] == right["episodes"] == len(VARIANTS)
                     and left["blocked"] == right["blocked"] == 0
                     and left["limit_breaches"] == right["limit_breaches"] == 0
                     and versions_match
-                    and left["repairs_per_usd"] is not None
-                    and right["repairs_per_usd"] is not None)
-        gain = (right["repairs_per_usd"] / left["repairs_per_usd"] - 1
-                if left["repairs_per_usd"] and right["repairs_per_usd"] is not None else None)
+                    and left["repairs_per_estimated_usd"] is not None
+                    and right["repairs_per_estimated_usd"] is not None)
+        gain = (right["repairs_per_estimated_usd"] / left["repairs_per_estimated_usd"] - 1
+                if left["repairs_per_estimated_usd"] and right["repairs_per_estimated_usd"] is not None else None)
         comparisons[label] = {
             "comparable": complete, "observed_relative_gain": gain,
             "paired_outcomes": paired, "provider_versions_match": versions_match,
@@ -762,9 +879,10 @@ def summarize(results: list[dict], *, prior_creation_usd: float = 0.0) -> dict:
             "retention_supported": False,
             "retention_reason": "single_small_pilot_no_uncertainty_estimate",
         }
-    return {"primary_metric": "accepted_complete_tasks_per_measured_usd",
+    return {"primary_metric": "accepted_complete_tasks_per_estimated_usd",
+            "cost_basis": "configured_token_tariffs_plus_executor_time_estimate",
             "minimum_worthwhile_relative_gain": MIN_WORTHWHILE_GAIN,
-            "prior_creation_usd": prior_creation_usd,
+            "prior_creation_estimated_usd": prior_creation_estimated_usd,
             "arms": by_arm, "comparisons": comparisons,
             "interpretation": "pilot_only_no_production_promotion"}
 
@@ -794,7 +912,7 @@ def main(argv: list[str] | None = None) -> int:
         return 0
     if not args.live or not args.budget or not args.output:
         parser.error("live run requires --live --budget FILE --output DIR")
-    budget_config = json.loads(args.budget.read_text(encoding="utf-8"))
+    budget_config = _strict_json(args.budget.read_text(encoding="utf-8"))
     Budget(budget_config)  # Validate schema before any side effect.
     if (not shutil.which("docker") or not os.environ.get("HF_TOKEN") or
             (not args.seed_prior and not os.environ.get("TYPESAFE_API_KEY"))):
@@ -803,7 +921,7 @@ def main(argv: list[str] | None = None) -> int:
                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                       timeout=10, check=False).returncode != 0:
         raise SystemExit("pinned sandbox image is not present locally")
-    prior, prior_creation_usd = _read_prior(args.prior_state, contracts)
+    prior, prior_creation_estimated_usd = _read_prior(args.prior_state, contracts)
     if not prior and not args.seed_prior:
         raise SystemExit("paired memory comparison requires --prior-state with public attempts")
     if args.output.exists() != args.resume:
@@ -830,22 +948,25 @@ def main(argv: list[str] | None = None) -> int:
         "budget": budget_config,
         "prior_state": str(args.prior_state.resolve()) if args.prior_state else None,
         "prior_records_hash": digest(prior),
-        "prior_creation_usd": prior_creation_usd}
+        "prior_creation_estimated_usd": prior_creation_estimated_usd}
     config_path = args.output / "run_config.json"
     if args.resume:
-        if json.loads(config_path.read_text(encoding="utf-8")) != run_config:
+        if _strict_json(config_path.read_text(encoding="utf-8")) != run_config:
             raise SystemExit("resume configuration or prior evidence changed")
     else:
         config_path.write_text(json.dumps(run_config, indent=2) + "\n", encoding="utf-8")
     evidence = args.output / "results.jsonl"
-    results = ([json.loads(line) for line in evidence.read_text(encoding="utf-8").splitlines()]
-               if args.resume else [])
+    results = ([_strict_json(line) for line in evidence.read_text(encoding="utf-8").splitlines()]
+               if args.resume and evidence.exists() else [])
     completed = [(item.get("variant"), item.get("arm")) for item in results]
     if completed != order[:len(completed)]:
         raise SystemExit("resume result order or identity changed")
-    if any(item.get("budget", {}).get("total_usd") is None for item in results):
+    for item in results:
+        verify_terminal(args.output / item["variant"] / item["arm"], item,
+                        contracts, budget_config["sandbox_image"])
+    if any(item.get("budget", {}).get("estimated_total_usd") is None for item in results):
         raise SystemExit("resume blocked: completed episode has unknown external cost")
-    total_spent = sum(item["budget"]["total_usd"] for item in results)
+    total_spent = sum(item["budget"]["estimated_total_usd"] for item in results)
     totals = {"max_total_calls": sum(item["budget"]["calls"] for item in results),
               "max_total_output_tokens": sum(item["budget"]["output_tokens"] for item in results),
               "max_total_worker_attempts": sum(item.get("worker_attempts", 0) for item in results),
@@ -868,7 +989,10 @@ def main(argv: list[str] | None = None) -> int:
                 result = {"variant": variant, "arm": arm, "status": "blocked",
                           "reason": type(exc).__name__ + ": " + str(exc)[:120],
                           "budget": budget.summary()}
-            handle.write(json.dumps(result, sort_keys=True) + "\n")
+                write_terminal(episode_root, result)
+            verify_terminal(episode_root, result, contracts,
+                            budget_config["sandbox_image"], allow_unknown=True)
+            handle.write(json.dumps(result, sort_keys=True, allow_nan=False) + "\n")
             handle.flush()
             os.fsync(handle.fileno())
             results.append(result)
@@ -887,7 +1011,9 @@ def main(argv: list[str] | None = None) -> int:
             if time.monotonic() - run_started > budget_config["max_elapsed_seconds"]:
                 break
     (args.output / "summary.json").write_text(
-        json.dumps(summarize(results, prior_creation_usd=prior_creation_usd), indent=2) + "\n",
+        json.dumps(summarize(results,
+                             prior_creation_estimated_usd=prior_creation_estimated_usd),
+                   indent=2, allow_nan=False) + "\n",
         encoding="utf-8")
     print(str(evidence))
     return 0
