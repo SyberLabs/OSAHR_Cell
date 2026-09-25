@@ -11,14 +11,14 @@ from grokcell.repair_adapters import JevChoice, QwenBuilder, QWEN_MODEL, _NoRedi
 from grokcell.repair_experiment import (Budget, Episode, _read_prior, main, revision_name,
                                         summarize, verify_contracts, verify_terminal,
                                         write_terminal)
-from grokcell.repair_fixture import COMPONENTS, SEED_SOURCES, SEED_VARIANT, VARIANTS
+from grokcell.repair_fixture import COMPONENTS, GOOD, SEED_SOURCES, SEED_VARIANT, VARIANTS
 from grokcell.repair_guard import validate_module
 from grokcell.repair_memory import AttemptStore, simple_retrieve
 from grokcell.mutant import mutate_source
 from grokcell.repair_policy import (DecisionState, deterministic_choice,
                                     digest, legal_candidates, select_action,
                                     validate_choice)
-from grokcell.runner import RunOutcome, _sandbox_command, isolated_call
+from grokcell.runner import RunOutcome, RunResult, _sandbox_command, isolated_call
 
 
 def _state(**changes):
@@ -46,6 +46,28 @@ def test_frozen_contract_and_fixture_shapes_are_offline():
     assert all(SEED_SOURCES["inventory_reducer"] != item["inventory_reducer"]
                for item in VARIANTS.values())
     assert mutate_source(VARIANTS["local_reserve"]["availability_api"]) is not None
+
+
+def test_passing_hidden_end_to_end_reaches_host_oracle(monkeypatch):
+    episode = object.__new__(Episode)
+    episode.sources = dict(GOOD)
+    episode.manifest = dict.fromkeys(COMPONENTS, "revision")
+    episode.contracts = verify_contracts()
+    episode.budget = type("BudgetStub", (), {
+        "config": {"sandbox_image": "pinned-image"},
+        "reserve_executor": lambda self, seconds: None,
+        "executor": lambda self, elapsed_ms: None,
+    })()
+    monkeypatch.setattr("grokcell.repair_experiment.pytest_suite",
+                        lambda *args, **kwargs: RunResult(RunOutcome.PASS, 0))
+    oracle_calls = []
+    monkeypatch.setattr(episode, "_host_oracle",
+                        lambda: (oracle_calls.append(True) or "pass", "operator_cases_passed"))
+
+    status, reason, binding = episode._end_to_end()
+
+    assert (status, reason) == ("pass", "held_out_end_to_end_pass")
+    assert binding and oracle_calls == [True]
 
 
 def test_preflight_blocks_paid_pilot_without_jev_decision_opportunity(tmp_path, capsys):
