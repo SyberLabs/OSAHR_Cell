@@ -10,7 +10,7 @@ The package itself declares only broad runtime lower bounds in `pyproject.toml`.
 For source-tree scripts without an editable install, export the package roots first:
 
 ```bash
-export PYTHONPATH=".:vendor"
+export PYTHONPATH=".:../.."
 ```
 
 Alternatively install the project into an isolated environment with `python -m pip install -e .`.
@@ -19,8 +19,7 @@ Alternatively install the project into an isolated environment with `python -m p
 
 ```bash
 python -m pytest -q
-python -m pytest -q tests/osahr_reference
-python -m compileall -q liquid_osahr02b vendor/osahr scripts tests
+python -m compileall -q liquid_osahr02b scripts tests
 ```
 
 ## 4. External telemetry normalization smoke tests

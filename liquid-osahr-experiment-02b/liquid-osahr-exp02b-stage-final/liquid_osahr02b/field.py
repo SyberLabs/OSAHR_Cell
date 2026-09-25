@@ -21,18 +21,12 @@ from dataclasses import dataclass
 from typing import Iterable, Mapping, Sequence
 import copy
 import math
-import sys
-from pathlib import Path
 
 import numpy as np
 import torch
 from torch import nn
 
 from .liquid_base import CfCCell
-
-VENDOR = Path(__file__).resolve().parents[1] / "vendor"
-if str(VENDOR) not in sys.path:
-    sys.path.insert(0, str(VENDOR))
 
 from osahr.graph import Hypergraph  # type: ignore
 from osahr.ids import EntityId  # type: ignore

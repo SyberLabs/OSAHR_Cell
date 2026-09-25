@@ -22,11 +22,6 @@ credentials
 .DS_Store
 Thumbs.db
 
-# Vendored duplicate kernel copies (root osahr/ is the source of truth)
-liquid-osahr-experiment-01/vendor/osahr/
-liquid-osahr-experiment-02a/liquid-osahr-experiment-02a/vendor/osahr/
-liquid-osahr-experiment-02b/liquid-osahr-exp02b-stage-final/vendor/osahr/
-
 # GrokCell withheld notes written by park / tests
 grokcell/vault/claims/*.md
 grokcell/vault/fidelity/*.json

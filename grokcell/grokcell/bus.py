@@ -79,11 +79,15 @@ def classify(
         else:
             baseline_outcome = pytest_suite(staged).outcome
         if baseline_outcome is RunOutcome.SANDBOX_REQUIRED:
-            return "reject", "runner_sandbox_required", None
+            return "outcome_unknown", "runner_sandbox_required", None
         if baseline_outcome is RunOutcome.TIMEOUT:
-            return "reject", "runner_timeout", None
+            return "outcome_unknown", "runner_timeout", None
         if baseline_outcome is RunOutcome.INFRA_ERROR:
-            return "reject", "runner_infrastructure", None
+            return "outcome_unknown", "runner_infrastructure", None
+        if baseline_outcome is RunOutcome.OUTPUT_LIMIT:
+            return "outcome_unknown", "runner_output_limit", None
+        if baseline_outcome is RunOutcome.CLEANUP_FAILED:
+            return "outcome_unknown", "runner_cleanup_failed", None
         if baseline_outcome is not RunOutcome.PASS:
             return "reject", "runner_failed", None
         if suite_hash(staged) != expected_hash:
@@ -97,11 +101,16 @@ def classify(
             untrusted=artifact.source == "payload",
         )
         if not killed:
-            return "reject", mutant_reason, None
+            status = "outcome_unknown" if mutant_reason.startswith("runner_") else "reject"
+            return status, mutant_reason, None
     if acceptance is not None:
         accepted, reason = evaluate_acceptance(artifact, acceptance)
         if not accepted:
-            return "reject", reason, None
+            uncertain = reason in {
+                "acceptance_timeout", "acceptance_infrastructure",
+                "acceptance_output_limit", "acceptance_cleanup_failed",
+                "runner_sandbox_required"}
+            return "outcome_unknown" if uncertain else "reject", reason, None
         artifact = replace(artifact, acceptance_suite_hash=acceptance.digest)
     return "admit", "vault_legal", artifact
 

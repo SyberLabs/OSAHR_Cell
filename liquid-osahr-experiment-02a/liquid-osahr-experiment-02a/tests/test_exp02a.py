@@ -9,10 +9,13 @@ import pytest
 import torch
 
 ROOT = Path(__file__).resolve().parents[1]
-VENDOR = ROOT / 'vendor'
-for p in (ROOT, VENDOR):
-    if str(p) not in sys.path:
-        sys.path.insert(0, str(p))
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+for _parent in (ROOT, *ROOT.parents):
+    if (_parent / "osahr" / "__init__.py").exists():
+        if str(_parent) not in sys.path:
+            sys.path.insert(0, str(_parent))
+        break
 
 from osahr import RuntimeConfig, SchedulerKind
 from liquid_osahr02a.field import (

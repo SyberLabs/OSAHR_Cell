@@ -16,14 +16,15 @@ from .protocol import (
     POLICIES,
     REGIMES,
     REPLICATES,
+    REPO_ROOT,
     confirmatory_scenario_id,
     confirmatory_scenario_seed_offset,
 )
 
 if str(EXP02B) not in sys.path:
     sys.path.insert(0, str(EXP02B))
-if str(EXP02B / "vendor") not in sys.path:
-    sys.path.insert(0, str(EXP02B / "vendor"))
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 import torch
 from liquid_osahr02b.field import HazardBounds, Scenario  # type: ignore

@@ -7,12 +7,12 @@ from typing import Any, Callable
 
 import pandas as pd
 
-from .protocol import ARM_SPECS, ART, EXP02B, HORIZON, POLICIES, REPLICATES
+from .protocol import ARM_SPECS, ART, EXP02B, HORIZON, POLICIES, REPLICATES, REPO_ROOT
 
 if str(EXP02B) not in sys.path:
     sys.path.insert(0, str(EXP02B))
-if str(EXP02B / "vendor") not in sys.path:
-    sys.path.insert(0, str(EXP02B / "vendor"))
+if str(REPO_ROOT) not in sys.path:
+    sys.path.insert(0, str(REPO_ROOT))
 
 import torch
 from liquid_osahr02b.field import HazardBounds, Scenario  # type: ignore

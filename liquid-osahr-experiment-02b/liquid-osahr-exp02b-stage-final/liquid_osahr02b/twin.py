@@ -2,12 +2,6 @@
 from __future__ import annotations
 
 from dataclasses import dataclass
-from pathlib import Path
-import sys
-
-VENDOR = Path(__file__).resolve().parents[1] / "vendor"
-if str(VENDOR) not in sys.path:
-    sys.path.insert(0, str(VENDOR))
 
 from osahr import (  # type: ignore
     AttributeSpec, BoundaryState, Expr, HyperedgeType, Hypergraph, Model,

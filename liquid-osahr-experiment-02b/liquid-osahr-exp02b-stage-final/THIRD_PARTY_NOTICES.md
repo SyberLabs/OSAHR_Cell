@@ -2,7 +2,7 @@
 
 ## OSAHR 0.2 reference runtime
 
-The experiment vendors the previously developed OSAHR 0.2 Python reference runtime under `vendor/osahr` for reproducibility. See `vendor/OSAHR_LICENSE`.
+The experiment uses the OSAHR 0.2 Python runtime from the repository root `osahr/` package (MIT; see the root `LICENSE`).
 
 ## CfC / LTC research attribution
 

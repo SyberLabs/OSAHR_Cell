@@ -5,7 +5,7 @@ import json, pandas as pd, pickle, platform, sys
 
 ROOT=Path(__file__).resolve().parents[1]
 # Allow direct execution from scripts/ without requiring an editable install.
-for _path in (ROOT, ROOT / 'vendor'):
+for _path in (ROOT,):
     _s = str(_path)
     if _s not in sys.path:
         sys.path.insert(0, _s)

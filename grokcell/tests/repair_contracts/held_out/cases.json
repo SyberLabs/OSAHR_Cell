@@ -1,0 +1,210 @@
+{
+  "schema_version": 1,
+  "comparison": "exact_json_types_and_values",
+  "component_stage_module": "service",
+  "component_entrypoints": {
+    "event_decoder": "decode_event",
+    "inventory_reducer": "apply_event",
+    "availability_api": "availability"
+  },
+  "application_pipeline": [
+    "event_decoder.decode_event",
+    "inventory_reducer.apply_event",
+    "availability_api.availability"
+  ],
+  "application_initial_state": {},
+  "cases": [
+    {
+      "id": "decoder_reserve_upstream",
+      "scope": "component",
+      "component": "event_decoder",
+      "args": ["{\"event_id\":\"e2\",\"sku\":\"SKU-A\",\"kind\":\"reserve\",\"quantity\":3}"],
+      "expected": {
+        "type": "return",
+        "value": {"event_id": "e2", "sku": "SKU-A", "kind": "reserve", "quantity": 3}
+      }
+    },
+    {
+      "id": "decoder_reserve_related_later",
+      "scope": "component",
+      "component": "event_decoder",
+      "args": ["{\"event_id\":\"later-2\",\"sku\":\"SKU-B\",\"kind\":\"reserve\",\"quantity\":4}"],
+      "expected": {
+        "type": "return",
+        "value": {"event_id": "later-2", "sku": "SKU-B", "kind": "reserve", "quantity": 4}
+      }
+    },
+    {
+      "id": "decoder_release_decoy",
+      "scope": "component",
+      "component": "event_decoder",
+      "args": ["{\"event_id\":\"decoy-3\",\"sku\":\"SKU-C\",\"kind\":\"release\",\"quantity\":2}"],
+      "expected": {
+        "type": "return",
+        "value": {"event_id": "decoy-3", "sku": "SKU-C", "kind": "release", "quantity": 2}
+      }
+    },
+    {
+      "id": "decoder_reject_boolean_quantity",
+      "scope": "component",
+      "component": "event_decoder",
+      "args": ["{\"event_id\":\"bad-1\",\"sku\":\"SKU-A\",\"kind\":\"receive\",\"quantity\":true}"],
+      "expected": {"type": "exception", "name": "ValueError"}
+    },
+    {
+      "id": "decoder_reject_extra_field",
+      "scope": "component",
+      "component": "event_decoder",
+      "args": ["{\"event_id\":\"bad-2\",\"sku\":\"SKU-A\",\"kind\":\"receive\",\"quantity\":1,\"unexpected\":1}"],
+      "expected": {"type": "exception", "name": "ValueError"}
+    },
+    {
+      "id": "reducer_reserve_local",
+      "scope": "component",
+      "component": "inventory_reducer",
+      "args": [
+        {"SKU-A": {"on_hand": 8, "reserved": 0}},
+        {"event_id": "e2", "sku": "SKU-A", "kind": "reserve", "quantity": 3}
+      ],
+      "expected": {
+        "type": "return",
+        "value": {"SKU-A": {"on_hand": 8, "reserved": 3}},
+        "args_after": [
+          {"SKU-A": {"on_hand": 8, "reserved": 0}},
+          {"event_id": "e2", "sku": "SKU-A", "kind": "reserve", "quantity": 3}
+        ]
+      }
+    },
+    {
+      "id": "reducer_preserve_other_sku",
+      "scope": "component",
+      "component": "inventory_reducer",
+      "args": [
+        {"SKU-A": {"on_hand": 5, "reserved": 1}, "SKU-B": {"on_hand": 11, "reserved": 0}},
+        {"event_id": "later-2", "sku": "SKU-B", "kind": "reserve", "quantity": 4}
+      ],
+      "expected": {
+        "type": "return",
+        "value": {"SKU-A": {"on_hand": 5, "reserved": 1}, "SKU-B": {"on_hand": 11, "reserved": 4}},
+        "args_after": [
+          {"SKU-A": {"on_hand": 5, "reserved": 1}, "SKU-B": {"on_hand": 11, "reserved": 0}},
+          {"event_id": "later-2", "sku": "SKU-B", "kind": "reserve", "quantity": 4}
+        ]
+      }
+    },
+    {
+      "id": "reducer_release_decoy",
+      "scope": "component",
+      "component": "inventory_reducer",
+      "args": [
+        {"SKU-C": {"on_hand": 7, "reserved": 5}},
+        {"event_id": "decoy-3", "sku": "SKU-C", "kind": "release", "quantity": 2}
+      ],
+      "expected": {
+        "type": "return",
+        "value": {"SKU-C": {"on_hand": 7, "reserved": 3}},
+        "args_after": [
+          {"SKU-C": {"on_hand": 7, "reserved": 5}},
+          {"event_id": "decoy-3", "sku": "SKU-C", "kind": "release", "quantity": 2}
+        ]
+      }
+    },
+    {
+      "id": "reducer_reject_over_reservation",
+      "scope": "component",
+      "component": "inventory_reducer",
+      "args": [
+        {"SKU-A": {"on_hand": 8, "reserved": 3}},
+        {"event_id": "bad-3", "sku": "SKU-A", "kind": "reserve", "quantity": 6}
+      ],
+      "expected": {
+        "type": "exception",
+        "name": "ValueError",
+        "args_after": [
+          {"SKU-A": {"on_hand": 8, "reserved": 3}},
+          {"event_id": "bad-3", "sku": "SKU-A", "kind": "reserve", "quantity": 6}
+        ]
+      }
+    },
+    {
+      "id": "api_reserved_stock_wrong_patch",
+      "scope": "component",
+      "component": "availability_api",
+      "args": [{"SKU-A": {"on_hand": 8, "reserved": 3}}, "SKU-A"],
+      "expected": {
+        "type": "return",
+        "value": {"sku": "SKU-A", "on_hand": 8, "reserved": 3, "available": 5},
+        "args_after": [{"SKU-A": {"on_hand": 8, "reserved": 3}}, "SKU-A"]
+      }
+    },
+    {
+      "id": "api_other_sku_not_global_total",
+      "scope": "component",
+      "component": "availability_api",
+      "args": [
+        {"SKU-A": {"on_hand": 100, "reserved": 99}, "SKU-C": {"on_hand": 7, "reserved": 3}},
+        "SKU-C"
+      ],
+      "expected": {
+        "type": "return",
+        "value": {"sku": "SKU-C", "on_hand": 7, "reserved": 3, "available": 4},
+        "args_after": [
+          {"SKU-A": {"on_hand": 100, "reserved": 99}, "SKU-C": {"on_hand": 7, "reserved": 3}},
+          "SKU-C"
+        ]
+      }
+    },
+    {
+      "id": "api_unknown_sku",
+      "scope": "component",
+      "component": "availability_api",
+      "args": [{}, "SKU-MISSING"],
+      "expected": {
+        "type": "return",
+        "value": {"sku": "SKU-MISSING", "on_hand": 0, "reserved": 0, "available": 0},
+        "args_after": [{}, "SKU-MISSING"]
+      }
+    },
+    {
+      "id": "application_upstream_reservation",
+      "scope": "application",
+      "raw_events": [
+        "{\"event_id\":\"e1\",\"sku\":\"SKU-A\",\"kind\":\"receive\",\"quantity\":8}",
+        "{\"event_id\":\"e2\",\"sku\":\"SKU-A\",\"kind\":\"reserve\",\"quantity\":3}"
+      ],
+      "sku": "SKU-A",
+      "expected": {
+        "type": "return",
+        "value": {"sku": "SKU-A", "on_hand": 8, "reserved": 3, "available": 5}
+      }
+    },
+    {
+      "id": "application_related_later",
+      "scope": "application",
+      "raw_events": [
+        "{\"event_id\":\"later-1\",\"sku\":\"SKU-B\",\"kind\":\"receive\",\"quantity\":11}",
+        "{\"event_id\":\"later-2\",\"sku\":\"SKU-B\",\"kind\":\"reserve\",\"quantity\":4}",
+        "{\"event_id\":\"later-3\",\"sku\":\"SKU-B\",\"kind\":\"release\",\"quantity\":1}"
+      ],
+      "sku": "SKU-B",
+      "expected": {
+        "type": "return",
+        "value": {"sku": "SKU-B", "on_hand": 11, "reserved": 3, "available": 8}
+      }
+    },
+    {
+      "id": "application_release_decoy",
+      "scope": "application",
+      "raw_events": [
+        "{\"event_id\":\"decoy-1\",\"sku\":\"SKU-C\",\"kind\":\"receive\",\"quantity\":7}",
+        "{\"event_id\":\"decoy-2\",\"sku\":\"SKU-C\",\"kind\":\"reserve\",\"quantity\":5}",
+        "{\"event_id\":\"decoy-3\",\"sku\":\"SKU-C\",\"kind\":\"release\",\"quantity\":2}"
+      ],
+      "sku": "SKU-C",
+      "expected": {
+        "type": "return",
+        "value": {"sku": "SKU-C", "on_hand": 7, "reserved": 3, "available": 4}
+      }
+    }
+  ]
+}

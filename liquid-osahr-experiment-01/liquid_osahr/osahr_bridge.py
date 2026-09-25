@@ -9,14 +9,8 @@ OSAHR's next-reaction scheduler samples the declared CTMC exactly.
 from __future__ import annotations
 
 from dataclasses import dataclass, asdict
-from pathlib import Path
 import math
-import sys
 import numpy as np
-
-VENDOR = Path(__file__).resolve().parents[1] / "vendor"
-if str(VENDOR) not in sys.path:
-    sys.path.insert(0, str(VENDOR))
 
 from osahr import (  # type: ignore
     AttributeSpec, BoundaryDirection, BoundaryHandle, BoundaryState,

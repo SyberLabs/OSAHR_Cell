@@ -2,7 +2,7 @@
 
 ## OSAHR
 
-The experiment vendors the OSAHR 0.2 Python runtime under `vendor/osahr`. Its license text is preserved as `vendor/OSAHR_LICENSE`.
+The experiment uses the OSAHR 0.2 Python runtime from the repository root `osahr/` package (MIT; see the root `LICENSE`).
 
 ## Neural Circuit Policies / CfC / LTC
 

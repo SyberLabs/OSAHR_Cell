@@ -72,7 +72,7 @@ Do not
 - Elect alpha-star.
 - Let software-dev verbs become 6G occurrence types.
 - Let a training loop rewrite G.
-- Treat Research_Directions.txt scores as measurements.
+- Treat attractiveness rankings as measurements.
 - Put an LLM or z-update inside occurrence hazards.
 - Represent neurons, layers, or residual streams as 6G
   occurrence types.

@@ -6,15 +6,10 @@ from pathlib import Path
 from typing import Iterable
 import json
 import math
-import sys
 
 import numpy as np
 import torch
 from torch.utils.data import Dataset, DataLoader
-
-VENDOR = Path(__file__).resolve().parents[1] / "vendor"
-if str(VENDOR) not in sys.path:
-    sys.path.insert(0, str(VENDOR))
 
 from osahr import RuntimeConfig, SchedulerKind  # type: ignore
 from osahr.events import StepStatus  # type: ignore
