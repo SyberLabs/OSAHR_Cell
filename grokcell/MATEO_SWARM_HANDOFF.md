@@ -1,6 +1,6 @@
 # Parallel swarm handoff for Mateo
 
-Work in parallel on Seth's Jev-directed Qwen repair experiment inside the existing SyberLabs/OSAHR_Cell GrokCell. Start from the current tip of `experiment/jev-qwen-repair` at `https://github.com/SyberLabs/OSAHR_Cell.git` (at least `28a8c86`). Read `REPAIR_EXPERIMENT.md` and the existing code before changing it. Work in your own checkout and feature branch. Do not edit Seth's shared checkout or push to `experiment/jev-qwen-repair`.
+Work in parallel on Seth's Jev-directed Qwen repair experiment inside the existing SyberLabs/OSAHR_Cell GrokCell. Start from the latest `main` at `https://github.com/SyberLabs/OSAHR_Cell.git`; the experiment was merged in PR #24. Read `REPAIR_EXPERIMENT.md` and the existing code before changing it. Work in your own checkout and feature branch. Do not edit Seth's shared checkout or push directly to `main`.
 
 Objective: improve independently accepted complete repairs per total execution dollar without weaker verification, hidden human rescue, or unsafe generated-code execution. Qwen/Qwen3-Coder-Next proposes code; TypeSafe Jev is an experimental choice policy whose value in this repair loop is unproven. Existing GrokCell state, admission, and independent acceptance remain authoritative. Arm E (Jev-Mem) is blocked because nested provider usage cannot yet be bounded and accounted for. There are no live comparison results: the current machine lacks Docker and provider credentials. Do not infer performance from offline tests.
 
