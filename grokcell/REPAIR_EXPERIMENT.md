@@ -1,0 +1,52 @@
+# GrokCell repair experiment
+
+From `grokcell/`, run the offline preflight without provider calls or candidate execution:
+
+```powershell
+python -m grokcell.repair_experiment --check
+python -m pytest tests/test_repair_offline.py -q
+```
+
+Copy `repair_budget.template.json` to `budget.json` and fill its deliberately
+unusable image and price placeholders from your authorized infrastructure.
+The live runner needs a pre-pulled digest-pinned Linux image containing Python and pytest,
+Docker, `HF_TOKEN`, and (for the paired pilot) `TYPESAFE_API_KEY`. Supply real
+account prices for Qwen and Jev input/output tokens and the executor-second
+estimate. The budget names `sandbox_image` as `repository@sha256:<digest>`.
+The runner will not pull an image or use the host-execution opt-in.
+
+```powershell
+python -m grokcell.repair_experiment --live --seed-prior --budget budget.json --output seed-run
+python -m grokcell.repair_experiment --live --budget budget.json --prior-state seed-run/seed_reserve/B/state --output pilot-run
+python -m grokcell.repair_experiment --live --resume --budget budget.json --prior-state seed-run/seed_reserve/B/state --output pilot-run
+```
+
+The unscored seed episode creates public repair evidence on a distinct input.
+The paired pilot
+shuffles five frozen variants across A (Qwen routing), B (deterministic), C
+(Jev), D (Jev with simple retrieval), and E (Jev-Mem). E is currently reported
+as **blocked** because Jev-Mem's nested provider usage cannot yet be metered
+and reserved under the same hard budget. `results.jsonl`, `run_config.json`,
+and `summary.json` are the machine-readable evidence. Resume skips fully
+recorded episodes; an interrupted episode stops for operator reconciliation
+before any call or admission is replayed.
+
+The frozen test manifest is `tests/repair_contracts/SHA256SUMS.txt`. A separate
+test-author context wrote the operator suites before the repair loop was built;
+this is authorship separation, not external validation. A passing episode
+requires the component gates and assembled application check on the same
+revision manifest. The generated module language is constrained, and Docker
+provides host isolation; hostile-code claims require a live adversarial run in
+the approved image.
+
+The predeclared worthwhile threshold is 20% more independently accepted
+complete repairs per measured dollar, without lower completion or an observed
+false acceptance. A five-task pilot is descriptive and cannot authorize
+production promotion. Unknown cost blocks comparison.
+
+References: [Qwen3-Coder-Next](https://huggingface.co/Qwen/Qwen3-Coder-Next)
+(repository revision `a7fbcb5c0e12d62a448eaa0e260346bf5dcc0feb`, Apache-2.0),
+[TypeSafe API](https://docs.typesafe.ai/api), and
+[Jev-Mem](https://github.com/libingzheren/Jev-Mem)
+(pinned commit `81574eb23f3fd8d1a6c4d54a1e7d6f2dd539e9bb`, MIT).
+Provider-served runtime revisions and prices remain unverified until a live run.

@@ -5,9 +5,13 @@ import hashlib
 import importlib.util
 import json
 import os
+import re
 import signal
 import subprocess
 import sys
+import threading
+import time
+import uuid
 from dataclasses import dataclass
 from enum import Enum
 from pathlib import Path
@@ -17,6 +21,9 @@ from .protocol import SUITE_BY_COMPONENT, WORLD_DIR
 
 TEST_TIMEOUT_SECONDS = 30.0
 UNSANDBOXED_RUNNER_ENV = "GROKCELL_ALLOW_UNSANDBOXED_RUNNER"
+SANDBOX_IMAGE_ENV = "GROKCELL_SANDBOX_IMAGE"
+DEADLINE_ENV = "GROKCELL_EXPERIMENT_DEADLINE"
+MAX_OUTPUT_BYTES = 16_384
 
 
 class RunOutcome(str, Enum):
@@ -25,6 +32,8 @@ class RunOutcome(str, Enum):
     INFRA_ERROR = "infra_error"
     TIMEOUT = "timeout"
     SANDBOX_REQUIRED = "sandbox_required"
+    OUTPUT_LIMIT = "output_limit"
+    CLEANUP_FAILED = "cleanup_failed"
 
 
 @dataclass(frozen=True, slots=True)
@@ -33,6 +42,9 @@ class RunResult:
     exit_code: int
     stdout: str = ""
     stderr: str = ""
+    stdout_truncated: bool = False
+    stderr_truncated: bool = False
+    elapsed_ms: int = 0
 
     @property
     def passed(self) -> bool:
@@ -57,6 +69,203 @@ def _runner_environment(pytest_root: Path) -> dict[str, str]:
         }
     )
     return env
+
+
+def _capture(command: list[str], *, cwd: Path | None, env: dict[str, str] | None,
+             timeout: float, sandbox_name: str | None = None,
+             input_bytes: bytes | None = None) -> RunResult:
+    """The outer process status is authoritative; output is bounded diagnostic data."""
+    buffers = [bytearray(), bytearray()]
+    truncated = [False, False]
+    output_limit = threading.Event()
+
+    def drain(stream, index: int) -> None:
+        while chunk := stream.read(4096):
+            available = MAX_OUTPUT_BYTES - len(buffers[index])
+            if available > 0:
+                buffers[index].extend(chunk[:available])
+            if len(chunk) > available:
+                truncated[index] = True
+                output_limit.set()
+
+    kwargs: dict[str, object] = {}
+    if os.name == "nt":
+        kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
+    else:
+        kwargs["start_new_session"] = True
+    started = time.monotonic()
+    try:
+        proc = subprocess.Popen(
+            command, cwd=str(cwd) if cwd else None, env=env,
+            stdin=subprocess.PIPE if input_bytes is not None else subprocess.DEVNULL,
+            stdout=subprocess.PIPE, stderr=subprocess.PIPE, **kwargs,
+        )
+    except OSError as exc:
+        return RunResult(RunOutcome.INFRA_ERROR, -1, stderr=str(exc))
+    assert proc.stdout is not None and proc.stderr is not None
+    readers = [threading.Thread(target=drain, args=(stream, index), daemon=True)
+               for index, stream in enumerate((proc.stdout, proc.stderr))]
+    for reader in readers:
+        reader.start()
+    writer = None
+    if input_bytes is not None:
+        def send() -> None:
+            assert proc.stdin is not None
+            try:
+                proc.stdin.write(input_bytes)
+                proc.stdin.close()
+            except (OSError, BrokenPipeError):
+                pass
+        writer = threading.Thread(target=send, daemon=True)
+        writer.start()
+    deadline = started + timeout
+    try:
+        while proc.poll() is None and not output_limit.is_set():
+            remaining = deadline - time.monotonic()
+            if remaining <= 0:
+                break
+            try:
+                proc.wait(timeout=min(0.1, remaining))
+            except subprocess.TimeoutExpired:
+                pass
+        if output_limit.is_set():
+            _terminate_process_tree(proc)
+            outcome, exit_code = RunOutcome.OUTPUT_LIMIT, -1
+        elif proc.poll() is None:
+            _terminate_process_tree(proc)
+            outcome, exit_code = RunOutcome.TIMEOUT, -1
+        else:
+            exit_code = proc.returncode
+            outcome = (RunOutcome.PASS if exit_code == 0 else
+                       RunOutcome.TESTS_FAILED if exit_code == 1 else RunOutcome.INFRA_ERROR)
+    finally:
+        if sandbox_name:
+            # Killing the Docker client does not guarantee its container stopped.
+            try:
+                subprocess.run(["docker", "rm", "-f", sandbox_name],
+                               stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
+                               timeout=5, check=False)
+                check = subprocess.run(
+                    ["docker", "ps", "-a", "--filter", f"name=^{sandbox_name}$",
+                     "--format", "{{.Names}}"], capture_output=True, timeout=5,
+                    check=False)
+                if check.returncode != 0 or check.stdout.strip():
+                    outcome = RunOutcome.CLEANUP_FAILED
+                    buffers[1].extend(f"\nsandbox_cleanup_unverified:{sandbox_name}".encode())
+            except (OSError, subprocess.TimeoutExpired):
+                outcome = RunOutcome.CLEANUP_FAILED
+                buffers[1].extend(f"\nsandbox_cleanup_unverified:{sandbox_name}".encode())
+        try:
+            proc.wait(timeout=2)
+        except subprocess.TimeoutExpired:
+            _terminate_process_tree(proc)
+        for reader in readers:
+            reader.join(timeout=1)
+        if writer is not None:
+            writer.join(timeout=1)
+        for stream in (proc.stdout, proc.stderr):
+            stream.close()
+    if output_limit.is_set() and outcome is not RunOutcome.CLEANUP_FAILED:
+        outcome = RunOutcome.OUTPUT_LIMIT
+    return RunResult(
+        outcome, exit_code,
+        buffers[0].decode("utf-8", errors="replace"),
+        buffers[1].decode("utf-8", errors="replace"),
+        truncated[0], truncated[1],
+        int((time.monotonic() - started) * 1000),
+    )
+
+
+def _sandbox_base(path: Path, image: str) -> tuple[list[str], str]:
+    if not re.fullmatch(r"[^\s]+@sha256:[0-9a-f]{64}", image):
+        raise ValueError("sandbox image must be pinned by sha256 digest")
+    name = "grokcell-" + uuid.uuid4().hex
+    return ([
+        "docker", "run", "--rm", "--name", name, "--pull=never",
+        "--log-driver=none",
+        "--network=none", "--read-only", "--cap-drop=ALL",
+        "--security-opt=no-new-privileges", "--pids-limit=64",
+        "--memory=512m", "--cpus=1", "--user=65534:65534",
+        "--tmpfs=/tmp:rw,nosuid,nodev,size=64m",
+        "--mount", f"type=bind,source={path.resolve()},target=/workspace,readonly",
+        "--workdir=/workspace", "--env=HOME=/tmp",
+        "--env=PYTHONDONTWRITEBYTECODE=1",
+        "--env=PYTEST_DISABLE_PLUGIN_AUTOLOAD=1",
+    ], name)
+
+
+def _sandbox_command(path: Path, image: str) -> tuple[list[str], str]:
+    base, name = _sandbox_base(path, image)
+    return (base + ["--entrypoint=python", image, "-m", "pytest", "/workspace",
+        "-q", "--tb=short", "-p", "no:cacheprovider",
+        "--rootdir=/workspace",
+    ], name)
+
+
+_CALL_SCRIPT = """import importlib, json, sys
+sys.path.insert(0, '/workspace')
+item = json.load(sys.stdin)
+args = None
+try:
+    if item['scope'] == 'component':
+        module = importlib.import_module('service')
+        fn = getattr(module, item['function'])
+        args = item['args']
+        value = fn(*args)
+        result = {'type': 'return', 'value': value, 'args_after': args}
+    elif item['scope'] == 'application':
+        decoder = importlib.import_module('event_decoder').decode_event
+        reducer = importlib.import_module('inventory_reducer').apply_event
+        api = importlib.import_module('availability_api').availability
+        state = {}
+        for raw in item['raw_events']:
+            state = reducer(state, decoder(raw))
+        result = {'type': 'return', 'value': api(state, item['sku'])}
+    else:
+        raise ValueError('invalid scope')
+except Exception as exc:
+    result = {'type': 'exception', 'name': type(exc).__name__}
+    if item.get('scope') == 'component' and args is not None:
+        result['args_after'] = args
+try:
+    encoded = json.dumps({'completed': True, 'result': result}, separators=(',', ':'))
+except (TypeError, ValueError):
+    encoded = json.dumps({'completed': True, 'result': {'type': 'exception',
+                          'name': 'UnserializableReturn'}})
+print(encoded)
+"""
+
+
+def isolated_call(path: Path, payload: dict, *, timeout: float = 8.0) -> tuple[RunResult, dict | None]:
+    """Return candidate behavior only; the host compares it with hidden expected data."""
+    image = os.environ.get(SANDBOX_IMAGE_ENV)
+    if not image:
+        return RunResult(RunOutcome.SANDBOX_REQUIRED, 4), None
+    try:
+        base, name = _sandbox_base(path, image)
+    except ValueError as exc:
+        return RunResult(RunOutcome.INFRA_ERROR, 4, stderr=str(exc)), None
+    encoded = json.dumps(payload, separators=(",", ":")).encode("utf-8")
+    if len(encoded) > 64_000:
+        return RunResult(RunOutcome.INFRA_ERROR, 4, stderr="probe payload too large"), None
+    command = base + ["-i", "--entrypoint=python", image, "-I", "-c", _CALL_SCRIPT]
+    result = _capture(command, cwd=None, env=None, timeout=_bounded_timeout(timeout),
+                      sandbox_name=name, input_bytes=encoded)
+    if not result.passed or result.stdout_truncated or result.stderr_truncated:
+        return result, None
+    lines = result.stdout.splitlines()
+    if len(lines) != 1:
+        return RunResult(RunOutcome.INFRA_ERROR, result.exit_code,
+                         stderr="probe did not complete exactly once",
+                         elapsed_ms=result.elapsed_ms), None
+    try:
+        report = json.loads(lines[0])
+    except json.JSONDecodeError:
+        report = None
+    if not isinstance(report, dict) or report.get("completed") is not True or not isinstance(report.get("result"), dict):
+        return RunResult(RunOutcome.INFRA_ERROR, result.exit_code,
+                         stderr="invalid probe completion", elapsed_ms=result.elapsed_ms), None
+    return result, report["result"]
 
 
 def _terminate_process_tree(process: subprocess.Popen[bytes]) -> None:
@@ -86,6 +295,16 @@ def _terminate_process_tree(process: subprocess.Popen[bytes]) -> None:
             process.kill()
         except OSError:
             pass
+
+
+def _bounded_timeout(requested: float) -> float:
+    value = os.environ.get(DEADLINE_ENV)
+    if not value:
+        return requested
+    try:
+        return max(0.001, min(requested, float(value) - time.monotonic()))
+    except ValueError:
+        return 0.001
 
 
 def suite_path(name: str) -> Path | None:
@@ -126,6 +345,15 @@ def pytest_suite(
     timeout: float = TEST_TIMEOUT_SECONDS,
     untrusted: bool = False,
 ) -> RunResult:
+    image = os.environ.get(SANDBOX_IMAGE_ENV) if untrusted else None
+    if image:
+        try:
+            command, name = _sandbox_command(path, image)
+        except ValueError as exc:
+            return RunResult(RunOutcome.INFRA_ERROR, 4, stderr=str(exc))
+        # Docker is only a transport here. The pinned image must contain pytest.
+        return _capture(command, cwd=None, env=None,
+                        timeout=_bounded_timeout(timeout), sandbox_name=name)
     if untrusted and os.environ.get(UNSANDBOXED_RUNNER_ENV) != "1":
         return RunResult(
             RunOutcome.SANDBOX_REQUIRED,
@@ -145,7 +373,7 @@ def pytest_suite(
         "pytest",
         str(path),
         "-q",
-        "--tb=no",
+        "--tb=short",
         "-p",
         "no:cacheprovider",
         "-c",
@@ -153,41 +381,8 @@ def pytest_suite(
         "--rootdir",
         str(path),
     ]
-    kwargs: dict[str, object] = {}
-    if os.name == "nt":
-        kwargs["creationflags"] = subprocess.CREATE_NEW_PROCESS_GROUP
-    else:
-        kwargs["start_new_session"] = True
-    try:
-        proc = subprocess.Popen(
-            command,
-            cwd=str(path),
-            stdout=subprocess.DEVNULL,
-            stderr=subprocess.DEVNULL,
-            env=_runner_environment(pytest_root),
-            **kwargs,
-        )
-        try:
-            exit_code = proc.wait(timeout=timeout)
-        except subprocess.TimeoutExpired:
-            _terminate_process_tree(proc)
-            try:
-                proc.wait(timeout=5.0)
-            except subprocess.TimeoutExpired:
-                pass
-            return RunResult(RunOutcome.TIMEOUT, -1)
-        except BaseException:
-            _terminate_process_tree(proc)
-            raise
-    except OSError as exc:
-        return RunResult(RunOutcome.INFRA_ERROR, -1, stderr=str(exc))
-    if exit_code == 0:
-        outcome = RunOutcome.PASS
-    elif exit_code == 1:
-        outcome = RunOutcome.TESTS_FAILED
-    else:
-        outcome = RunOutcome.INFRA_ERROR
-    return RunResult(outcome, int(exit_code))
+    return _capture(command, cwd=path, env=_runner_environment(pytest_root),
+                    timeout=timeout)
 
 
 def run_path(

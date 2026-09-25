@@ -75,6 +75,8 @@ def evaluate_acceptance(artifact: Artifact, suite: AcceptanceSuite) -> tuple[boo
                 RunOutcome.TIMEOUT: "acceptance_timeout",
                 RunOutcome.INFRA_ERROR: "acceptance_infrastructure",
                 RunOutcome.SANDBOX_REQUIRED: "runner_sandbox_required",
+                RunOutcome.OUTPUT_LIMIT: "acceptance_output_limit",
+                RunOutcome.CLEANUP_FAILED: "acceptance_cleanup_failed",
             }[outcome]
         if suite_hash(staged) != expected_hash:
             return False, "acceptance_modified_artifact"

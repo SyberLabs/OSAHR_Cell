@@ -35,6 +35,24 @@ class _FlipReturnConstants(ast.NodeTransformer):
             elif isinstance(value.value, (int, float)) and value.value != 0:
                 self.flipped = True
                 node.value = ast.Constant(value=type(value.value)(0))
+        return node if self.flipped else self.generic_visit(node)
+
+    def visit_Compare(self, node: ast.Compare) -> ast.Compare:
+        if not self.flipped and len(node.ops) == 1:
+            opposite = {ast.Eq: ast.NotEq, ast.NotEq: ast.Eq,
+                        ast.Lt: ast.GtE, ast.LtE: ast.Gt,
+                        ast.Gt: ast.LtE, ast.GtE: ast.Lt,
+                        ast.In: ast.NotIn, ast.NotIn: ast.In}
+            replacement = opposite.get(type(node.ops[0]))
+            if replacement is not None:
+                node.ops[0] = replacement()
+                self.flipped = True
+        return node
+
+    def visit_BinOp(self, node: ast.BinOp) -> ast.BinOp:
+        if not self.flipped and isinstance(node.op, (ast.Add, ast.Sub)):
+            node.op = ast.Sub() if isinstance(node.op, ast.Add) else ast.Add()
+            self.flipped = True
         return node
 
 

@@ -5,6 +5,7 @@ Not the kernel. Not confirmatory science. Experiment 06 (seed 260826)
 remains the last executed confirmatory record.
 
 Product direction: `PRODUCT_PLAN.md`. Surface laws: `ARCHITECTURE.md`.
+The bounded Jev/Qwen repair probe is documented in `REPAIR_EXPERIMENT.md`.
 
 ```text
 grokbot -> bus.post / park.request / oda.* -> vault + junction
