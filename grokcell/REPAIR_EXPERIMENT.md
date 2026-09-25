@@ -7,6 +7,10 @@ python -m grokcell.repair_experiment --check
 python -m pytest tests/test_repair_offline.py -q
 ```
 
+`--check` verifies frozen contracts and reports whether a Docker command and
+credential variables are present. It does not test the Docker daemon, image
+contents, provider access, tariffs, or candidate isolation.
+
 Copy `repair_budget.template.json` to `budget.json` and fill its deliberately
 unusable image and price placeholders from your authorized infrastructure.
 The live runner needs a pre-pulled digest-pinned Linux image containing Python and pytest,
@@ -28,8 +32,9 @@ shuffles five frozen variants across A (Qwen routing), B (deterministic), C
 as **blocked** because Jev-Mem's nested provider usage cannot yet be metered
 and reserved under the same hard budget. `results.jsonl`, `run_config.json`,
 and `summary.json` are the machine-readable evidence. Resume skips fully
-recorded episodes; an interrupted episode stops for operator reconciliation
-before any call or admission is replayed.
+recorded episodes. It cannot restart an interrupted episode in place: preserve
+its evidence and reconcile external cost and admission before an operator
+authorizes a fresh run.
 The paid paired pilot is disabled until an independently accepted fixture has
 a genuine Jev routing opportunity; `--check` reports this gate. The seed path
 remains available for testing the repair machinery with authorized resources.
