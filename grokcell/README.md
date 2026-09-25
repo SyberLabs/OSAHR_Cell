@@ -24,8 +24,8 @@ python -m pytest tests/test_repair_offline.py -q
 
 The [experiment guide](REPAIR_EXPERIMENT.md) has the budget template, sandbox
 requirements, frozen acceptance contracts, and machine-readable evidence paths.
-The [Cloudflare staging adapter](../deploy/cloudflare/README.md) can expose
-read-only contract health and pilot readiness without enabling repair runs.
+Cloudflare deployment is deferred while the paid pilot has no useful Jev
+routing decision to test. The offline preflight remains available above.
 
 ```text
 grokbot -> bus.post / park.request / oda.* -> vault + junction

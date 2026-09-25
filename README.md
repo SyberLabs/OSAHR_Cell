@@ -92,9 +92,11 @@ offline preflight. Candidate execution requires a digest-pinned Docker image
 and explicit provider credentials and spending limits. See the probe guide for
 the budget template, acceptance boundary, and current blockers.
 
-The [Cloudflare deployment adapter](deploy/cloudflare/README.md) serves only
-read-only `/healthz` and `/preflight` endpoints from a separate Python
-container. It does not run Qwen, Jev, candidate code, or the paid pilot.
+Cloudflare deployment is deferred. The current repair fixture cannot test a
+useful Jev routing decision, and a status-only endpoint would not generate
+repair evidence. Hosting should be reconsidered after an independently accepted
+fixture exposes multiple productive legal actions and the bounded pilot shows
+a measured benefit. See the [probe guide](grokcell/REPAIR_EXPERIMENT.md).
 
 The ontology benchmark passed transition-law checks but was substantially slower than plain direct simulation. See `docs/VALIDATION_FRAMEWORK.md`.
 
