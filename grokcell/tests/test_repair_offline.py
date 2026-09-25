@@ -281,6 +281,7 @@ def test_unmeasured_memory_arm_cannot_earn_retention():
     scored = summarize(rows)
     assert not scored["comparisons"]["E_vs_D"]["comparable"]
     assert not scored["comparisons"]["E_vs_D"]["retention_supported"]
+    assert scored["comparisons"]["C_vs_B"]["retention_reason"] == "no_jev_decision_exposure"
 
 
 def test_prior_record_is_bound_to_completed_episode_and_seed_cost(tmp_path):

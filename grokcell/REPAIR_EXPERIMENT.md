@@ -35,6 +35,17 @@ Routing is deterministic when there is at most one productive legal action;
 the always-present escalation option does not by itself justify a model call.
 The summary reports Jev route calls. Zero calls mean this pilot did not test
 Jev's judgment and cannot support retaining it.
+With the current three-component chain, component gates expose at most one
+failing component before its dependents can run. The no-memory C arm therefore
+has no Jev routing opportunity; A, B, and C choose the same productive action.
+D can ask Jev whether to retrieve prior evidence, so a D/C difference would
+mix routing with retrieval. This fixture tests repair and admission, but cannot
+establish a Jev routing gain or separate the value of simple retrieval. Do not
+create artificial choices solely to make Jev run.
+The `upstream_sku` defect is caught by the decoder's own public contract before
+the downstream components run, so this fixture also does not demonstrate a
+misleading downstream failure. A different independently accepted incident is
+needed to test root-cause routing.
 
 The frozen test manifest is `tests/repair_contracts/SHA256SUMS.txt`. A separate
 test-author context wrote the operator suites before the repair loop was built;

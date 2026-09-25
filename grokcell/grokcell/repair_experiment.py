@@ -870,6 +870,8 @@ def summarize(results: list[dict], *, prior_creation_estimated_usd: float = 0.0)
                     and right["repairs_per_estimated_usd"] is not None)
         gain = (right["repairs_per_estimated_usd"] / left["repairs_per_estimated_usd"] - 1
                 if left["repairs_per_estimated_usd"] and right["repairs_per_estimated_usd"] is not None else None)
+        jev_unexposed = any(by_arm[arm]["jev_route_calls"] == 0
+                            for arm in (baseline, challenger) if arm in {"C", "D", "E"})
         comparisons[label] = {
             "comparable": complete, "observed_relative_gain": gain,
             "paired_outcomes": paired, "provider_versions_match": versions_match,
@@ -878,7 +880,8 @@ def summarize(results: list[dict], *, prior_creation_estimated_usd: float = 0.0)
                 and right["accepted"] >= left["accepted"]
                 and right["observed_false_acceptances"] == 0),
             "retention_supported": False,
-            "retention_reason": "single_small_pilot_no_uncertainty_estimate",
+            "retention_reason": ("no_jev_decision_exposure" if jev_unexposed else
+                                 "single_small_pilot_no_uncertainty_estimate"),
         }
     return {"primary_metric": "accepted_complete_tasks_per_estimated_usd",
             "cost_basis": "configured_token_tariffs_plus_executor_time_estimate",
