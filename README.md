@@ -79,6 +79,19 @@ Selected MEASURED results:
 `research_directions/` is PROPOSED notes, not science. Do not cite it as MEASURED.
 GrokCell (`grokcell/`) is a prototype control-plane host, not a confirmatory record.
 
+## GrokCell repair probe
+
+The [bounded repair probe](grokcell/REPAIR_EXPERIMENT.md) uses Qwen to propose
+component repairs and GrokCell's operator-owned tests and admission rules to
+evaluate them. Jev routing is experimental. The current three-component fixture
+offers no useful Jev routing choice, so the paid comparison is blocked; no live
+repair or comparative result has been measured.
+
+From `grokcell/`, run `python -m grokcell.repair_experiment --check` for the
+offline preflight. Candidate execution requires a digest-pinned Docker image
+and explicit provider credentials and spending limits. See the probe guide for
+the budget template, acceptance boundary, and current blockers.
+
 The ontology benchmark passed transition-law checks but was substantially slower than plain direct simulation. See `docs/VALIDATION_FRAMEWORK.md`.
 
 [Architecture](ARCHITECTURE.md) · [Changelog](CHANGELOG.md) · [Repository guide](CELL.md)

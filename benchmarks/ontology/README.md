@@ -1,4 +1,4 @@
-# Open-ontology execution control — v1
+# Open-ontology execution control - v1
 
 Status: **development probe**, not a production adapter or a competitive win.
 This directory tests the proposed role of OSAHR as an executable stochastic

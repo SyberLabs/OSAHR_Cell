@@ -7,6 +7,24 @@ remains the last executed confirmatory record.
 Product direction: `PRODUCT_PLAN.md`. Surface laws: `ARCHITECTURE.md`.
 The bounded Jev/Qwen repair probe is documented in `REPAIR_EXPERIMENT.md`.
 
+## Repair probe
+
+Qwen proposes code; the existing GrokCell gates independently test and admit
+immutable component revisions. Jev only has a potential role when there are
+multiple productive legal actions. In the current fixture there are none for
+the no-memory Jev arm, so the paid paired pilot stops before any provider call.
+Jev-Mem is also blocked. The implementation and fixtures are offline tested,
+with no live repair or production deployment claim.
+
+```bash
+cd grokcell
+python -m grokcell.repair_experiment --check
+python -m pytest tests/test_repair_offline.py -q
+```
+
+The [experiment guide](REPAIR_EXPERIMENT.md) has the budget template, sandbox
+requirements, frozen acceptance contracts, and machine-readable evidence paths.
+
 ```text
 grokbot -> bus.post / park.request / oda.* -> vault + junction
         -> DPO assemble-component on licensed admit
