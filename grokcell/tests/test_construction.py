@@ -25,7 +25,7 @@ def test_sequential_construction_commits_through_the_kernel(tmp_path: Path):
         },
     )
     drained = tools.call("bus.drain", {})
-    assert drained["results"][0]["status"] == "admit"
+    assert drained["results"][0]["status"] == "admit", drained["results"][0]
     after = tools.call("surface.inspect", {})
     assert after["components"] == ["core.api"]
     assert after["state_hash"] != before["state_hash"]
@@ -45,7 +45,7 @@ def test_sequential_construction_commits_through_the_kernel(tmp_path: Path):
         },
     )
     second = tools.call("bus.drain", {})
-    assert second["results"][0]["status"] == "admit"
+    assert second["results"][0]["status"] == "admit", second["results"][0]
     final = tools.call("surface.inspect", {})
     assert final["components"] == ["core.api", "app.ui"]
 
