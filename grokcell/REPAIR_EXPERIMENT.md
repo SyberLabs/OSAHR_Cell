@@ -31,6 +31,11 @@ and `summary.json` are the machine-readable evidence. Resume skips fully
 recorded episodes; an interrupted episode stops for operator reconciliation
 before any call or admission is replayed.
 
+Routing is deterministic when there is at most one productive legal action;
+the always-present escalation option does not by itself justify a model call.
+The summary reports Jev route calls. Zero calls mean this pilot did not test
+Jev's judgment and cannot support retaining it.
+
 The frozen test manifest is `tests/repair_contracts/SHA256SUMS.txt`. A separate
 test-author context wrote the operator suites before the repair loop was built;
 this is authorship separation, not external validation. A passing episode

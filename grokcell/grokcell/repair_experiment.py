@@ -830,6 +830,7 @@ def summarize(results: list[dict], *, prior_creation_estimated_usd: float = 0.0)
             "qwen_revisions": revisions,
             "qwen_revision_known": bool(qwen_calls) and len(revisions) == 1 and all(
                 item.get("revision") == revisions[0] for item in qwen_calls),
+            "jev_route_calls": len(jev_routes),
             "jev_models": jev_models,
             "jev_model_known": bool(jev_routes) and len(jev_models) == 1 and all(
                 route.get("model") == jev_models[0] for route in jev_routes),

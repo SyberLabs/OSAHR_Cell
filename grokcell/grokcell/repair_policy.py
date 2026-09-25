@@ -97,8 +97,13 @@ def deterministic_choice(candidates: list[Candidate]) -> Candidate:
 def select_action(state: DecisionState, policy: str, chooser=None) -> tuple[Candidate, dict]:
     candidates = legal_candidates(state)
     fallback = deterministic_choice(candidates)
-    if policy == "deterministic" or len(candidates) == 1:
+    if policy == "deterministic":
         return fallback, {"source": "deterministic", "fallback": False}
+    productive = [item for item in candidates if item.action != "ESCALATE"]
+    if len(productive) <= 1:
+        return fallback, {"source": "deterministic", "fallback": False,
+                          "reason": ("single_productive_action" if productive
+                                     else "no_productive_action")}
     if policy not in {"jev", "qwen"} or chooser is None:
         raise ValueError("invalid routing policy")
     reply = None

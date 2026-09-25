@@ -73,6 +73,22 @@ def test_contradiction_forces_investigation_and_infrastructure_escalates():
     assert [item.action for item in legal_candidates(blocked)] == ["ESCALATE"]
 
 
+@pytest.mark.parametrize("policy", ["jev", "qwen"])
+def test_single_productive_action_does_not_spend_routing_call(policy):
+    class UnusedChooser:
+        def choose(self, **kwargs):
+            raise AssertionError("unnecessary routing call")
+
+    repair, repair_route = select_action(_state(), policy, UnusedChooser())
+    assert repair.action == "REPAIR_COMPONENT"
+    assert repair_route == {"source": "deterministic", "fallback": False,
+                            "reason": "single_productive_action"}
+    investigate, investigate_route = select_action(
+        _state(observations=({"status": "contradictory"},)), policy, UnusedChooser())
+    assert investigate.action == "INVESTIGATE"
+    assert investigate_route["reason"] == "single_productive_action"
+
+
 def test_low_confidence_and_invalid_jev_choice_are_visible_fallbacks():
     class LowConfidence:
         min_confidence = 0.65
@@ -84,7 +100,8 @@ def test_low_confidence_and_invalid_jev_choice_are_visible_fallbacks():
                                       "model": "jev-1", "elapsed_ms": 1,
                                       "request_id": "r", "probabilities": {}})()
 
-    choice, route = select_action(_state(), "jev", LowConfidence())
+    choice, route = select_action(
+        _state(evidence_ids=("prior.a1",), retrieval_enabled=True), "jev", LowConfidence())
     assert choice.action == "REPAIR_COMPONENT"
     assert route["fallback"] and route["reason"] == "jev_low_confidence"
     assert route["model"] == "jev-1" and route["confidence"] == 0.2
@@ -340,6 +357,7 @@ def test_score_labels_estimated_cost_and_rejects_model_drift():
     assert scored["primary_metric"].endswith("estimated_usd")
     assert scored["cost_basis"] == "configured_token_tariffs_plus_executor_time_estimate"
     assert scored["prior_creation_estimated_usd"] == 0.5
+    assert scored["arms"]["C"]["jev_route_calls"] == len(VARIANTS)
     assert not scored["comparisons"]["C_vs_A"]["comparable"]
     assert not scored["comparisons"]["C_vs_B"]["comparable"]
     assert not scored["comparisons"]["C_vs_B"]["retention_supported"]
