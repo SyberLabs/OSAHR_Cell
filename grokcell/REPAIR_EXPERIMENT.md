@@ -69,6 +69,12 @@ separately and included in the fully loaded D/E rate. A five-task pilot is
 descriptive and cannot authorize production promotion. Unknown cost blocks
 comparison.
 
+The [TypeSafe workflow chart](https://evals.typesafe.ai/) scores four other
+workflows against model-consensus labels. It does not measure accepted GrokCell
+repairs or establish that Jev chooses the right repair action here. Typed Choice
+output constrains the answer format; the frozen operator checks and the paired
+cost comparison determine whether this routing layer earns its place.
+
 References: [Qwen3-Coder-Next](https://huggingface.co/Qwen/Qwen3-Coder-Next)
 (repository revision `a7fbcb5c0e12d62a448eaa0e260346bf5dcc0feb`, Apache-2.0),
 [TypeSafe API](https://docs.typesafe.ai/api), and
