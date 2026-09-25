@@ -1,0 +1,16 @@
+.git
+.agents
+.venv
+venv
+node_modules
+.wrangler
+**/__pycache__
+**/.pytest_cache
+.env
+.env.*
+secrets
+credentials
+private-data
+grokcell/vault/state
+grokcell/vault/claims
+grokcell/vault/fidelity
