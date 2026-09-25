@@ -5,8 +5,7 @@ import hashlib
 import json
 from dataclasses import asdict, dataclass
 
-ACTIONS = {"INVESTIGATE", "REPAIR_COMPONENT", "REIMPLEMENT_COMPONENT",
-           "RETRIEVE_EVIDENCE", "ESCALATE"}
+ACTIONS = {"REPAIR_COMPONENT", "RETRIEVE_EVIDENCE", "ESCALATE"}
 
 
 def digest(value: object) -> str:
@@ -60,17 +59,15 @@ def legal_candidates(state: DecisionState) -> list[Candidate]:
                           if item.get("status") == "tests_failed" and item.get("component")})
         uncertain = any(item.get("status") in {"unknown", "contradictory"}
                         for item in state.observations)
-        if uncertain or not failing:
-            specs.append(("INVESTIGATE", "task", "run bounded public diagnostic", 0, 0))
         if (not uncertain and state.remaining_calls >= 1 + state.routing_calls
                 and state.remaining_output_tokens >= 2048 + state.routing_tokens):
             for target in failing:
                 prior = [item for item in state.attempts if item.get("target") == target
                          and item.get("action") in {"REPAIR_COMPONENT", "REIMPLEMENT_COMPONENT"}]
                 if len(prior) < 2:
-                    action = "REIMPLEMENT_COMPONENT" if prior else "REPAIR_COMPONENT"
-                    specs.append((action, target, "propose service.py and public candidate tests", 1, 2048))
-        if (state.retrieval_enabled and failing and state.evidence_ids
+                    specs.append(("REPAIR_COMPONENT", target,
+                                  "propose service.py and public candidate tests", 1, 2048))
+        if (not uncertain and state.retrieval_enabled and failing and state.evidence_ids
                 and state.remaining_retrievals > 0):
             specs.append(("RETRIEVE_EVIDENCE", "task", "read bounded canonical prior attempts", 0, 0))
         specs.append(("ESCALATE", "task", "stop with observed evidence", 0, 0))
@@ -86,8 +83,7 @@ def validate_choice(state: DecisionState, chosen: Candidate) -> bool:
 
 
 def deterministic_choice(candidates: list[Candidate]) -> Candidate:
-    for action in ("REPAIR_COMPONENT", "REIMPLEMENT_COMPONENT", "INVESTIGATE",
-                   "RETRIEVE_EVIDENCE", "ESCALATE"):
+    for action in ("REPAIR_COMPONENT", "RETRIEVE_EVIDENCE", "ESCALATE"):
         for candidate in candidates:
             if candidate.action == action:
                 return candidate

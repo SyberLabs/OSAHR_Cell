@@ -29,6 +29,7 @@ ARMS = {"A": ("qwen", "none"), "B": ("deterministic", "none"),
         "C": ("jev", "none"), "D": ("jev", "simple"),
         "E": ("jev", "jev_mem")}
 MIN_WORTHWHILE_GAIN = 0.20  # Design hypothesis, frozen before any live result.
+PAIRED_PILOT_READY = False  # Current chain presents no Jev choice in arm C.
 CONTRACT_FILES = {component: (
     CONTRACT_ROOT / "held_out" / f"acceptance_hidden_{component}.py")
     for component in COMPONENTS}
@@ -541,13 +542,6 @@ class Episode:
             if choice.action == "ESCALATE":
                 status, reason = "escalated", "policy_escalated"
                 break
-            if choice.action == "INVESTIGATE":
-                # A second identical observation is a stopping condition.
-                if self.attempt_history and self.attempt_history[-1].get("action") == "INVESTIGATE":
-                    status, reason = "escalated", "unchanged_public_state"
-                    break
-                self.attempt_history.append({"action": "INVESTIGATE", "route": route})
-                continue
             if choice.action == "RETRIEVE_EVIDENCE":
                 self.retrievals += 1
                 signature = str(self.observations[-1].get("diagnostic", "")) if self.observations else ""
@@ -909,6 +903,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.check and not args.live:
         print(json.dumps({"status": "offline_preflight_only", "contract_count": len(contracts),
                           "variants": list(VARIANTS), "arms": list(ARMS),
+                          "paired_pilot_ready": PAIRED_PILOT_READY,
                           "sandbox_configured": bool(os.environ.get(SANDBOX_IMAGE_ENV)),
                           "docker_available": bool(shutil.which("docker")),
                           "qwen_credential": bool(os.environ.get("HF_TOKEN")),
@@ -918,6 +913,8 @@ def main(argv: list[str] | None = None) -> int:
         parser.error("live run requires --live --budget FILE --output DIR")
     budget_config = _strict_json(args.budget.read_text(encoding="utf-8"))
     Budget(budget_config)  # Validate schema before any side effect.
+    if not args.seed_prior and not PAIRED_PILOT_READY:
+        raise SystemExit("paired pilot blocked: current fixture has no Jev routing opportunity")
     if (not shutil.which("docker") or not os.environ.get("HF_TOKEN") or
             (not args.seed_prior and not os.environ.get("TYPESAFE_API_KEY"))):
         raise SystemExit("live prerequisites missing: Docker, HF_TOKEN, and TypeSafe key for paired pilot")

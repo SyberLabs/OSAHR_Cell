@@ -30,6 +30,9 @@ and reserved under the same hard budget. `results.jsonl`, `run_config.json`,
 and `summary.json` are the machine-readable evidence. Resume skips fully
 recorded episodes; an interrupted episode stops for operator reconciliation
 before any call or admission is replayed.
+The paid paired pilot is disabled until an independently accepted fixture has
+a genuine Jev routing opportunity; `--check` reports this gate. The seed path
+remains available for testing the repair machinery with authorized resources.
 
 Routing is deterministic when there is at most one productive legal action;
 the always-present escalation option does not by itself justify a model call.
@@ -46,6 +49,9 @@ The `upstream_sku` defect is caught by the decoder's own public contract before
 the downstream components run, so this fixture also does not demonstrate a
 misleading downstream failure. A different independently accepted incident is
 needed to test root-cause routing.
+Uncertain observations escalate: the earlier `INVESTIGATE` branch only repeated
+the same tests. `REIMPLEMENT_COMPONENT` also used the same builder operation as
+`REPAIR_COMPONENT`, so the redundant action label was removed.
 
 The frozen test manifest is `tests/repair_contracts/SHA256SUMS.txt`. A separate
 test-author context wrote the operator suites before the repair loop was built;

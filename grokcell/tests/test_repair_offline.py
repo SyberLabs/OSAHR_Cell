@@ -3,11 +3,12 @@ from __future__ import annotations
 import ast
 import json
 import math
+from pathlib import Path
 
 import pytest
 
 from grokcell.repair_adapters import JevChoice, QwenBuilder, QWEN_MODEL, _NoRedirect
-from grokcell.repair_experiment import (Budget, Episode, _read_prior, revision_name,
+from grokcell.repair_experiment import (Budget, Episode, _read_prior, main, revision_name,
                                         summarize, verify_contracts, verify_terminal,
                                         write_terminal)
 from grokcell.repair_fixture import COMPONENTS, SEED_SOURCES, SEED_VARIANT, VARIANTS
@@ -47,6 +48,22 @@ def test_frozen_contract_and_fixture_shapes_are_offline():
     assert mutate_source(VARIANTS["local_reserve"]["availability_api"]) is not None
 
 
+def test_preflight_blocks_paid_pilot_without_jev_decision_opportunity(tmp_path, capsys):
+    assert main(["--check"]) == 0
+    assert json.loads(capsys.readouterr().out)["paired_pilot_ready"] is False
+    template = Path(__file__).resolve().parents[1] / "repair_budget.template.json"
+    budget = json.loads(template.read_text(encoding="utf-8"))
+    for key, value in budget.items():
+        if value is None:
+            budget[key] = 1.0
+    config = tmp_path / "budget.json"
+    config.write_text(json.dumps(budget), encoding="utf-8")
+    output = tmp_path / "paid-run"
+    with pytest.raises(SystemExit, match="no Jev routing opportunity"):
+        main(["--live", "--budget", str(config), "--output", str(output)])
+    assert not output.exists()
+
+
 def test_choice_is_one_legal_action_target_pair_and_stale_decisions_fail():
     state = _state()
     choice = deterministic_choice(legal_candidates(state))
@@ -65,12 +82,18 @@ def test_route_reserves_worker_call_and_disables_retrieval_without_backend():
     assert "RETRIEVE_EVIDENCE" in {item.action for item in legal_candidates(with_memory)}
 
 
-def test_contradiction_forces_investigation_and_infrastructure_escalates():
+def test_contradiction_and_infrastructure_escalate():
     contradictory = _state(observations=({"status": "contradictory"},))
-    assert {item.action for item in legal_candidates(contradictory)} == {
-        "INVESTIGATE", "ESCALATE"}
+    assert [item.action for item in legal_candidates(contradictory)] == ["ESCALATE"]
     blocked = _state(infrastructure_ready=False)
     assert [item.action for item in legal_candidates(blocked)] == ["ESCALATE"]
+
+
+def test_repair_after_prior_attempt_uses_same_builder_operation():
+    state = _state(attempts=({"target": "inventory_reducer",
+                              "action": "REPAIR_COMPONENT"},))
+    assert [item.action for item in legal_candidates(state)] == [
+        "REPAIR_COMPONENT", "ESCALATE"]
 
 
 @pytest.mark.parametrize("policy", ["jev", "qwen"])
@@ -83,10 +106,10 @@ def test_single_productive_action_does_not_spend_routing_call(policy):
     assert repair.action == "REPAIR_COMPONENT"
     assert repair_route == {"source": "deterministic", "fallback": False,
                             "reason": "single_productive_action"}
-    investigate, investigate_route = select_action(
+    escalation, escalation_route = select_action(
         _state(observations=({"status": "contradictory"},)), policy, UnusedChooser())
-    assert investigate.action == "INVESTIGATE"
-    assert investigate_route["reason"] == "single_productive_action"
+    assert escalation.action == "ESCALATE"
+    assert escalation_route["reason"] == "no_productive_action"
 
 
 def test_low_confidence_and_invalid_jev_choice_are_visible_fallbacks():
