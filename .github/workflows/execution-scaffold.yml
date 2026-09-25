@@ -23,6 +23,7 @@ jobs:
     runs-on: ubuntu-24.04
     timeout-minutes: 10
     strategy:
+      fail-fast: false
       matrix:
         python: ['3.11', '3.13']
     env:
@@ -39,6 +40,7 @@ jobs:
         run: |
           python -m pip install "setuptools>=75" wheel
           python -m pip install --no-build-isolation -e . -e ./grokcell
+          python -m pip install --no-build-isolation -e ./liquid-osahr-experiment-05 -e ./liquid-osahr-experiment-06
       - name: Root and workbench regressions
         run: python -m pytest tests workbench/tests -q
       - name: Scaffold and repair offline regressions
