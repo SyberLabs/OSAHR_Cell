@@ -39,6 +39,7 @@ def workflow_identity(name):
 
 
 def assessment_bytes(source=DEPENDENCY_OBSERVATION):
+    _validate_dependency_source(source)
     data = source.value()
     return canonical({"dependency": data["dependency"], "from_version": data["from_version"],
                       "to_version": data["to_version"], "source_hash": source.identity,
@@ -53,6 +54,7 @@ def checked_proposal(runtime, observation, decision, request, artifact_type, *, 
 
 
 def repair(runtime, source=REPAIR_OBSERVATION):
+    _validate_repair_source(source)
     observation = runtime.read("input", source)
     decision = runtime.decide("route", observation, (
         ActionOffer("repair", "generate", "repair the demonstrated availability arithmetic defect"),
@@ -68,6 +70,7 @@ def repair(runtime, source=REPAIR_OBSERVATION):
 
 
 def dependency(runtime, source=DEPENDENCY_OBSERVATION):
+    _validate_dependency_source(source)
     observation = runtime.read("input", source)
     decision = runtime.decide("route", observation, (
         ActionOffer("assess", "generate", "draft an evidence-scoped dependency assessment for human review"),
@@ -84,3 +87,34 @@ def json_assessment_shape(source):
     """Public requirements; no hidden compatibility or semantic claims are inserted."""
     import json
     return json.loads(assessment_bytes(source))
+
+
+def _validate_repair_source(source):
+    if type(source) is not JsonSnapshot:
+        raise TypeError("repair input must be a JSON snapshot")
+    value = source.value()
+    fields = {"component", "source", "public_diagnostic", "public_contract"}
+    if type(value) is not dict or set(value) != fields:
+        raise ValueError("repair input fields do not match the bounded schema")
+    if any(type(value[key]) is not str or not value[key].strip() or len(value[key]) > 4096 for key in fields):
+        raise ValueError("repair input values must be nonempty text within 4096 characters")
+    if value["component"] != "available":
+        raise ValueError("repair component must be available")
+
+
+def _validate_dependency_source(source):
+    if type(source) is not JsonSnapshot:
+        raise TypeError("dependency input must be a JSON snapshot")
+    value = source.value()
+    fields = {"dependency", "from_version", "to_version", "changes", "compatibility"}
+    if type(value) is not dict or set(value) != fields:
+        raise ValueError("dependency input fields do not match the bounded schema")
+    for key in ("dependency", "from_version", "to_version"):
+        if type(value[key]) is not str or not value[key].strip() or len(value[key]) > 128:
+            raise ValueError("dependency identity and versions must be nonempty text within 128 characters")
+    if (type(value["changes"]) is not list or not value["changes"]
+            or len(value["changes"]) > 16
+            or any(type(item) is not str or not item.strip() or len(item) > 512 for item in value["changes"])):
+        raise ValueError("dependency changes must be 1-16 text facts within 512 characters each")
+    if value["compatibility"] != "not_established":
+        raise ValueError("compatibility must remain not_established")
