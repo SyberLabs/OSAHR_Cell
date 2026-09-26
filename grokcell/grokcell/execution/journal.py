@@ -59,7 +59,7 @@ def sync_directory(path: Path) -> None:
 
 
 def sync_file(path: Path) -> None:
-    with path.open("rb") as handle:
+    with path.open("r+b") as handle:
         os.fsync(handle.fileno())
 
 
@@ -87,6 +87,11 @@ def _current(store: SnapshotStore):
     if (set(manifest) != {"version", "kind", "generation", "execution", "sha256"}
             or manifest["version"] != MANIFEST_VERSION or manifest["kind"] != "execution"):
         raise ValueError("state root belongs to another format; no implicit migration")
+    if (any(path.exists() or path.is_symlink()
+            for path in (store.kernel_path, store.surface_path))
+            or any(store.root.glob("kernel-*.osahr.gz"))
+            or any(store.root.glob("surface-*.json"))):
+        raise ValueError("mixed state formats; operator recovery required")
     generation = manifest["generation"]
     if type(generation) is not str or not re.fullmatch(r"[0-9a-f]{32}", generation):
         raise ValueError("invalid execution generation")

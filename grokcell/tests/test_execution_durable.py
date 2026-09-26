@@ -16,6 +16,7 @@ from grokcell.execution.examples import (FixtureChooser, FixtureWorker, REPAIR,
                                         RepairFixtureVerifier, repair_workflow)
 from grokcell.execution.records import ActionOffer, JsonSnapshot, Limits, Permission
 from grokcell.execution.runtime import ExecutionBlocked, OutcomeUnknown
+from grokcell import snapshot as grokcell_snapshot
 from grokcell.snapshot import SnapshotStore
 
 PERMISSION = Permission("durable-test", "operator", ("read", "decide", "generate", "check", "admit", "yield"), 2_000_000_000)
@@ -162,6 +163,40 @@ def test_legacy_root_cannot_be_implicitly_converted(tmp_path):
     (tmp_path / "CURRENT.json").write_text('{"version":1}')
     with pytest.raises(ValueError, match="another format"):
         open_run(tmp_path)
+
+
+@pytest.mark.parametrize("kernel_name,surface_name", [
+    ("kernel.osahr.gz", "surface.json"),
+    ("kernel-" + "0" * 32 + ".osahr.gz", "surface-" + "0" * 32 + ".json"),
+])
+def test_execution_root_rejects_legacy_snapshot_files(tmp_path, kernel_name, surface_name):
+    store = SnapshotStore(tmp_path)
+    assert store.load_execution() is None
+    store.save_execution({"execution": "current"})
+    (tmp_path / kernel_name).write_bytes(b"legacy kernel")
+    (tmp_path / surface_name).write_text("{}")
+
+    with pytest.raises(ValueError, match="mixed state formats"):
+        store.load_execution()
+
+
+def test_legacy_snapshot_save_syncs_written_files(tmp_path, monkeypatch):
+    store = SnapshotStore(tmp_path)
+    assert store.load_pair() is None
+
+    def write_checkpoint(path, _runtime):
+        path.write_bytes(b"trusted legacy checkpoint fixture")
+
+    class Runtime:
+        def snapshot(self):
+            return {}
+
+    monkeypatch.setattr(grokcell_snapshot, "save_checkpoint", write_checkpoint)
+    surface = grokcell_snapshot.SurfaceSnapshot(0, 0, [], {})
+
+    store.save(Runtime(), surface)
+
+    assert store.current_path.is_file()
 
 
 def test_stale_generation_compare_and_swap(tmp_path):
