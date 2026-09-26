@@ -5,16 +5,16 @@ Not the kernel. Not confirmatory science. Experiment 06 (seed 260826)
 remains the last executed confirmatory record.
 
 Product direction: `PRODUCT_PLAN.md`. Surface laws: `ARCHITECTURE.md`.
-The bounded Jev/Qwen repair probe is documented in `REPAIR_EXPERIMENT.md`.
+The bounded Qwen repair path and the routing-study decision are documented in
+`REPAIR_EXPERIMENT.md`.
 
-## Repair probe
+## Repair path
 
-Qwen proposes code; the existing GrokCell gates independently test and admit
-immutable component revisions. Jev only has a potential role when there are
-multiple productive legal actions. In the current fixture there are none for
-the no-memory Jev arm, so the paid paired pilot stops before any provider call.
-Jev-Mem is also blocked. The implementation and fixtures are offline tested,
-with no live repair or production deployment claim.
+Action selection is deterministic. Qwen can propose a component module and
+candidate tests; GrokCell's sandbox, operator-owned checks, host oracle, and
+admission gate decide whether the revision is accepted. The Jev route, retrieval
+arms, and paid routing comparison were removed because the current fixtures
+offer only one productive next action. No live repair result is measured.
 
 ```bash
 cd grokcell
@@ -22,10 +22,8 @@ python -m grokcell.repair_experiment --check
 python -m pytest tests/test_repair_offline.py -q
 ```
 
-The [experiment guide](REPAIR_EXPERIMENT.md) has the budget template, sandbox
-requirements, frozen acceptance contracts, and machine-readable evidence paths.
-Cloudflare deployment is deferred while the paid pilot has no useful Jev
-routing decision to test. The offline preflight remains available above.
+The [repair note](REPAIR_EXPERIMENT.md) records the removal decision and the
+single-run budget requirements. The offline preflight remains available above.
 
 ```text
 grokbot -> bus.post / park.request / oda.* -> vault + junction

@@ -1,21 +1,12 @@
 {
   "sandbox_image": "replace-with-local-image@sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
-  "max_total_usd": 25,
-  "max_task_usd": 1,
+  "max_usd": 1,
   "max_calls": 8,
-  "max_total_calls": 200,
   "max_output_tokens": 16384,
-  "max_total_output_tokens": 409600,
   "max_worker_attempts": 2,
-  "max_total_worker_attempts": 50,
-  "max_retrieval_rounds": 2,
-  "max_total_retrieval_rounds": 50,
-  "max_elapsed_seconds": 7500,
-  "max_task_elapsed_seconds": 300,
+  "max_elapsed_seconds": 300,
   "max_input_tokens_per_call": 50000,
   "qwen_input_usd_per_million": null,
   "qwen_output_usd_per_million": null,
-  "jev_input_usd_per_million": null,
-  "jev_output_usd_per_million": null,
   "executor_usd_per_second": null
 }
