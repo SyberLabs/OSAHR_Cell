@@ -1,4 +1,4 @@
-"""Canonical repair attempts in GrokCell state and bounded lexical retrieval."""
+"""Canonical repair attempt records in GrokCell state."""
 from __future__ import annotations
 
 import hashlib
@@ -53,37 +53,3 @@ class AttemptStore:
     def unfinished(self) -> list[dict]:
         return [item for item in self.all() if item.get("status") in {
             "started", "proposal_ready"}]
-
-
-def simple_retrieve(store: AttemptStore, *, component: str, signature: str,
-                    contract_hash: str, base_hash: str,
-                    dependency_manifest: dict[str, str], environment_hash: str,
-                    limit: int = 5) -> list[dict]:
-    words = set(re.findall(r"[a-z0-9_]+", signature.lower()))
-    scored = []
-    for record in store.all():
-        if record.get("status") != "finished" or not record.get("observed_outcome"):
-            continue
-        same_contract = record.get("contract_hash") == contract_hash
-        same_component = record.get("target") == component
-        prior_words = set(re.findall(r"[a-z0-9_]+", str(record.get("failure_signature", "")).lower()))
-        score = 8 * same_contract + 4 * same_component + min(3, len(words & prior_words))
-        if score:
-            scored.append((score, record["id"], record))
-    scored.sort(key=lambda item: (-item[0], item[1]))
-    return [dict(record, record_hash=_digest(record),
-                 applicability=("exact_context" if same_context(
-                     record, component, contract_hash, base_hash,
-                     dependency_manifest, environment_hash)
-                                else "related_requires_retest"))
-            for _, _, record in scored[:limit]]
-
-
-def same_context(record: dict, component: str, contract_hash: str,
-                 base_hash: str, dependency_manifest: dict[str, str],
-                 environment_hash: str) -> bool:
-    return (record.get("target") == component
-            and record.get("contract_hash") == contract_hash
-            and record.get("base_hash") == base_hash
-            and record.get("dependency_manifest") == dependency_manifest
-            and record.get("environment_hash") == environment_hash)

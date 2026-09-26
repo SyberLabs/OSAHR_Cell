@@ -58,8 +58,7 @@ API = '''def availability(state: dict[str, dict[str, int]], sku: str) -> dict[st
 GOOD = {"event_decoder": DECODER, "inventory_reducer": REDUCER,
         "availability_api": API}
 
-# The later case is a distinct reserve off-by-one defect. The release defect
-# is a similar-looking decoy, so a retrieved repair still needs a new check.
+# Distinct reserve defects and a release defect exercise offline contract checks.
 VARIANTS = {
     "upstream_sku": {**GOOD, "event_decoder": DECODER.replace(
         '    return event\n', '    event["sku"] = event["sku"].lower()\n    return event\n')},
@@ -73,7 +72,7 @@ VARIANTS = {
         'current["reserved"] -= quantity', 'current["on_hand"] -= quantity')},
 }
 
-# Construction-only prior task. It is never included in the scored pilot.
+# The single live episode starts from this independent reserve defect.
 SEED_VARIANT = "seed_reserve"
 SEED_SOURCES = {**GOOD, "inventory_reducer": REDUCER.replace(
     'current["reserved"] += quantity', 'current["reserved"] = current["reserved"] + quantity + 1')}
