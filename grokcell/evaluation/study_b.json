@@ -1,0 +1,23 @@
+{
+  "study_id": "grokcell-complete-systems",
+  "protocol_version": "1.0.0",
+  "status": "frozen-no-scored-runs",
+  "question": "How do credible complete systems perform against equivalent task outcomes, evidence requirements, authority, and resource bounds?",
+  "system_decomposition": "unconstrained; register each system before evaluation and do not force a shared internal workflow",
+  "equivalence_requirements": ["same sealed cases", "same task outcome bar", "same permitted data and actions",
+                               "same maximum wall time and fully loaded cost envelope", "same human-rescue policy",
+                               "same evidence retention and failure accounting"],
+  "case_control": {
+    "case_families": ["development", "retrieval", "evaluation"],
+    "repository_split_required": true,
+    "case_family_overlap_forbidden": true,
+    "repository_overlap_forbidden": true,
+    "sealed_cases_controlled_by_independent_acceptance_owner": true,
+    "owner_id": null,
+    "sealed_case_commitment": null
+  },
+  "report_all": ["all_attempts_and_failures", "required_and_passed_checks", "human_rescue",
+                 "latency", "provider_cost", "billing_reconciliation", "coverage", "uncertainty"],
+  "decision_rule": "Report uncertainty and task-family differences. Do not infer superiority from one case or from an unmatched authority or cost envelope.",
+  "paid_or_live_execution_authorized": false
+}

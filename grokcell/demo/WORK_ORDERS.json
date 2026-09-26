@@ -1,0 +1,13 @@
+{
+  "scope": "Follow-on tasks, not claims that independent agents were launched",
+  "base": "PR #29 continuation; pin the actual revision at assignment time",
+  "integration_rule": "separate worktrees, exclusive owned paths, one integration owner",
+  "bounds": {"max_concurrent_builders": 2, "max_correction_cycles": 2},
+  "tasks": [
+    {"id": "review-runtime", "objective": "Independently attack durable transitions and recovery", "paths": ["grokcell/grokcell/execution/durable.py", "grokcell/grokcell/execution/journal.py", "grokcell/tests/test_execution_durable.py"], "acceptance": "Reproduce failures; retain regression; no weakened acceptance", "effects": "offline branch/test only", "status": "independent_reviewer_required"},
+    {"id": "review-isolation", "objective": "Review actual-Docker evidence and checker authority", "paths": ["grokcell/grokcell/execution/checking.py", "grokcell/tests/test_execution_demo.py"], "acceptance": "Host-owned comparisons and actual image evidence; no host fallback", "effects": "approved sandbox only", "status": "independent_reviewer_required"},
+    {"id": "live-provider-smoke", "objective": "Exercise the implemented Jev/HF path with approved accounts and limits", "paths": ["grokcell/execution_live.template.json"], "acceptance": "Retained request identities, budget and applicable evidence; no fabricated results", "effects": "explicit provider budget required", "status": "blocked_credentials_budget_and_target"},
+    {"id": "comparative-evaluation", "objective": "Run controlled controller ablation and competitive full-system study", "paths": ["new separately versioned evaluation cases"], "acceptance": "Predeclared task splits, thresholds, matched authority and fully loaded costs", "effects": "separate approved study budget", "status": "blocked_acceptance_owner_cases_and_live_access"},
+    {"id": "marketing-release", "objective": "Approve claims against completed evidence and real maintainer use", "paths": ["grokcell/demo/MARKETING_HANDOFF.md"], "acceptance": "No live, production, superiority or adoption claims without evidence", "effects": "draft preparation only; external publication separately approved", "status": "internal_preview_materials_prepared"}
+  ]
+}
