@@ -22,6 +22,20 @@ class Reply:
             integer(self.actual_microusd)
 
 
+class ObservedReplyError(ValueError):
+    """Invalid provider content after billable usage was observed."""
+
+    def __init__(self, message: str, actual_microusd: int | None,
+                 metadata: JsonSnapshot):
+        if actual_microusd is not None:
+            integer(actual_microusd)
+        if type(metadata) is not JsonSnapshot:
+            raise TypeError("observed provider metadata required")
+        super().__init__(message)
+        self.actual_microusd = actual_microusd
+        self.metadata = metadata
+
+
 class DecisionAdapter(Protocol):
     id: str
     mode: str
