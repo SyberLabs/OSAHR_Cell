@@ -1,7 +1,7 @@
 {
   "authorized": false,
-  "budget_scope": "dedicated_credentials_operator_reviewed_bounds",
+  "budget_scope": "credential_owner_no_bill_to_override",
   "limits": {"max_steps": 64, "max_calls": 4, "max_bytes": 65536, "max_microusd": 1000000, "max_seconds": 300},
-  "jev": {"provider": "jev", "model": "jev-1.13.0", "expected_models": ["jev-1.13.0"], "input_microusd_per_million": null, "output_microusd_per_million": 0, "max_charge_microusd": null, "max_input_tokens": 64000, "max_output_tokens": 512, "max_input_bytes": 24000, "timeout_seconds": 15},
-  "hf": {"provider": "hf", "model": "REPLACE_WITH_MODEL:EXPLICIT_PROVIDER", "expected_models": ["REPLACE_WITH_RETURNED_MODEL_ID"], "input_microusd_per_million": null, "output_microusd_per_million": null, "max_charge_microusd": null, "max_input_tokens": 64000, "max_output_tokens": 2048, "max_input_bytes": 24000, "timeout_seconds": 45}
+  "jev": {"provider": "jev", "model": "jev-1.13.0", "expected_models": ["jev-1.13.0"], "input_microusd_per_million": 42000, "output_microusd_per_million": 0, "max_charge_microusd": 2700, "max_input_tokens": 64000, "max_output_tokens": 512, "max_input_bytes": 24000, "timeout_seconds": 15, "billing_scope": "credential_owner"},
+  "hf": {"provider": "hf", "model": "openai/gpt-oss-20b:ovhcloud", "expected_models": ["openai/gpt-oss-20b"], "input_microusd_per_million": 50000, "output_microusd_per_million": 180000, "max_charge_microusd": 3600, "max_input_tokens": 64000, "max_output_tokens": 2048, "max_input_bytes": 24000, "timeout_seconds": 45, "billing_scope": "credential_owner"}
 }

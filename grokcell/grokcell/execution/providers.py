@@ -9,6 +9,7 @@ from __future__ import annotations
 import json
 import math
 import os
+import re
 import signal
 import subprocess
 import sys
@@ -24,6 +25,12 @@ from .records import ActionOffer, JsonSnapshot, Observation, canonical, digest, 
 ENDPOINTS = {"jev": "https://api.typesafe.ai/v1/systemone",
              "hf": "https://router.huggingface.co/v1/chat/completions"}
 MAX_RESPONSE = 1_048_576
+HF_CHAT_PROVIDERS = frozenset({
+    "baseten", "cerebras", "cohere", "deepinfra", "featherless-ai",
+    "fireworks-ai", "groq", "hf-inference", "novita", "nscale",
+    "ovhcloud", "publicai", "together", "zai",
+})
+RETRY_POLICY = "none"
 
 
 @dataclass(frozen=True)
@@ -38,6 +45,7 @@ class ProviderConfig:
     max_output_tokens: int
     max_input_bytes: int = 24_000
     timeout_seconds: int = 30
+    billing_scope: str = "credential_owner"
 
     def __post_init__(self):
         if self.provider not in ENDPOINTS:
@@ -56,13 +64,17 @@ class ProviderConfig:
             integer(ceiling, positive=True)
         if self.max_input_bytes > 64_000 or self.timeout_seconds > 60:
             raise ValueError("provider request exceeds supported envelope")
+        if self.billing_scope != "credential_owner":
+            raise ValueError("only credential-owner billing is supported")
         maximum = self.estimate(self.max_input_tokens, self.max_output_tokens)
         if maximum is None or maximum > self.max_charge_microusd:
             raise ValueError("charge reservation below configured token ceilings")
-        if self.provider == "jev" and (self.model in ("jev-latest", "jev-preview") or not self.model.startswith("jev-")):
+        if self.provider == "jev" and not re.fullmatch(r"jev-\d+\.\d+\.\d+", self.model):
             raise ValueError("pin a versioned Jev model")
-        if self.provider == "hf" and (":" not in self.model or self.model.rsplit(":", 1)[1] in ("auto", "fastest", "cheapest")):
-            raise ValueError("pin an explicit Hugging Face provider suffix")
+        if self.provider == "hf":
+            repository, separator, route = self.model.rpartition(":")
+            if (not separator or not repository.strip() or route not in HF_CHAT_PROVIDERS):
+                raise ValueError("pin a documented Hugging Face chat provider route")
 
     def estimate(self, inputs, outputs):
         for value in (inputs, outputs):
@@ -185,6 +197,10 @@ def post(config: ProviderConfig, payload: dict) -> tuple[dict, str | None, int]:
 def _metadata(config, result, request_id, elapsed):
     if result.get("model") not in config.expected_models:
         raise ValueError("provider returned unexpected model identity")
+    if request_id is None:
+        request_id = result.get("id")
+    if request_id is not None:
+        text(request_id)
     usage = result.get("usage")
     if usage is None:
         usage = {}
@@ -196,13 +212,41 @@ def _metadata(config, result, request_id, elapsed):
         if count is not None:
             integer(count)
     cost = config.estimate(inputs, outputs)
+    cached_tokens = reasoning_tokens = None
+    if config.provider == "hf":
+        prompt_details = usage.get("prompt_tokens_details")
+        completion_details = usage.get("completion_tokens_details")
+        if prompt_details is not None and type(prompt_details) is not dict:
+            raise ValueError("invalid prompt token details")
+        if completion_details is not None and type(completion_details) is not dict:
+            raise ValueError("invalid completion token details")
+        cached_tokens = (prompt_details or {}).get("cached_tokens")
+        reasoning_tokens = (completion_details or {}).get("reasoning_tokens")
+        for count in (cached_tokens, reasoning_tokens):
+            if count is not None:
+                integer(count)
+        if ((cached_tokens is not None and inputs is not None and cached_tokens > inputs)
+                or (reasoning_tokens is not None and outputs is not None and reasoning_tokens > outputs)):
+            raise ValueError("provider token detail exceeds total usage")
     violation = ((inputs is not None and inputs > config.max_input_tokens)
-                 or (config.provider != "jev" and outputs is not None and outputs > config.max_output_tokens))
+                 or (outputs is not None and outputs > config.max_output_tokens))
     metadata = {"provider": config.provider, "requested_model": config.model,
-                "returned_model": result["model"], "request_id": request_id or result.get("id"),
+                "returned_model": result["model"], "request_id": request_id,
                 "serving_revision": result.get("system_fingerprint") or result.get("model_revision"),
                 "input_tokens": inputs, "output_tokens": outputs, "elapsed_ms": elapsed,
                 "cost_basis": "operator_configured_upper_bound_tariff_not_invoice",
+                "input_microusd_per_million": config.input_microusd_per_million,
+                "output_microusd_per_million": config.output_microusd_per_million,
+                "pricing_method": "configured_rates_applied_to_provider_total_token_counts",
+                "cached_input_tokens": cached_tokens, "reasoning_output_tokens": reasoning_tokens,
+                "billing_scope": config.billing_scope,
+                "billing_scope_note": "credential owner; no organization bill-to header is sent",
+                "max_input_tokens": config.max_input_tokens,
+                "max_output_tokens": config.max_output_tokens,
+                "max_input_bytes": config.max_input_bytes,
+                "max_response_bytes": MAX_RESPONSE,
+                "timeout_seconds": config.timeout_seconds,
+                "retry_policy": RETRY_POLICY,
                 "estimated_microusd": cost, "configuration_hash": config.identity,
                 "limits_breached": bool(violation)}
     return cost, metadata
