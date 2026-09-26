@@ -169,7 +169,7 @@ class DependencyVerifier:
         source = self.source.value()
         schema = type(data) is dict and set(data) == {"dependency", "from_version", "to_version", "source_hash",
                                                      "compatibility", "review_required", "upgrade_authorized"}
-        facts = schema and all(data.get(key) == value for key, value in {
+        facts = schema and all(canonical(data.get(key)) == canonical(value) for key, value in {
             "dependency": source["dependency"], "from_version": source["from_version"],
             "to_version": source["to_version"], "source_hash": self.source.identity}.items())
         denial = type(data) is dict and data.get("upgrade_authorized") is False
