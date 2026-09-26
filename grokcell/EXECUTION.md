@@ -1,158 +1,69 @@
-# GrokCell decision execution — internal technical preview
+# GrokCell execution preview
 
-This package composes fallible decisions and candidate generation with explicit
-observations, checks, permission, accounting and accepted-state receipts. It is
-not a production multi-tenant service or an autonomous deployment system.
+**Status: draft for internal review. Evidence-pending for the integrated release candidate.**
 
-## Run a presenter demo
+GrokCell is a local execution contract for composing a semantic decision with a candidate-generating worker and explicit checks, permission, accounting, and an accepted-state receipt. In this reference flow, Jev chooses among permitted next actions; a Hugging Face Inference Providers route supplies candidate output; GrokCell records and checks the workflow. Model confidence is not admission authority. The CLI examples use bundled inventory-repair and dependency-assessment fixtures; they are not a general repository repair service.
 
-From an installed `grokcell-surface` package, or after `pip install -e . -e ./grokcell`:
+The current Session 07 checkout is based on `c1de0fd34995d0329be37c4e8aa0aab5107b86fc`. The new CLI and implementation are present in this checkout; PR #29 at `481151c00347ce461fb5439f4e0a9f73ec64e8fd` is the earlier scaffold and must not be used as evidence for them. This base is not itself a release verdict. **Freeze all final commands and feature claims against Session 1's exact candidate revision and Session 8's audit.**
+
+## Read the prepared offline report
+
+The kit's `recorded-demo/index.html` is a static report of synthetic fixture runs. It requires no Python environment or provider credentials to view. It is not a hosted service, live provider call, isolated-code result, or deployment authorization. Inspect the HTML itself before sharing because it embeds report content.
+
+## Install and run the continuation (prerequisite-dependent)
+
+**UNEXECUTED here:** these commands require Session 1 to freeze the exact candidate revision, a clean checkout at that revision, the full repository, Python 3.11+, and a supported POSIX host. The kit's sparse demo runtime is not a distribution and must not be copied over the full checkout. Use the integration owner's frozen patch instructions; do not apply the kit patch to a different revision just because it applied to the historical scaffold.
 
 ```bash
+# From the integrated full-repository checkout, after its revision is frozen:
+python -m pip install -e . -e ./grokcell
+python -m grokcell.execution --help
+python -m grokcell.execution preflight
 python -m grokcell.execution demo --out /tmp/grokcell-demo-new
 # Open /tmp/grokcell-demo-new/index.html in a browser.
 python -m grokcell.execution release-check --out /tmp/grokcell-rollback-new
-python -m grokcell.execution preflight
 ```
 
-Choose new output directories. Existing runs are never silently overwritten.
-The demo runs repair and dependency assessment in separate processes, reopens
-each journal, and checks that replay adds neither adapter calls nor admissions.
-The report is self-contained and makes no network requests. Its default mode
-uses fixtures, not Jev/HF, and the repair check compares fixture bytes.
+Choose new output folders. Existing run/report folders are not overwritten. In source-overlay CLI code, `demo` defaults to offline fixtures and the report is self-contained. `preflight` reports only whether credential variables, Docker CLI, and image configuration are present; it makes no provider calls and does not authenticate credentials, validate Docker, or establish spending approval. Session 07 executed `python -m grokcell.execution --help`, `python -m grokcell.execution run --help`, and `python -m grokcell.execution preflight` at this checkout using the workspace Python 3.12.14 runtime. Help listed `repair`, `dependency`, `run`, `cancel`, `revoke`, `inspect`, `demo`, `release-check`, and `preflight`; `run` showed workflow, mode, config, state, and resume options. Preflight returned zero live calls and reported TypeSafe credential=false, HF credential=false, Docker CLI=false, image configured=false, independent review=false. The interactive system Python shim was unavailable on PATH; the bundled workspace interpreter was used. Offline demo, release check, isolated behavior, and live-provider commands remain unexecuted here because the host does not meet the documented POSIX and/or approved service prerequisites. Separately, the kit reports 104 passes and two skips for its sparse source (Docker/image and unavailable full legacy kernel); see kit `evidence/SUMMARY.md` and `evidence/tests.txt`. Neither that sparse result nor CLI help establishes full-checkout CI or packaging.
 
-## Persistent execution
+## Offline, isolated, and live modes
 
-```bash
-python -m grokcell.execution run --workflow repair --state /tmp/repair-run
-python -m grokcell.execution run --workflow repair --state /tmp/repair-run --resume
-python -m grokcell.execution inspect --state /tmp/repair-run
-python -m grokcell.execution cancel --state /tmp/repair-run
-```
+- **Offline:** deterministic fixture callbacks; the repair check compares known bytes. No candidate Python execution and no network provider call.
+- **Isolated:** repair candidate is checked using the existing digest-pinned Docker runner and a restricted arithmetic component contract. Requires a locally available, separately approved image and actual Docker verification. The kit did not run actual Docker/image cases. A language guard is defense in depth, not proof of general Python safety.
+- **Live:** uses both Jev and HF provider adapters. Requires a separately authorized provider/account envelope and credentials; there is no silent fallback to fixtures. The kit made zero live provider calls. Live repair additionally requires approved isolation. Live dependency assessment does not grant upgrade permission.
 
-`DurableRuntime` exposes READ/DECIDE/CALL/CHECK/ADMIT/YIELD using trusted Python
-control flow. `workflows.py` contains two clients and a shared `checked_proposal`
-circuit. Composition shares the caller's remaining budget and permission.
-`PreviewRuntime` remains available for small in-memory reference tests.
+Durable state is intended for operator-owned private POSIX local storage with working file locks, atomic rename, and fsync. Do not treat state as an upload format. The implementation binds replay to the original limits, expiry, workflow/runtime identity, provider identities, and check contract; it does not silently migrate schemas. Replay shows recorded results, not fresh inference. Preserve state after interrupted or unknown provider effects; do not retry blindly.
 
-`SnapshotStore` now supports execution-only generation manifests (version 2).
-The existing version-1 kernel/surface format is retained. A root may contain one
-format, never two competing authoritative pointers. Cross-format opening fails;
-no implicit migration, graph projection, or legacy artifact license is created.
-Ordinary workflow scheduling does not use the stochastic kernel.
+## Provider selection and configuration
 
-Execution roots must be operator-owned, mode 0700, on POSIX local storage with
-working file locks, atomic rename and fsync. The implementation flushes payloads
-and directories before/after advancing CURRENT. Checksums detect corruption;
-they do not authenticate a host administrator. A missing pointer with generation
-files fails closed. The state directory is not an untrusted upload format.
+Jev and HF are separate roles and credentials. The Jev adapter sends a versioned model ID to TypeSafe's `POST /v1/systemone` Choice API. The HF worker sends chat-completion requests to the Hugging Face router. In this code, `hf.provider` is the adapter name `"hf"`; the selected HF serving provider is the explicit suffix in `hf.model`, for example `org/model:provider`. This is a model ID convention, not a UI model picker. Check the live model/provider catalog and returned model identity before an approved run. HF requires a fine-grained token permitted to call Inference Providers; the TypeSafe key is separate.
 
-An OS lease prevents competing coordinators. State writes use short locked
-compare-and-swap transactions; no lock is held across provider execution. Operator
-cancel/revoke can update the journal while a request is in flight. The original
-coordinator then loses CAS and cannot commit a late result.
+The source template `execution_live.template.json` is intentionally disabled and incomplete: it has `authorized: false`, null price/reservation values, and a model placeholder. Do not run it unchanged. An authorized operator must fill only source-supported fields in a private file, pin the model/route and exact expected returned identity, convert the current approved tariff to integer micro-USD per million tokens, and set charge reservations and workflow limits that fit the approved aggregate envelope. The template is an example, not authorization or a price quote.
 
-Before an effect, the intent and maximum liability are committed. Completed
-results, typed records, checks, receipts and accounting share a generation.
-Interrupted provider/check effects remain unknown and are not resent. Uncommitted
-local READ/ADMIT/YIELD changes can be recomputed because they had no independent
-external commit. Replay is recorded execution, not fresh model inference.
+Supported configuration in source overlay includes provider, pinned model ID, expected returned identities, token ceilings, input-byte ceiling, request timeout, and operator-supplied per-million-token tariffs and reservation. HF uses `max_output_tokens` as its request `max_tokens`. Jev's Choice adapter does not expose a generation-token limit. The byte check is not a tokenizer. The local reservation cannot force provider billing limits; reconcile with provider usage/bills. The code fixes provider endpoints. It has no `endpoint`, `temperature`, `top_p`, `reasoning_effort`, `response_format`, browser model picker, generic custom-server setting, `bill_to`, or `X-HF-Bill-To` header. Do not add such keys and infer support. Organization billing needs an adapter change if the operator requires the HF organization billing header.
 
-The clock, original expiry, limits, workflow source identity, runtime identity,
-provider identities and check contract remain bound across restart. Reopening
-with different configuration fails rather than resetting the budget. Code/schema
-migration is intentionally blocked until an explicit migration procedure exists.
+**Credential handling:** use the approved secret manager on the actual execution host and scope dedicated credentials to the approved task. The source adapter reads `TYPESAFE_API_KEY` and `HF_TOKEN`; never paste values into chat, repository files, JSON, reports, screenshots, or shell history. An environment variable is not encrypted storage. Clear temporary variables after the authorized run. No key is requested or included here.
 
-## Verification modes
-
-- **offline:** known fixture bytes; never executes candidate Python.
-- **isolated:** `IsolatedRepairVerifier` reuses the existing digest-pinned Docker
-  runner and a narrowed arithmetic-component language guard (no imports, attributes,
-  helper functions, defaults or loops). Inputs enter the sandbox; expected values
-  and per-case comparisons stay with the host verifier. Only completed matching
-  checks can produce an `isolated_contract_checked` execution receipt.
-- **data-only:** dependency assessment must match the exact supplied versions and
-  source snapshot, preserve unknown compatibility, require human review, and
-  deny upgrade authority. It makes no assertion about arbitrary prose truth.
-
-The operator owns contracts. Candidate tests do not select or replace them.
-These public example contracts are not sealed evaluation data or proof of general
-correctness. The language guard is defense in depth, not a Python security proof.
-Docker/OS and the trusted verifier are part of the declared computing base.
-
-To execute isolated behavior, provision and approve a Python image first:
+**Live command (UNEXECUTED; separate approval required):**
 
 ```bash
-export GROKCELL_SANDBOX_IMAGE='approved-repository@sha256:APPROVED_DIGEST'
-python -m grokcell.execution demo --mode isolated --out /tmp/isolated-demo-new
-```
-
-The runtime never pulls an image or falls back to host execution.
-
-## Real Jev/Hugging Face adapters
-
-`providers.py` implements the TypeSafe choice endpoint and the HF chat-completion
-router. A trusted transport subprocess bounds local wall time and receives only
-the relevant provider credential. Responses are size-limited; application retries
-and redirects are disabled. Model identity, usage, request ID, configuration,
-serving revision when available and estimated cost are retained.
-
-No provider call is enabled just by setting environment variables. Copy
-`execution_live.template.json`, enter reviewed configuration, dedicated credential
-scope and explicit authorization, then invoke `run --mode live --config FILE`.
-Repair additionally requires the approved sandbox. Missing prerequisites block;
-the command never substitutes fixtures for live output.
-
-```bash
-export TYPESAFE_API_KEY='set-through-your-approved-secret-manager'
-export HF_TOKEN='set-through-your-approved-secret-manager'
-python -m grokcell.execution run --workflow repair --state /private/live-repair \
+python -m grokcell.execution run --workflow dependency \
+  --state /private/grokcell/dependency-001 \
   --mode live --config /private/approved-execution.json
 ```
 
-Never put actual secrets in this repository, configuration JSON, reports or shell
-history. The assignments above are illustrative names, not supplied credentials.
+This exact invocation requires the frozen candidate package, private state storage, completed reviewed configuration, credentials present in the process environment, and a separate grant naming provider/account, data, task, dollar/call/time limits, and execution target. No such spend or live run is authorized by this documentation. A repair run additionally needs an approved digest-pinned image already available on the approved Docker host.
 
-Prices are operator-configured nonnegative integer microdollars per million
-tokens, not hardcoded vendor quotations. Missing billable usage remains unknown.
-A zero-priced output field does not require output token counts for pricing, but
-response-size/call/time limits still apply. Outstanding bounded liabilities stay
-reserved. Returned usage beyond a declared ceiling faults the run. The configured
-exposure bound must be independently reviewed against the provider's billing and
-context guarantees; input bytes are NOT assumed to equal an input token ceiling.
-Local accounting cannot force a provider to honor a dollar limit. Reconcile costs
-with the provider invoice before making comparative economic claims.
+## Share a static report versus host a live service
 
-References checked 2026-09-25: TypeSafe `https://docs.typesafe.ai/api` and
-`https://docs.typesafe.ai/models`; HF
-`https://huggingface.co/docs/inference-providers/tasks/chat-completion`.
-No current-model winner or measured advantage is asserted by this implementation.
+A reviewed static export such as `recorded-demo/index.html` may be considered for Cloudflare Pages after explicit audience and data review. The Pages asset contains a report only: no GrokCell backend, live provider logic, secrets, persistent execution state, or browser model control. Keep the upload directory to the single approved `index.html`; review its embedded contents first. Cloudflare documents Direct Upload via Wrangler or dashboard drag-and-drop and notes a Direct Upload project cannot later convert to Git integration. These are publishing instructions only; no account configuration or deployment was performed or authorized.
 
-## Test and release evidence
+An interactive service is a separate product and security boundary. The kit provides a Python CLI/library, not an authenticated HTTP API or Cloudflare Worker/Pages Function. A future service needs approved API/authentication, fixed model profiles, user and project permissions, budgets, queue/concurrency controls, cancellation/status, isolation, durable-state design, disclosure controls, deployment, and recovery validation. Pages Functions are a Cloudflare server-side capability, not a backend already present in this repository. Do not put provider credentials in static assets or a candidate sandbox. Do not describe this CLI as a drop-in Cloudflare service.
 
-```bash
-(cd grokcell && PYTEST_DISABLE_PLUGIN_AUTOLOAD=1 python -m pytest tests/test_execution_*.py)
-```
+## Evidence and release gates
 
-The suite includes real process kills before dispatch, after a response, and
-around admission; explicit cancel/revoke; stale writers; missing/mutated pointers;
-forged evidence; missing checks; non-Python snapshot changes; data-only claim
-boundaries; provider response/usage validation; report escaping; and a local
-entrypoint failure/rollback drill. Docker-specific cases require an actual image
-and must not be called executed when skipped.
+The kit's `evidence/STATUS.json` reports 104 passed / 2 skipped on a sparse Linux source reconstruction, offline two-workflow fresh-process replay, local entrypoint failure/rollback exercise, browser render checks, and a sparse-wheel smoke. It explicitly reports no full-checkout CI for the continuation, no actual Docker behavior, no live Jev/HF calls, no independent review, no deployment, no comparative advantage, no external maintainer validation, and not engineering complete. Earlier CI for PR #29 does not carry forward to this continuation.
 
-The CI configuration defines full-checkout regressions, these execution tests,
-wheel installation and both demos outside the checkout, then a separate
-actual-Docker verification job. The continuation has not completed remote CI;
-consult the delivered evidence status before claiming those jobs passed.
-The local rollback exercise injects a broken entrypoint and restores the working
-entrypoint without rewinding state. It is not a production rollout or a general
-schema-migration rollback proof.
+Keep these separate: (1) internal offline-demo readiness, (2) engineering completion on the integrated candidate, (3) operational validation including actual provider/isolation and recovery, (4) empirical advantage under a comparative protocol, and (5) actual maintainer reuse. An execution receipt is not a legacy graph/artifact license or deployment grant. A green fixture suite is not marketing readiness.
 
-## Remaining release gates
-
-A runnable internal demo is not full engineering or commercial completion. Keep
-live-provider evidence, independent review, deployment approval, comparative
-Studies A/B, and real maintainer reuse distinct. No worker receives deploy keys.
-The execution receipts do not write legacy GrokCell graph/artifact licenses.
-Marketing guidance and bounded follow-on work orders are in `demo/`.
+**External docs checked 2026-09-25:** [TypeSafe models](https://docs.typesafe.ai/models), [TypeSafe API](https://docs.typesafe.ai/api), [TypeSafe Choice](https://docs.typesafe.ai/primitives/choice), [Hugging Face Inference Providers](https://huggingface.co/docs/inference-providers/index), [HF model/provider catalog](https://huggingface.co/docs/inference-providers/hub-api), [HF pricing and organization billing](https://huggingface.co/docs/inference-providers/pricing), [Cloudflare Pages Direct Upload](https://developers.cloudflare.com/pages/get-started/direct-upload/), [Cloudflare Pages Functions](https://developers.cloudflare.com/pages/functions/). Verify provider availability, rates, and Cloudflare console behavior again before an actual operation.

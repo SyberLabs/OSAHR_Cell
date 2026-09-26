@@ -1,77 +1,64 @@
-# SyberLabs / GrokCell — technical-preview demo handoff
+# GrokCell — internal presenter handoff
 
-## Positioning
+**DRAFT — evidence pending. Internal technical preview only.**
 
-**Models propose. Execution earns acceptance.**
+Use the prepared synthetic report from `recorded-demo/index.html` for the presentation. The kit records an offline demo, not a live provider session. Do not show a live status, current candidate result, Docker claim, deployment URL, comparative win, or integrated-release completion until the exact artifact has passed its named gate. Freeze this copy against Session 1's exact release-candidate revision and Session 8's factual audit.
 
-GrokCell is a small execution layer for composing model judgments and generative
-workers into bounded, inspectable workflows. The reference implementation keeps
-observations, decisions, candidates, evidence, permission and accepted state
-separate. It provides recorded replay and explicit stop conditions instead of
-making a model's confidence the authority to act.
+## Three-minute script
 
-**Current audience:** internal SyberLabs demonstration and technical review.
-This is not approval to launch a production service or publish superiority claims.
+**0:00–0:25 — Set scope.** “This is a recorded offline technical preview. The report uses synthetic examples and fixture adapters; no model account was called to produce it. GrokCell separates a semantic choice, a generated proposal, the checks, permission, and the accepted-state receipt.”
 
-## Three-minute demonstration
+**0:25–1:05 — Component repair.** Open the repair view. Point out the deliberately small arithmetic defect and the proposed source change. “In this report the check is fixture-byte comparison. It does not execute candidate Python or prove arbitrary code correct. Isolated mode is a separate Docker-dependent gate and has not been evidenced by this kit.”
 
-1. Generate a fresh bundle with `python -m grokcell.execution demo --out NEW_DIR`.
-   Open `index.html`. Start by naming the mode: **offline fixtures** by default.
-   The two calls shown are fixture adapter calls, not live provider usage.
-2. Select **Component repair**. Explain the arithmetic defect and show the
-   candidate. In default mode, the check compares known bytes; in separately
-   prepared isolated mode, the host compares actual sandbox behavior against the
-   example contract. Neither mode proves arbitrary software correct.
-3. Open the audit. Show named steps, reservations and the accepted-state receipt.
-   Point out that acceptance does not grant deployment permission.
-4. Select **Dependency assessment**. Show the same runtime handling a different
-   artifact: known version facts, unknown compatibility, mandatory human review
-   and `upgrade_authorized: false`.
-5. Show **process-restart replay PASS**. This is computed by reopening each state
-   in a new process and checking that calls and admission count do not increase.
-   Navigation in the browser only displays the recorded evidence.
-6. Close on scope: the implementation has real Jev/HF adapter code, but a report
-   must contain actual live request evidence before anyone calls it a live-model
-   demonstration. Quantified economics and real maintainer reuse remain separate.
+**1:05–1:45 — Evidence and stop conditions.** Open the audit view. Walk through observations, decision, bounded call, check, admission, and recorded result. “Jev can select a permitted next action; it cannot grant itself permission. A receipt records the tested contract and scope; it does not authorize deployment.”
 
-## Safe talking points
+**1:45–2:20 — Dependency assessment.** Show the second workflow. “The example records known version facts, preserves unknown compatibility, asks for human review, and withholds upgrade authority. It is a data-only example, not a general truth checker.”
 
-| Statement | Evidence needed / current meaning |
+**2:20–2:45 — Replay.** Show the fresh-process replay result. “The kit's recorded evidence says replay reopened state in separate processes without increasing fixture calls or admission counts. This is replay of recorded execution, not a fresh model decision.”
+
+**2:45–3:00 — Close honestly.** “The kit includes Jev and Hugging Face adapter code, but no live provider calls, actual Docker result, full-checkout continuation CI, independent audit, production deployment, comparative result, or external maintainer reuse. Those remain separate gates.”
+
+## Approved scope of statements
+
+| Safe statement | Evidence and limit |
 |---|---|
-| Two workflows compose through one execution interface | Runnable repair and dependency clients in `execution/workflows.py`. |
-| Recorded results survive process restart | Executed filesystem/process tests and per-demo replay assertions. |
-| Interrupted requests are not silently resent | Retained reservation and outcome-unknown regression cases. |
-| Current permission and dependency scope matter | Admission and cancellation/revocation tests; inspect the specific receipt. |
-| Real provider integrations are implemented | Adapter source and conformance tests. This does NOT establish live account access, quality or cost. |
-| Actual isolated behavior was tested | Cite a completed actual-Docker CI job and image digest, never an offline fixture run. |
+| The kit contains two example workflow clients using an execution contract. | `source-overlay/grokcell/grokcell/execution/workflows.py`; exact integrated candidate still pending. |
+| The kit's offline report records repair and dependency examples with replay. | `recorded-demo/`, `evidence/SUMMARY.md`, `evidence/tests.txt`; synthetic, sparse-kit evidence. |
+| Source includes Jev and HF adapters. | `source-overlay/.../providers.py`; provider conformance tests used injected responses, not live services. |
+| Dependency example preserves unknowns and withholds upgrade authority. | Source workflow and fixture report; only this example contract. |
 
-Do not claim: production-ready; fully autonomous deployment; universally safe
-Python; guaranteed correctness; independent multi-agent review; exactly-once
-provider execution; cheaper/better than contemporary alternatives; live Jev/HF
-success without a live trace; external customers or adoption without records.
+Do not claim production-ready, fully autonomous deployment, universally safe Python, guaranteed correctness, exactly-once provider execution, independent review, live Jev/HF success, cheaper/better than alternatives, external customers/adoption, or maintainer reuse without separate direct evidence. Do not turn fixture passes into marketing readiness or state that the current integrated candidate passed checks before its SHA-specific results exist.
 
 ## FAQ
 
-**Why Jev?** It is the required semantic decision component in this reference
-implementation. Its advantage on each workload must be measured, not presumed.
+**What does GrokCell do?** It composes a bounded semantic choice and candidate worker with explicit checks, permission, accounting, and recorded acceptance. The supplied examples are fixed workflows.
 
-**Why Hugging Face?** The worker interface supports an explicitly selected HF
-model/provider route. This release does not anoint a model as the best builder.
+**Does a model approve its own output?** No. Jev chooses among actions supplied by trusted workflow code. The runtime and operator-defined checks control admission; a model's confidence is not permission.
 
-**Is this a model router?** The provider seam is replaceable, but the product is
-bounded execution, verification and recovery around composed decisions.
+**Does the demo use real Jev or HF?** No. The recorded report is offline fixture evidence. Adapter source and injected-response tests do not prove account access, output quality, live cost, or current provider availability.
 
-**Does it deploy code?** No. It produces evidence-scoped execution receipts and
-reviewable candidates; deployment requires a separate authorized release path.
+**Can it run arbitrary Python safely?** No such claim is supported. Offline mode compares known bytes. The constrained isolated check depends on Docker, the host verifier, and a narrow contract; actual Docker evidence is missing.
 
-**What is proven by passing checks?** Only the tested contract under its declared
-runtime and isolation assumptions. Compatibility and broader behavior may remain
-unknown. The public demo cases are not a held-out benchmark.
+**Can I choose a model in the browser?** No. No browser model picker exists. An operator chooses the HF model/provider route in a reviewed host-side config. Jev is separately pinned and configured.
 
-## External-demo go/no-go
+**Does the receipt deploy the change?** No. It is scoped execution evidence. Deployment permission is separate, and the kit does not establish a production deployment path.
 
-Before describing a demo as live, obtain a successful authorized Jev/HF run with
-request IDs, serving identities where available, bounded usage, and applicable
-checker evidence. Obtain independent technical review and named release approval
-before public product availability claims. Use measured comparative evidence for
-any superiority claim. Keep private state and credentials out of shared bundles.
+**Is it faster, cheaper, or more accurate?** Unknown. No comparative study or reconciled live-provider spend is in this evidence.
+
+**Can the report be hosted on Pages?** A reviewed static export can be considered for Pages; it remains only a static report. No Pages deployment has been approved or performed here. A live hosted backend would require separate service implementation and validation.
+
+## Troubleshooting / presenter recovery
+
+| If this happens | Say or do this |
+|---|---|
+| Someone asks whether fixture calls were real models | State that the kit used offline fixtures and made zero live calls. |
+| Report claims an isolated check | Check for exact image digest and completed Docker evidence. If absent, stop and label this as unverified. |
+| Someone calls a receipt a deployment approval | Clarify that it is evidence scoped to a check; deployment permission is separate. |
+| The report or browser is unavailable | Use the local recorded report artifact and its README; do not improvise results. Regeneration requires the kit's POSIX/Python prerequisites. |
+| Someone asks for current model price or availability | Refer to current vendor account/catalog pages and the approved tariff record; this handoff contains no live account verification. |
+| Someone asks to run a live call or publish the site | Stop. This session has zero paid-provider and cloud-deployment authorization. Route to the named operator for a separate explicit grant. |
+| Someone asks whether the code is independently reviewed or integrated | Point to the claims register; the final audit and integrated candidate SHA are still pending. |
+
+## Presenter readiness checklist
+
+Before presenting, the owner should open the exact report, verify it is the synthetic fixture artifact, review the HTML for embedded content, and read the claims register. After engineering integrates the continuation, rerun this script against that exact candidate and replace every pending statement only with evidence tied to its SHA. Session 6 owns presenter-flow review; Session 8 owns factual claim audit. This draft is not their approval.
