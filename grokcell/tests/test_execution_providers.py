@@ -343,23 +343,46 @@ def test_usage_above_reservation_is_recorded_and_breaches_run_bound(tmp_path):
 
     body = response()
     body["usage"] = {"input_tokens": 10_000, "output_tokens": 0}
+    sends = []
+
+    def injected_transport(*_args):
+        sends.append("jev")
+        return body, "over-reserved", 1
+
     runtime_options = dict(
         state_dir=tmp_path, run_id="provider-over-reservation",
         workflow_id=workflow_identity("dependency"),
         permission=Permission("test", "operator", ("read", "decide", "generate", "yield"), 2_000_000_000),
         dependencies=DEPENDENCY_OBSERVATION, limits=Limits(max_seconds=60),
         chooser=JevAdapter(replace(config(), max_charge_microusd=42),
-                           transport=lambda *a: (body, "over-reserved", 1)),
+                           transport=injected_transport),
         workers={}, verifier=DependencyVerifier(DEPENDENCY_OBSERVATION), allow_live=True)
     with DurableRuntime(**runtime_options) as runtime:
         observation = runtime.read("read", DEPENDENCY_OBSERVATION)
-        decision = runtime.decide("decision", observation, OFFERS)
-        assert decision.choice.id == "repair"
+        # Accounting is committed before the fail-closed exception reaches the caller.
+        with pytest.raises(ExecutionBlocked, match="accounting bound breached"):
+            runtime.decide("decision", observation, OFFERS)
         audit = runtime.audit()
         assert audit["liability_microusd"] == 420
         assert audit["bound_breached"] is True
+        decision_row = next(row for row in audit["journal"] if row["step"] == "decision")
+        assert decision_row["status"] == "complete"
+        assert decision_row["actual"] == 420
+        assert decision_row["provider"]["request_id"] == "over-reserved"
+        assert decision_row["provider"]["limits_breached"] is True
+
+    with DurableRuntime(**runtime_options) as runtime:
+        audit = runtime.audit()
+        assert audit["liability_microusd"] == 420
+        assert audit["bound_breached"] is True
+        decision_row = next(row for row in audit["journal"] if row["step"] == "decision")
+        assert decision_row["status"] == "complete"
+        assert decision_row["actual"] == 420
+        assert decision_row["provider"]["request_id"] == "over-reserved"
+        # Even replaying the committed receipt cannot bypass the breached bound.
         with pytest.raises(ExecutionBlocked, match="accounting bound breached"):
-            runtime.yield_control("stop")
+            runtime.decide("decision", observation, OFFERS)
+    assert sends == ["jev"]
 
 
 def test_live_template_is_validated_non_authorizing_operator_configuration():
