@@ -191,7 +191,12 @@ class AcceptedState(Versioned):
     candidate_hash: str
     evidence_hash: str
     dependency_hash: str
-    assurance: ClassVar[str] = "offline_preview"
+    assurance: str = "offline_preview"
+
+    def __post_init__(self):
+        integer(self.revision, positive=True)
+        if self.assurance not in ("offline_preview", "isolated_contract_checked", "data_contract_checked"):
+            raise ValueError("unsupported receipt assurance")
 
 
 @dataclass(frozen=True, slots=True)

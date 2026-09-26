@@ -11,10 +11,13 @@ from .records import ActionOffer, Candidate, CheckResult, JsonSnapshot, Observat
 class Reply:
     value: str | bytes
     actual_microusd: int | None = 0
+    metadata: JsonSnapshot | None = None
 
     def __post_init__(self):
         if type(self.value) not in (str, bytes):
             raise TypeError("adapter reply must be text or bytes")
+        if self.metadata is not None and type(self.metadata) is not JsonSnapshot:
+            raise TypeError("reply metadata must be an immutable snapshot")
         if self.actual_microusd is not None:
             integer(self.actual_microusd)
 
