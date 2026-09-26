@@ -11,7 +11,7 @@ This guide covers the supplied local CLI and the recorded demo kit. The pinned d
 | View the prepared demo | Open `recorded-demo/index.html` from the kit. | Static synthetic offline report; no install or provider keys. Review embedded HTML content before sharing. |
 | Regenerate offline examples | Use the complete approved checkout on a supported POSIX host. | Unexecuted in Session 07; kit reports the offline fixture evidence separately. |
 | Run Jev and Hugging Face | Use the full candidate package, reviewed config, dedicated credentials, and separate provider/account/task/budget approval. | Kit made zero live calls; no spend was authorized here. |
-| Publish a presentation | Prepare a reviewed static `index.html` export for Cloudflare Pages. | No account setup or deployment performed. This does not host GrokCell execution. |
+| Publish a presentation | Prepare a reviewed static export containing `index.html` and `_headers` for Cloudflare Pages. | No account setup or deployment performed. This does not host GrokCell execution. |
 
 ## Install and verify
 
@@ -55,7 +55,7 @@ For HF, choose a model available for chat completion and an explicit serving pro
 
 For Jev, configure a versioned TypeSafe model identity and use a separate TypeSafe API key. Current TypeSafe documentation describes the `POST /v1/systemone` Choice endpoint, Jev `jev-1.13.0`, and currently listed input pricing. These facts may change; check the vendor's current model, account, and billing information before setting rates.
 
-The source template `execution_live.template.json` is intentionally not runnable: authorization is false, prices/reservations are null, and the HF model is a placeholder. Keep a completed copy outside the repository in a private location. Configure only implemented fields: model and expected response identity, token ceilings, request byte ceiling, timeout, integer micro-USD-per-million-token rates, and maximum charge reservation. HF's output ceiling is sent as `max_tokens`; Jev Choice has no generation-token setting. Bytes are not tokens. Local reservations cannot force vendor billing caps; account for the aggregate across calls and reconcile actual usage with provider records.
+The source template `execution_live.template.json` is intentionally disabled with `authorized: false`. It contains example numeric tariffs, reservations, and an example HF route, `openai/gpt-oss-20b:ovhcloud`; none grants account access or establishes a current price quote. Keep a reviewed copy outside the repository in a private location. Verify current route availability, returned identity, and account tariffs before setting implemented fields: model and expected response identity, token ceilings, request byte ceiling, timeout, integer micro-USD-per-million-token rates, and maximum charge reservation. HF's output ceiling is sent as `max_tokens`; Jev Choice has no generation-token setting. Bytes are not tokens. Local reservations cannot force vendor billing caps; account for the aggregate across calls and reconcile actual usage with provider records.
 
 No `endpoint`, `temperature`, `top_p`, `reasoning_effort`, `response_format`, custom server URL, `bill_to`, or `X-HF-Bill-To` field is supported by this adapter. Environment variables alone do not enable a call. The adapter reads `TYPESAFE_API_KEY` and `HF_TOKEN`; load them only on the approved execution host through the approved secret manager. Never share keys in chat, source control, JSON, HTML, logs, or screenshots. An environment variable is not encrypted storage.
 
@@ -76,7 +76,7 @@ Before any provider request, an authorized owner must approve provider/account, 
 
 ## Cloudflare Pages: static report only
 
-Cloudflare Pages Direct Upload can serve a reviewed static report. Before publishing, prepare a clean folder containing only the approved `index.html`, inspect its embedded content, and obtain audience/account approval. A Direct Upload site serves static files; it does not run the Python CLI, provider adapters, or a live execution service. No SyberLabs Pages project or deployment has been created or approved here. Cloudflare notes Direct Upload projects cannot later be converted to Git integration, so choose that workflow deliberately.
+Cloudflare Pages Direct Upload can serve a reviewed static report. Before publishing, prepare a clean folder containing only Session 06's approved `index.html` and `_headers`, inspect both, and obtain audience/account approval. A Direct Upload site serves static files; it does not run the Python CLI, provider adapters, or a live execution service. No SyberLabs Pages project or deployment has been created or approved here. Cloudflare notes Direct Upload projects cannot later be converted to Git integration, so choose that workflow deliberately.
 
 A future interactive service would need an authenticated API, fixed reviewed model profiles, permissions and budgets, queue and cancellation behavior, durable-state design, isolation, disclosure controls, deployment approval, and recovery validation. Pages Functions are a platform feature; this repository does not contain that live service. Never place model credentials in the static report or candidate sandbox.
 
