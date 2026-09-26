@@ -19,7 +19,7 @@ from typing import Callable
 from urllib import error, request
 from urllib.parse import urlsplit
 
-from .ports import Reply
+from .ports import ObservedReplyError, Reply
 from .records import ActionOffer, JsonSnapshot, Observation, canonical, digest, integer, text
 
 ENDPOINTS = {"jev": "https://api.typesafe.ai/v1/systemone",
@@ -230,9 +230,12 @@ def _metadata(config, result, request_id, elapsed):
             raise ValueError("provider token detail exceeds total usage")
     violation = ((inputs is not None and inputs > config.max_input_tokens)
                  or (outputs is not None and outputs > config.max_output_tokens))
+    revision = result.get("system_fingerprint") or result.get("model_revision")
+    if type(revision) is not str or len(revision) > 512:
+        revision = None
     metadata = {"provider": config.provider, "requested_model": config.model,
                 "returned_model": result["model"], "request_id": request_id,
-                "serving_revision": result.get("system_fingerprint") or result.get("model_revision"),
+                "serving_revision": revision,
                 "input_tokens": inputs, "output_tokens": outputs, "elapsed_ms": elapsed,
                 "cost_basis": "operator_configured_upper_bound_tariff_not_invoice",
                 "input_microusd_per_million": config.input_microusd_per_million,
@@ -250,6 +253,26 @@ def _metadata(config, result, request_id, elapsed):
                 "estimated_microusd": cost, "configuration_hash": config.identity,
                 "limits_breached": bool(violation)}
     return cost, metadata
+
+
+_OBSERVED_METADATA_FIELDS = (
+    "provider", "requested_model", "returned_model", "request_id", "serving_revision",
+    "input_tokens", "output_tokens", "elapsed_ms", "cost_basis",
+    "input_microusd_per_million", "output_microusd_per_million", "pricing_method",
+    "cached_input_tokens", "reasoning_output_tokens", "billing_scope", "billing_scope_note",
+    "max_input_tokens", "max_output_tokens", "max_input_bytes", "max_response_bytes",
+    "timeout_seconds", "retry_policy", "estimated_microusd", "configuration_hash",
+    "limits_breached",
+)
+
+
+def _observed_error(provider, cost, metadata):
+    """Retain only bounded accounting/identity metadata; never include response content."""
+    safe = {key: metadata.get(key) for key in _OBSERVED_METADATA_FIELDS}
+    if type(safe["serving_revision"]) is not str:
+        safe["serving_revision"] = None
+    return ObservedReplyError(f"invalid {provider} response content", cost,
+                              JsonSnapshot.capture(safe))
 
 
 class JevAdapter:
@@ -275,20 +298,24 @@ class JevAdapter:
             raise ValueError("provider input byte ceiling")
         result, request_id, elapsed = self._transport(self.config, payload)
         cost, metadata = _metadata(self.config, result, request_id, elapsed)
-        answers = result.get("answers")
-        answer = answers.get("next_action") if type(answers) is dict else None
-        if type(answer) is not dict or answer.get("type") != "choice" or answer.get("choice") not in criteria:
-            raise ValueError("invalid Jev choice")
-        probabilities = answer.get("probabilities")
-        confidence = answer.get("confidence")
-        values = list(probabilities.values()) if type(probabilities) is dict else []
-        if (type(probabilities) is not dict or set(probabilities) != set(criteria)
-                or any(type(value) not in (int, float) or not math.isfinite(value) or not 0 <= value <= 1
-                       for value in [confidence, *values])
-                or abs(sum(values) - 1) > 0.02):
-            raise ValueError("invalid Jev probability data")
-        metadata.update(confidence=confidence, probabilities=probabilities)
-        return Reply(answer["choice"], cost, JsonSnapshot.capture(metadata))
+        try:
+            answers = result.get("answers")
+            answer = answers.get("next_action") if type(answers) is dict else None
+            if (type(answer) is not dict or answer.get("type") != "choice"
+                    or answer.get("choice") not in criteria):
+                raise ValueError("invalid choice")
+            probabilities = answer.get("probabilities")
+            confidence = answer.get("confidence")
+            values = list(probabilities.values()) if type(probabilities) is dict else []
+            if (type(probabilities) is not dict or set(probabilities) != set(criteria)
+                    or any(type(value) not in (int, float) or not math.isfinite(value) or not 0 <= value <= 1
+                           for value in [confidence, *values])
+                    or abs(sum(values) - 1) > 0.02):
+                raise ValueError("invalid probabilities")
+            metadata.update(confidence=confidence, probabilities=probabilities)
+            return Reply(answer["choice"], cost, JsonSnapshot.capture(metadata))
+        except Exception:
+            raise _observed_error("Jev", cost, metadata) from None
 
 
 class HuggingFaceWorker:
@@ -315,20 +342,20 @@ class HuggingFaceWorker:
         cost, metadata = _metadata(self.config, result, request_id, elapsed)
         try:
             answer = result["choices"][0]["message"]["content"]
-        except (KeyError, IndexError, TypeError):
-            raise ValueError("missing worker content") from None
-        if type(answer) is not str:
-            raise ValueError("worker content must be text")
-        parsed = _strict_json(answer)
-        if type(parsed) is not dict:
-            raise ValueError("worker must produce a JSON object")
-        if self.output_key:
-            if set(parsed) != {self.output_key} or type(parsed[self.output_key]) is not str:
-                raise ValueError("worker module fields mismatch")
-            content = parsed[self.output_key].encode("utf-8")
-        else:
-            content = canonical(parsed)
-        return Reply(content, cost, JsonSnapshot.capture(metadata))
+            if type(answer) is not str:
+                raise ValueError("worker content must be text")
+            parsed = _strict_json(answer)
+            if type(parsed) is not dict:
+                raise ValueError("worker must produce a JSON object")
+            if self.output_key:
+                if set(parsed) != {self.output_key} or type(parsed[self.output_key]) is not str:
+                    raise ValueError("worker module fields mismatch")
+                content = parsed[self.output_key].encode("utf-8")
+            else:
+                content = canonical(parsed)
+            return Reply(content, cost, JsonSnapshot.capture(metadata))
+        except Exception:
+            raise _observed_error("Hugging Face", cost, metadata) from None
 
 
 def preflight() -> dict:

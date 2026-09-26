@@ -7,6 +7,7 @@ import pytest
 
 from grokcell.execution.providers import (HuggingFaceWorker, JevAdapter, ProviderConfig,
                                          _NoRedirect, _strict_json, post, preflight)
+from grokcell.execution.ports import ObservedReplyError
 from grokcell.execution.records import ActionOffer, JsonSnapshot, Observation
 
 
@@ -64,8 +65,12 @@ def test_duplicate_and_nonfinite_json_fields_are_refused(raw):
 def test_jev_malformed_choice_refused(field, value):
     body = response()
     body["answers"]["next_action"][field] = value
-    with pytest.raises(ValueError):
+    with pytest.raises(ObservedReplyError) as error:
         JevAdapter(config(), transport=lambda *args: (body, None, 0)).choose(OBSERVATION, OFFERS)
+    assert error.value.actual_microusd == 5
+    metadata = error.value.metadata.value()
+    assert metadata["estimated_microusd"] == 5
+    assert "answers" not in metadata and "probabilities" not in metadata
 
 
 def test_changed_model_refused():
@@ -114,9 +119,32 @@ def test_hf_model_route_and_module_only():
                                     '{"module":false}', 'not json'])
 def test_hf_invalid_module_payload_refused(content):
     def transport(*args):
-        return {"model": "openai/gpt-oss-20b", "choices": [{"message": {"content": content}}]}, None, 0
-    with pytest.raises(ValueError):
+        return {"model": "openai/gpt-oss-20b", "id": "hf-observed", "usage": {
+            "prompt_tokens": 100, "completion_tokens": 50},
+            "choices": [{"message": {"content": content}}]}, None, 0
+    with pytest.raises(ObservedReplyError) as error:
         HuggingFaceWorker(config("hf"), output_key="module", transport=transport).propose(JsonSnapshot.capture({}))
+    assert error.value.actual_microusd == 14
+    metadata = error.value.metadata.value()
+    assert metadata["request_id"] == "hf-observed"
+    assert metadata["estimated_microusd"] == 14
+    assert not {"choices", "content", "module", "HF_TOKEN"}.intersection(metadata)
+
+
+@pytest.mark.parametrize("result", [
+    {"model": "openai/gpt-oss-20b"},
+    {"model": "openai/gpt-oss-20b", "choices": []},
+    {"model": "openai/gpt-oss-20b", "choices": [{"message": {}}]},
+    {"model": "openai/gpt-oss-20b", "choices": [{"message": {"content": 7}}]},
+])
+def test_hf_missing_or_malformed_content_preserves_valid_usage(result):
+    body = {**result, "usage": {"prompt_tokens": 100, "completion_tokens": 50}}
+    with pytest.raises(ObservedReplyError) as error:
+        HuggingFaceWorker(config("hf"), transport=lambda *a: (body, "hf-usage-known", 3)).propose(
+            JsonSnapshot.capture({}))
+    assert error.value.actual_microusd == 14
+    assert error.value.metadata.value()["request_id"] == "hf-usage-known"
+    assert error.value.metadata.value()["output_tokens"] == 50
 
 
 @pytest.mark.parametrize("field,value", [("input_microusd_per_million", -1),
