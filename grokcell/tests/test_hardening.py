@@ -151,7 +151,7 @@ def test_collection_failure_is_not_a_killed_mutant(tmp_path: Path, monkeypatch):
     tools = ToolRegistry(isolated_surface(tmp_path))
     propose(tools, name="edge.invalid", tests="def broken(:\n")
     result = tools.call("bus.drain", {})["results"][0]
-    assert result["status"] == "reject"
+    assert result["status"] == "outcome_unknown"
     assert result["reason"] == "runner_infrastructure"
 
 
@@ -270,7 +270,7 @@ def test_generated_python_requires_explicit_unsafe_opt_in(tmp_path: Path, monkey
         tests="from service import ping\n\ndef test_ping():\n    assert ping() == 'pong'\n",
     )
     result = tools.call("bus.drain", {})["results"][0]
-    assert result["status"] == "reject"
+    assert result["status"] == "outcome_unknown"
     assert result["reason"] == "runner_sandbox_required"
 
 
