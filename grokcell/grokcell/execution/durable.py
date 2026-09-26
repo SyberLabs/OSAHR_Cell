@@ -27,8 +27,11 @@ _FIELDS = ("_started", "_last_time", "_epoch", "_revision", "_canceled", "_pause
 
 def configuration(*, run_id, workflow_id, permission, dependencies, limits, chooser, workers, verifier):
     package = Path(__file__).parent
+    # Pin replay engine, adapters, built-in workflows, and storage semantics.
+    # Built-in verifier code is covered here or by its source-derived checker_id.
     implementation = {name: hashlib.sha256((package / name).read_bytes()).hexdigest() for name in (
-        "runtime.py", "durable.py", "records.py", "ports.py", "codec.py", "journal.py")}
+        "runtime.py", "durable.py", "records.py", "ports.py", "codec.py", "journal.py",
+        "providers.py", "http_worker.py", "../snapshot.py", "workflows.py", "examples.py")}
     return {"implementation": implementation, "run_id": run_id, "workflow_id": workflow_id, "permission": encode(permission),
             "dependencies": encode(dependencies), "limits": encode(limits),
             "chooser": [chooser.id, chooser.mode],

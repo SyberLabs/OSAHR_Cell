@@ -11,7 +11,7 @@ import time
 from dataclasses import asdict
 from typing import Callable
 
-from .ports import DecisionAdapter, Reply, Verifier, WorkerAdapter
+from .ports import DecisionAdapter, ObservedReplyError, Reply, Verifier, WorkerAdapter
 from .records import (AcceptedState, ActionOffer, Candidate, Decision, Evidence,
                       JsonSnapshot, Limits, Observation, Permission, digest, integer, text)
 
@@ -94,6 +94,16 @@ class PreviewRuntime:
         return sum(row["actual"] if row["actual"] is not None else row["reserved"]
                    for row in self._journal.values())
 
+    def _complete_locked(self, effect: str, row: dict, result, actual) -> None:
+        row.update(status="complete", result=result, actual=actual)
+        self._active = False
+        if actual is not None and actual > row["reserved"]:
+            self._breach = True
+        self._pending_step = None
+        self._checkpoint("complete")
+        # Keep the response/accounting even when it arrived after cancellation.
+        self._guard(effect)
+
     def _run(self, step: str, effect: str, binding: object, operation: Callable,
              *, reserve: int | None = None, fresh_revision: int | None = None):
         text(step)
@@ -132,19 +142,39 @@ class PreviewRuntime:
                 self._active = False
                 raise
         try:
-            result, actual = operation()
-            if actual is not None:
-                integer(actual)
-            with self._lock:
-                row.update(status="complete", result=result, actual=actual)
-                self._active = False
-                if actual is not None and actual > row["reserved"]:
-                    self._breach = True
-                self._pending_step = None
-                self._checkpoint("complete")
-                # Keep the response/accounting even when it arrived after cancellation.
-                self._guard(effect)
+            if effect in ("read", "admit"):
+                # These callbacks only mutate local state. Keep that mutation and
+                # its journal receipt under one lock so operator checkpoints see
+                # either the old state or the completed transition.
+                with self._lock:
+                    result, actual = operation()
+                    if actual is not None:
+                        integer(actual)
+                    self._complete_locked(effect, row, result, actual)
+            else:
+                result, actual = operation()
+                if actual is not None:
+                    integer(actual)
+                with self._lock:
+                    self._complete_locked(effect, row, result, actual)
             return result
+        except ObservedReplyError as error:
+            with self._lock:
+                if row["status"] == "started":
+                    metadata = error.metadata.value()
+                    row["provider"] = metadata
+                    if error.actual_microusd is not None:
+                        row["actual"] = error.actual_microusd
+                        if error.actual_microusd > row["reserved"]:
+                            self._breach = True
+                    if type(metadata) is dict and metadata.get("limits_breached") is True:
+                        self._breach = True
+                    row["status"] = "outcome_unknown"
+                self._active = False
+                self._pending_step = None
+                if not self._faulted:
+                    self._checkpoint("interrupted")
+            raise
         except BaseException:
             with self._lock:
                 if row["status"] == "started":

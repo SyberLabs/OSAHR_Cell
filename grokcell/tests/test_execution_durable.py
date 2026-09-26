@@ -1,21 +1,27 @@
 """Real local filesystem/process tests, not live-provider or sandbox evidence."""
 from __future__ import annotations
 
+import copy
 import json
 import os
 import subprocess
 import sys
+import threading
 from dataclasses import replace
 from pathlib import Path
 
 import pytest
 
 from grokcell.execution.codec import decode, encode
-from grokcell.execution.durable import DurableRuntime, control, inspect_state
+from grokcell.execution import durable as durable_module
+from grokcell.execution import runtime as runtime_module
+from grokcell.execution.durable import DurableRuntime, configuration, control, inspect_state
 from grokcell.execution.examples import (FixtureChooser, FixtureWorker, REPAIR,
                                         RepairFixtureVerifier, repair_workflow)
-from grokcell.execution.records import ActionOffer, JsonSnapshot, Limits, Permission
-from grokcell.execution.runtime import ExecutionBlocked, OutcomeUnknown
+from grokcell.execution.ports import ObservedReplyError
+from grokcell.execution.providers import ProviderConfig, _metadata
+from grokcell.execution.records import ActionOffer, JsonSnapshot, Limits, Permission, digest
+from grokcell.execution.runtime import ExecutionBlocked, OutcomeUnknown, PreviewRuntime
 from grokcell import snapshot as grokcell_snapshot
 from grokcell.snapshot import SnapshotStore
 
@@ -64,6 +70,26 @@ def test_configuration_change_cannot_reset_accounting(tmp_path, change):
         repair_workflow(runtime)
     with pytest.raises(ExecutionBlocked, match="configuration"):
         open_run(tmp_path, **change)
+
+
+@pytest.mark.parametrize("changed_file", ["providers.py", "http_worker.py", "../snapshot.py",
+                                           "workflows.py", "examples.py"])
+def test_restart_identity_tracks_provider_and_snapshot_implementations(monkeypatch, changed_file):
+    values = dict(run_id="run", workflow_id="repair-v1", permission=PERMISSION,
+                  dependencies=JsonSnapshot.capture({"data.csv": "v1"}),
+                  limits=Limits(max_seconds=600), chooser=FixtureChooser("repair"),
+                  workers={"generate": FixtureWorker(REPAIR)}, verifier=RepairFixtureVerifier())
+    before = configuration(**values)
+    target = (Path(durable_module.__file__).parent / changed_file).resolve()
+    original = Path.read_bytes
+
+    def updated_bytes(path):
+        raw = original(path)
+        return raw + b"\n# simulated installed implementation update\n" if path.resolve() == target else raw
+
+    monkeypatch.setattr(Path, "read_bytes", updated_bytes)
+    after = configuration(**values)
+    assert digest(after) != digest(before), f"Changed {changed_file} is invisible to restart identity"
 
 
 def test_second_coordinator_cannot_enter(tmp_path):
@@ -116,6 +142,126 @@ def test_unknown_liability_retained_on_restart(tmp_path):
                          artifact_type="python_component", reserve_microusd=50)
         assert runtime.audit()["liability_microusd"] == 50
         assert runtime.audit()["calls"] == 2
+
+
+def test_invalid_huggingface_content_keeps_observed_billing_and_breach():
+    config = ProviderConfig("hf", "org/model:novita", ("org/model",),
+                            1_000_000, 1_000_000, 20, 10, 10)
+    response = {"model": "org/model", "usage": {"prompt_tokens": 100, "completion_tokens": 100},
+                "choices": [{"message": {"content": "not valid JSON"}}]}
+
+    class MalformedHuggingFaceResponse:
+        id = "offline-hf-malformed-response"
+        mode = "offline"
+        reservation_microusd = config.max_charge_microusd
+
+        def propose(self, _request):
+            # Model the adapter boundary after usage metadata is available. The
+            # malformed body and billing estimate are entirely in memory.
+            actual, metadata = _metadata(config, response, "audit-request", 1)
+            try:
+                json.loads(response["choices"][0]["message"]["content"])
+            except (ValueError, UnicodeError):
+                raise ObservedReplyError("invalid provider content", actual,
+                                         JsonSnapshot.capture(metadata)) from None
+            raise AssertionError("fixture content unexpectedly parsed")
+
+    values = dict(permission=PERMISSION, dependencies=JsonSnapshot.capture({"data.csv": "v1"}),
+                  chooser=FixtureChooser("repair"),
+                  workers={"generate": MalformedHuggingFaceResponse()},
+                  verifier=RepairFixtureVerifier(), limits=Limits(max_seconds=600), clock=lambda: 1)
+    config_values = {key: value for key, value in values.items() if key != "clock"}
+
+    class CheckpointRuntime(PreviewRuntime):
+        def __init__(self):
+            super().__init__(**values)
+            self._config = configuration(run_id="run", workflow_id="repair-v1", **config_values)
+            self._config_hash = digest(self._config)
+            self.saved = None
+
+        def _checkpoint(self, _stage):
+            self.saved = copy.deepcopy(DurableRuntime._document(self))
+
+    runtime = CheckpointRuntime()
+    observation = runtime.read("input", JsonSnapshot.capture({"task": "fixture"}))
+    decision = runtime.decide("route", observation,
+                              (ActionOffer("repair", "generate", "fixture"),))
+    with pytest.raises(ObservedReplyError):
+        runtime.call("proposal", observation, decision, JsonSnapshot.capture({}),
+                     artifact_type="python_component")
+    restored = CheckpointRuntime()
+    DurableRuntime._restore(restored, runtime.saved)
+    audit = restored.audit()
+    proposal = next(row for row in audit["journal"] if row["step"] == "proposal")
+    assert audit["bound_breached"] is True
+    assert audit["liability_microusd"] == 200
+    assert proposal["status"] == "outcome_unknown"
+    assert proposal["actual"] == 200
+    assert proposal["provider"]["estimated_microusd"] == 200
+    assert proposal["provider"]["limits_breached"] is True
+
+
+def test_admission_and_local_checkpoint_are_atomic(monkeypatch):
+    values = dict(permission=PERMISSION, dependencies=JsonSnapshot.capture({"data.csv": "v1"}),
+                  chooser=FixtureChooser("repair"), workers={"generate": FixtureWorker(REPAIR)},
+                  verifier=RepairFixtureVerifier(), limits=Limits(max_seconds=600), clock=lambda: 1)
+    config_values = {key: value for key, value in values.items() if key != "clock"}
+    operator_entered = threading.Event()
+    dependency_checkpointed = threading.Event()
+
+    class CheckpointRuntime(PreviewRuntime):
+        def __init__(self):
+            super().__init__(**values)
+            self._config = configuration(run_id="run", workflow_id="repair-v1", **config_values)
+            self._config_hash = digest(self._config)
+            self.saved = None
+
+        def _checkpoint(self, stage):
+            self.saved = copy.deepcopy(DurableRuntime._document(self))
+            if stage == "dependencies":
+                dependency_checkpointed.set()
+
+        def replace_dependencies(self, dependencies):
+            if threading.current_thread().name == "operator-checkpoint":
+                operator_entered.set()
+            return super().replace_dependencies(dependencies)
+
+    class ProcessCrash(BaseException):
+        pass
+
+    runtime = CheckpointRuntime()
+    original_integer = runtime_module.integer
+    operators = []
+    interrupted = []
+
+    def checkpoint_between_admission_and_receipt(value, **kwargs):
+        original_integer(value, **kwargs)
+        row = runtime._journal.get("admission", {})
+        if value == 0 and runtime._revision == 1 and row.get("status") == "started" and not interrupted:
+            interrupted.append(True)
+            operator = threading.Thread(target=runtime.replace_dependencies,
+                                        args=(runtime._dependencies,), name="operator-checkpoint")
+            operators.append(operator)
+            operator.start()
+            assert operator_entered.wait(timeout=2)
+            if dependency_checkpointed.wait(timeout=0.5):
+                operator.join(timeout=2)
+                assert not operator.is_alive()
+                runtime._faulted = True
+                raise ProcessCrash()
+
+    monkeypatch.setattr(runtime_module, "integer", checkpoint_between_admission_and_receipt)
+    try:
+        repair_workflow(runtime)
+    except ProcessCrash:
+        pass
+    for operator in operators:
+        operator.join(timeout=2)
+        assert not operator.is_alive()
+    restored = CheckpointRuntime()
+    DurableRuntime._restore(restored, runtime.saved)
+    assert restored.audit()["revision"] == 1
+    assert repair_workflow(restored) == restored._accepted[0]
 
 
 def test_dependency_invalidation_is_persistent(tmp_path):
