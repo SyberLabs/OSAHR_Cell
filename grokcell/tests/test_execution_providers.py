@@ -346,7 +346,7 @@ def test_usage_above_reservation_is_recorded_and_breaches_run_bound(tmp_path):
     runtime_options = dict(
         state_dir=tmp_path, run_id="provider-over-reservation",
         workflow_id=workflow_identity("dependency"),
-        permission=Permission("test", "operator", ("read", "decide", "yield"), 2_000_000_000),
+        permission=Permission("test", "operator", ("read", "decide", "generate", "yield"), 2_000_000_000),
         dependencies=DEPENDENCY_OBSERVATION, limits=Limits(max_seconds=60),
         chooser=JevAdapter(replace(config(), max_charge_microusd=42),
                            transport=lambda *a: (body, "over-reserved", 1)),

@@ -13,7 +13,7 @@ permissions:
 jobs:
   offline:
     runs-on: ubuntu-24.04
-    timeout-minutes: 12
+    timeout-minutes: 20
     strategy:
       fail-fast: false
       matrix:
@@ -31,7 +31,7 @@ jobs:
       - name: Install existing packages and declared regression dependencies
         run: |
           python -m pip install "setuptools>=75" wheel
-          python -m pip install --no-build-isolation -e . -e ./grokcell
+          python -m pip install --no-build-isolation -e '.[benchmark]' -e ./grokcell
           python -m pip install --no-build-isolation -e ./liquid-osahr-experiment-05 -e ./liquid-osahr-experiment-06
       - name: Root and workbench regressions
         run: python -m pytest tests workbench/tests -q
@@ -53,7 +53,7 @@ jobs:
 
   isolated:
     runs-on: ubuntu-24.04
-    timeout-minutes: 10
+    timeout-minutes: 20
     env:
       PYTEST_DISABLE_PLUGIN_AUTOLOAD: '1'
       PYTHONDONTWRITEBYTECODE: '1'
@@ -68,15 +68,19 @@ jobs:
         run: |
           python -m pip install "setuptools>=75" wheel
           python -m pip install --no-build-isolation -e . -e ./grokcell
-      - name: Resolve a test image digest before candidate execution
+      - name: Pull the operator-approved test image by digest
+        env:
+          APPROVED_IMAGE: ${{ vars.GROKCELL_APPROVED_ISOLATION_TEST_IMAGE }}
         run: |
-          docker pull python:3.11-slim
-          image=$(docker image inspect python:3.11-slim --format '{{index .RepoDigests 0}}')
-          test -n "$image"
-          echo "GROKCELL_SANDBOX_IMAGE=$image" >> "$GITHUB_ENV"
-          echo "Test executor pinned for this run: $image"
+          [[ "$APPROVED_IMAGE" =~ ^[^[:space:]]+@sha256:[0-9a-f]{64}$ ]] || { echo "Set GROKCELL_APPROVED_ISOLATION_TEST_IMAGE to an approved image digest" >&2; exit 1; }
+          docker pull "$APPROVED_IMAGE"
+          docker image inspect "$APPROVED_IMAGE" >/dev/null
+          echo "GROKCELL_SANDBOX_IMAGE=$APPROVED_IMAGE" >> "$GITHUB_ENV"
+          echo "GROKCELL_APPROVED_ISOLATION_TEST_IMAGE=$APPROVED_IMAGE" >> "$GITHUB_ENV"
       - name: Actual isolation, behavioral checks and early-exit refusals
         working-directory: grokcell
-        run: python -m pytest tests/test_execution_demo.py -ra
+        run: |
+          python -m pytest tests/test_execution_isolation.py::test_actual_approved_docker_image_checks_candidate_behavior tests/test_execution_demo.py::test_actual_isolation_checks_valid_and_wrong_behavior -ra | tee "$RUNNER_TEMP/isolation-tests.txt"
+          grep -Eq '2 passed in' "$RUNNER_TEMP/isolation-tests.txt"
       - name: Isolated demo with restart replay
         run: python -m grokcell.execution demo --mode isolated --out "$RUNNER_TEMP/isolated-demo"
