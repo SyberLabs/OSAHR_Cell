@@ -1,7 +1,3 @@
-> **SYBERLABS TECHNICAL PRIORITY #1 — JEV INTEGRATION**
-> JEV integration is SyberLabs' number one technical priority and portfolio-wide focus across every project.
-> **We are actively recruiting engineers with hands-on JEV experience.**
-
 # OSAHR 0.2
 
 **This is the project:** [SyberLabs/OSAHR_Cell](https://github.com/SyberLabs/OSAHR_Cell).
@@ -83,24 +79,19 @@ Selected MEASURED results:
 `research_directions/` is PROPOSED notes, not science. Do not cite it as MEASURED.
 GrokCell (`grokcell/`) is a prototype control-plane host, not a confirmatory record.
 
-## GrokCell repair probe
+## GrokCell repair path
 
-The [bounded repair probe](grokcell/REPAIR_EXPERIMENT.md) uses Qwen to propose
-component repairs and GrokCell's operator-owned tests and admission rules to
-evaluate them. Jev routing is experimental. The current three-component fixture
-offers no useful Jev routing choice, so the paid comparison is blocked; no live
-repair or comparative result has been measured.
+The [bounded repair path](grokcell/REPAIR_EXPERIMENT.md) keeps next-action
+selection deterministic and uses Qwen only to propose candidate code and tests.
+GrokCell's isolated runner, operator-owned checks, host oracle, and admission
+gate control whether a revision is accepted. The Jev router and paid routing
+comparison were removed because the live fixture chain exposes only one
+productive repair action at a time. No provider-based repair result has been measured.
 
 From `grokcell/`, run `python -m grokcell.repair_experiment --check` for the
-offline preflight. Candidate execution requires a digest-pinned Docker image
-and explicit provider credentials and spending limits. See the probe guide for
-the budget template, acceptance boundary, and current blockers.
-
-Cloudflare deployment is deferred. The current repair fixture cannot test a
-useful Jev routing decision, and a status-only endpoint would not generate
-repair evidence. Hosting should be reconsidered after an independently accepted
-fixture exposes multiple productive legal actions and the bounded pilot shows
-a measured benefit. See the [probe guide](grokcell/REPAIR_EXPERIMENT.md).
+offline preflight. A live single-episode run requires Docker, a digest-pinned
+image, a Qwen credential, and an explicit budget. The preflight makes no
+provider calls or candidate executions.
 
 The ontology benchmark passed transition-law checks but was substantially slower than plain direct simulation. See `docs/VALIDATION_FRAMEWORK.md`.
 

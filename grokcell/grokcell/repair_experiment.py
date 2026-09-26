@@ -6,7 +6,6 @@ import hashlib
 import json
 import math
 import os
-import random
 import shutil
 import subprocess
 import tempfile
@@ -16,20 +15,16 @@ from pathlib import Path
 from .artifact import Artifact, read_text_exact
 from .fidelity import FidelityStore
 from .messages import Message
-from .repair_adapters import JevChoice, QwenBuilder
+from .repair_adapters import QwenBuilder
 from .repair_fixture import (COMPONENTS, CONTRACT_ROOT, DEPENDENCIES, PUBLIC_END_TO_END,
-                             SEED_SOURCES, SEED_VARIANT, VARIANTS)
+                             SEED_SOURCES, SEED_VARIANT)
 from .repair_guard import validate_module
-from .repair_memory import AttemptStore, simple_retrieve
-from .repair_policy import DecisionState, digest, select_action, validate_choice
+from .repair_attempts import AttemptStore
+from .repair_policy import (DecisionState, deterministic_choice, digest,
+                            legal_candidates, validate_choice)
 from .runner import DEADLINE_ENV, RunOutcome, SANDBOX_IMAGE_ENV, isolated_call, pytest_suite
 from .surface import GrokCellSurface
 
-ARMS = {"A": ("qwen", "none"), "B": ("deterministic", "none"),
-        "C": ("jev", "none"), "D": ("jev", "simple"),
-        "E": ("jev", "jev_mem")}
-MIN_WORTHWHILE_GAIN = 0.20  # Design hypothesis, frozen before any live result.
-PAIRED_PILOT_READY = False  # Current chain presents no Jev choice in arm C.
 CONTRACT_FILES = {component: (
     CONTRACT_ROOT / "held_out" / f"acceptance_hidden_{component}.py")
     for component in COMPONENTS}
@@ -66,7 +61,7 @@ def revision_name(component: str, artifact_hash: str, dependencies: list[str],
 def _public_diagnostic(result) -> str:
     # Public only: never pass held-out traceback or test names to a provider.
     raw = (result.stdout + "\n" + result.stderr)[:6000]
-    for key in ("HF_TOKEN", "TYPESAFE_API_KEY", "QWEN_API_KEY"):
+    for key in ("HF_TOKEN", "QWEN_API_KEY"):
         secret = os.environ.get(key)
         if secret:
             raw = raw.replace(secret, "[redacted]")
@@ -82,14 +77,10 @@ def _strict_json(raw: str):
 
 class Budget:
     def __init__(self, values: dict) -> None:
-        required = {"sandbox_image", "max_total_usd", "max_task_usd", "max_calls",
-                    "max_total_calls", "max_output_tokens", "max_total_output_tokens",
-                    "max_worker_attempts", "max_total_worker_attempts",
-                    "max_retrieval_rounds", "max_total_retrieval_rounds",
-                    "max_elapsed_seconds", "max_task_elapsed_seconds",
+        required = {"sandbox_image", "max_usd", "max_calls", "max_output_tokens",
+                    "max_worker_attempts", "max_elapsed_seconds",
                     "max_input_tokens_per_call",
                     "qwen_input_usd_per_million", "qwen_output_usd_per_million",
-                    "jev_input_usd_per_million", "jev_output_usd_per_million",
                     "executor_usd_per_second"}
         if set(values) != required:
             raise ValueError(f"budget fields must be exactly {sorted(required)}")
@@ -97,10 +88,8 @@ class Budget:
         if (not isinstance(values["sandbox_image"], str)
                 or "@sha256:" not in values["sandbox_image"]):
             raise ValueError("pinned sandbox image required")
-        integer_fields = {"max_calls", "max_total_calls", "max_output_tokens",
-                          "max_total_output_tokens", "max_worker_attempts",
-                          "max_total_worker_attempts", "max_retrieval_rounds",
-                          "max_total_retrieval_rounds", "max_input_tokens_per_call"}
+        integer_fields = {"max_calls", "max_output_tokens", "max_worker_attempts",
+                          "max_input_tokens_per_call"}
         for key in required - {"sandbox_image"}:
             value = values[key]
             if (isinstance(value, bool) or not isinstance(value, (int, float))
@@ -108,23 +97,16 @@ class Budget:
                     or (key in integer_fields and type(value) is not int)):
                 raise ValueError(f"positive budget value required: {key}")
         self.started = time.monotonic()
-        self.task_started = self.started
         self.total_usd = 0.0
-        self.task_usd = 0.0
         self.calls = 0
         self.output_tokens = 0
         self.executor_seconds = 0.0
         self.unknown_cost = False
         self.limit_breached = False
 
-    def start_task(self) -> None:
-        self.task_usd = 0.0
-        self.task_started = time.monotonic()
-
     def remaining_seconds(self) -> float:
-        return max(0.0, min(
-            self.config["max_elapsed_seconds"] - (time.monotonic() - self.started),
-            self.config["max_task_elapsed_seconds"] - (time.monotonic() - self.task_started)))
+        return max(0.0, self.config["max_elapsed_seconds"] -
+                   (time.monotonic() - self.started))
 
     def remaining_calls(self) -> int:
         return max(0, int(self.config["max_calls"]) - self.calls)
@@ -134,35 +116,27 @@ class Budget:
 
     def _limit(self, dollars: float) -> None:
         if (self.unknown_cost or self.limit_breached
-                or self.total_usd + dollars > self.config["max_total_usd"]
-                or self.task_usd + dollars > self.config["max_task_usd"]
+                or self.total_usd + dollars > self.config["max_usd"]
                 or self.remaining_seconds() <= 0):
             raise RuntimeError("budget_exhausted_or_cost_unknown")
 
-    def _worst_call_cost(self, provider: str, max_output: int) -> float:
-        prefix = "qwen" if provider == "qwen" else "jev"
+    def _worst_call_cost(self, max_output: int) -> float:
         return (self.config["max_input_tokens_per_call"] *
-                self.config[f"{prefix}_input_usd_per_million"] +
-                max_output * self.config[f"{prefix}_output_usd_per_million"]) / 1_000_000
+                self.config["qwen_input_usd_per_million"] +
+                max_output * self.config["qwen_output_usd_per_million"]) / 1_000_000
 
-    def can_call(self, provider: str, max_output: int) -> bool:
-        return self.can_bundle(((provider, max_output),))
-
-    def can_bundle(self, calls: tuple[tuple[str, int], ...]) -> bool:
-        if (self.remaining_calls() < len(calls) or
-                self.remaining_output_tokens() < sum(output for _, output in calls)):
+    def can_call(self, max_output: int) -> bool:
+        if self.remaining_calls() < 1 or self.remaining_output_tokens() < max_output:
             return False
         try:
-            self._limit(sum(self._worst_call_cost(provider, output)
-                            for provider, output in calls))
+            self._limit(self._worst_call_cost(max_output))
         except RuntimeError:
             return False
         return True
 
-    def call(self, provider: str, max_output: int, operation):
-        if not self.can_call(provider, max_output):
+    def call(self, max_output: int, operation):
+        if not self.can_call(max_output):
             raise RuntimeError("model_call_limit")
-        prefix = "qwen" if provider == "qwen" else "jev"
         self.calls += 1
         try:
             reply = operation()
@@ -176,15 +150,13 @@ class Budget:
                 or input_count < 0 or output_count < 0):
             self.unknown_cost = True
             raise RuntimeError("provider_usage_unavailable")
-        cost = (input_count * self.config[f"{prefix}_input_usd_per_million"] +
-                output_count * self.config[f"{prefix}_output_usd_per_million"]) / 1_000_000
+        cost = (input_count * self.config["qwen_input_usd_per_million"] +
+                output_count * self.config["qwen_output_usd_per_million"]) / 1_000_000
         self.total_usd += cost
-        self.task_usd += cost
         self.output_tokens += output_count
         if (input_count > self.config["max_input_tokens_per_call"]
                 or output_count > max_output
-                or self.output_tokens > self.config["max_output_tokens"]
-                or self.task_usd > self.config["max_task_usd"]):
+                or self.output_tokens > self.config["max_output_tokens"]):
             self.limit_breached = True
             raise RuntimeError("provider_usage_or_spend_cap_breached")
         self._limit(0)
@@ -195,9 +167,6 @@ class Budget:
         cost = seconds * self.config["executor_usd_per_second"]
         self.executor_seconds += seconds
         self.total_usd += cost
-        self.task_usd += cost
-        if self.task_usd > self.config["max_task_usd"]:
-            self.limit_breached = True
         self._limit(0)
 
     def reserve_executor(self, maximum_seconds: float, *, require_full: bool = False) -> None:
@@ -211,30 +180,17 @@ class Budget:
                 "cost_basis": "configured_token_tariffs_plus_executor_time_estimate",
                 "calls": self.calls, "output_tokens": self.output_tokens,
                 "executor_seconds": self.executor_seconds,
-                "wall_seconds": time.monotonic() - self.task_started,
+                "wall_seconds": time.monotonic() - self.started,
                 "cost_unknown": self.unknown_cost,
                 "limit_breached": self.limit_breached}
 
 
-class _BudgetedChoice:
-    def __init__(self, chooser, budget: Budget, provider: str):
-        self.chooser, self.budget, self.provider = chooser, budget, provider
-        self.min_confidence = getattr(chooser, "min_confidence", 0.0)
-
-    def choose(self, **kwargs):
-        self.chooser.timeout = min(self.chooser.timeout, self.budget.remaining_seconds())
-        if self.chooser.timeout <= 0:
-            raise RuntimeError("task_elapsed_limit")
-        return self.budget.call(self.provider, 128 if self.provider == "qwen" else 512,
-                                lambda: self.chooser.choose(**kwargs))
-
-
 class Episode:
-    def __init__(self, *, variant: str, arm: str, root: Path, budget: Budget,
-                 prior_records: list[dict], contracts: dict[str, str]) -> None:
+    def __init__(self, *, root: Path, budget: Budget,
+                 contracts: dict[str, str]) -> None:
         if os.environ.get(SANDBOX_IMAGE_ENV) != budget.config["sandbox_image"]:
             raise RuntimeError("experiment_requires_pinned_sandbox")
-        self.variant, self.arm, self.root, self.budget = variant, arm, root, budget
+        self.variant, self.root, self.budget = SEED_VARIANT, root, budget
         self.root.mkdir(parents=True, exist_ok=True)
         self.state_root = root / "state"
         self.acceptance_root = root / "operator_acceptance"
@@ -243,7 +199,7 @@ class Episode:
             raise RuntimeError("interrupted_attempt_requires_operator_review")
         self.surface = GrokCellSurface.open(
             fidelity=FidelityStore(root / "fidelity"), state=self.state_root)
-        self.sources = dict(SEED_SOURCES if variant == SEED_VARIANT else VARIANTS[variant])
+        self.sources = dict(SEED_SOURCES)
         for source in self.sources.values():
             validate_module(source)
         self.contracts = contracts
@@ -252,16 +208,10 @@ class Episode:
         self.manifest: dict[str, str] = {}
         self.observations: list[dict] = []
         self.attempt_history: list[dict] = []
-        self.prior_records = list(prior_records) if ARMS[arm][1] != "none" else []
-        self.recalled: list[dict] = []
-        for prior in self.prior_records:
-            self.attempts.write(prior)
         self.oracle = json.loads(self._frozen_text(HELD_CASES))
-        self.retrievals = 0
         self.worker_attempts = 0
         input_cap = int(budget.config["max_input_tokens_per_call"])
         self.qwen = QwenBuilder(max_input_bytes=input_cap)
-        self.jev = JevChoice(max_input_bytes=input_cap)
 
     def _frozen_text(self, path: Path) -> str:
         relative = path.relative_to(CONTRACT_ROOT).as_posix()
@@ -444,19 +394,10 @@ class Episode:
                 os.environ[DEADLINE_ENV] = previous
 
     def _run(self) -> dict:
-        policy, retrieval = ARMS[self.arm]
-        self.budget.start_task()
         os.environ[DEADLINE_ENV] = str(time.monotonic() + self.budget.remaining_seconds())
         decisions: list[dict] = []
-        if retrieval == "jev_mem":
-            return {"variant": self.variant, "arm": self.arm, "status": "blocked",
-                    "reason": "jev_mem_nested_usage_unmetered", "manifest": {},
-                    "evaluation_binding": "", "worker_attempts": 0,
-                    "retrieval_rounds": 0, "observations": [], "decisions": [],
-                    "budget": self.budget.summary()}
         status, reason, binding = "incomplete", "", ""
-        limit = (int(self.budget.config["max_worker_attempts"]) +
-                 int(self.budget.config["max_retrieval_rounds"]) + 3)
+        limit = int(self.budget.config["max_worker_attempts"]) + 3
         for step in range(limit):
             self.observations.clear()
             for component in COMPONENTS:
@@ -509,68 +450,34 @@ class Episode:
                     break
                 status, reason = "unsupported", "end_to_end_only_failure_requires_public_target_diagnostic"
                 break
-            route_tokens = 128 if policy == "qwen" else 512
-            route_policy = ("deterministic" if policy == "deterministic" or
-                            not self.budget.can_bundle(((policy, route_tokens), ("qwen", 2048)))
-                            else policy)
             state = DecisionState(
                 manifest=dict(self.manifest), observations=tuple(self.observations),
                 attempts=tuple(self.attempt_history),
-                evidence_ids=tuple(item["id"] for item in self.prior_records[:5]),
                 remaining_calls=self.budget.remaining_calls(),
                 remaining_output_tokens=self.budget.remaining_output_tokens(),
                 remaining_attempts=int(self.budget.config["max_worker_attempts"]) - self.worker_attempts,
-                remaining_retrievals=int(self.budget.config["max_retrieval_rounds"]) - self.retrievals,
-                infrastructure_ready=self.budget.can_call("qwen", 2048),
-                routing_calls=0 if route_policy == "deterministic" else 1,
-                routing_tokens=0 if route_policy == "deterministic" else route_tokens,
-                retrieval_enabled=retrieval != "none")
-            chooser = None if route_policy == "deterministic" else _BudgetedChoice(
-                self.qwen if policy == "qwen" else self.jev, self.budget, policy)
-            choice, route = select_action(state, route_policy, chooser)
-            if route_policy != policy:
-                route = {**route, "fallback": True,
-                         "reason": "routing_and_worker_reservation_unaffordable"}
+                infrastructure_ready=self.budget.can_call(2048))
+            choice = deterministic_choice(legal_candidates(state))
             decisions.append({"step": step, "action": choice.action,
-                              "target": choice.target, "route": route})
+                              "target": choice.target})
             if self.budget.unknown_cost or self.budget.limit_breached:
-                status, reason = "blocked", "routing_cost_or_limit_uncertain"
+                status, reason = "blocked", "budget_uncertain"
                 break
             if not validate_choice(state, choice):
-                status, reason = "blocked", "stale_route"
+                status, reason = "blocked", "stale_choice"
                 break
             if choice.action == "ESCALATE":
                 status, reason = "escalated", "policy_escalated"
                 break
-            if choice.action == "RETRIEVE_EVIDENCE":
-                self.retrievals += 1
-                signature = str(self.observations[-1].get("diagnostic", "")) if self.observations else ""
-                target = str(self.observations[-1].get("component", "")) if self.observations else ""
-                if retrieval == "simple":
-                    retrieval_started = time.monotonic()
-                    recalled = simple_retrieve(self.attempts, component=target, signature=signature,
-                                               contract_hash=digest(self.contracts),
-                                               base_hash=hashlib.sha256(
-                                                   self.sources[target].encode()).hexdigest(),
-                                               dependency_manifest=dict(self.manifest),
-                                               environment_hash=hashlib.sha256(
-                                                   self.budget.config["sandbox_image"].encode()).hexdigest())
-                    self.budget.executor(int((time.monotonic() - retrieval_started) * 1000))
-                elif retrieval == "jev_mem":
-                    status, reason = "blocked", "jev_mem_nested_usage_unmetered"
-                    break
-                else:
-                    raise RuntimeError("retrieval_not_configured")
-                self.recalled = recalled
-                self.attempt_history.append({"action": "RETRIEVE_EVIDENCE", "route": route,
-                                             "evidence_ids": [item["id"] for item in recalled]})
-                continue
+            if choice.action != "REPAIR_COMPONENT":
+                status, reason = "blocked", "unsupported_repair_action"
+                break
             target = choice.target
-            if not self.budget.can_call("qwen", 2048):
-                status, reason = "blocked", "worker_budget_unavailable_after_route"
+            if not self.budget.can_call(2048):
+                status, reason = "blocked", "worker_budget_unavailable"
                 break
             self.worker_attempts += 1
-            record_id = f"{digest(str(self.root))[:12]}.{self.variant}.{self.arm.lower()}.a{step:03d}"
+            record_id = f"{digest(str(self.root))[:12]}.{self.variant}.a{step:03d}"
             target_diagnostic = next((str(item.get("diagnostic", "")) for item in self.observations
                                       if item.get("component") == target), "")
             started_record = {"id": record_id, "status": "started", "target": target,
@@ -580,21 +487,15 @@ class Episode:
                               "contract_hash": digest(self.contracts),
                               "environment_hash": hashlib.sha256(
                                   self.budget.config["sandbox_image"].encode()).hexdigest(),
-                              "failure_signature": target_diagnostic,
-                              "route": route}
+                              "failure_signature": target_diagnostic}
             self.attempts.write(started_record)
             diagnostic = target_diagnostic
             try:
                 self.qwen.timeout = min(self.qwen.timeout, self.budget.remaining_seconds())
-                reply = self.budget.call("qwen", 2048, lambda: self.qwen.propose(
+                reply = self.budget.call(2048, lambda: self.qwen.propose(
                     component=target, source=self.sources[target],
                     contract=self._frozen_text(CONTRACT_ROOT / "PUBLIC_CONTRACT.md"),
-                    diagnostic=diagnostic,
-                    prior_attempts=[{"id": item["id"], "observed_outcome": item.get("observed_outcome"),
-                                     "failure_signature": item.get("failure_signature"),
-                                     "applicability": item.get("applicability"),
-                                     "patch_source": item.get("patch_source")}
-                                    for item in self.recalled[:3]], max_tokens=2048))
+                    diagnostic=diagnostic, max_tokens=2048))
                 proposal = reply.value
                 proposal = {key: value.replace("\r\n", "\n").replace("\r", "\n")
                             for key, value in proposal.items()}
@@ -606,7 +507,6 @@ class Episode:
                     raise ValueError("duplicate_failed_patch")
                 self.sources[target] = proposal["module"]
                 self.candidate_tests[target] = proposal["tests"]
-                self.recalled = []
                 predecessor = self.manifest.pop(target, None)
                 for downstream in COMPONENTS:
                     if target in DEPENDENCIES[downstream] or any(
@@ -636,78 +536,12 @@ class Episode:
                 break
         else:
             status, reason = "escalated", "iteration_limit"
-        return {"variant": self.variant, "arm": self.arm, "status": status,
+        return {"variant": self.variant, "status": status,
                 "reason": reason, "manifest": self.manifest, "evaluation_binding": binding,
-                "worker_attempts": self.worker_attempts, "retrieval_rounds": self.retrievals,
+                "worker_attempts": self.worker_attempts,
                 "observations": self.observations, "decisions": decisions,
                 "attempts": self.attempt_history,
                 "budget": self.budget.summary()}
-
-
-def _read_prior(path: Path | None, contracts: dict[str, str]) -> tuple[list[dict], float]:
-    if path is None:
-        return [], 0.0
-    state_root = path.resolve()
-    if not state_root.is_dir() or not (state_root / "repair_attempts").is_dir():
-        raise ValueError("prior state must be a separate GrokCell state directory")
-    episode_root = state_root.parent
-    run_root = episode_root.parent.parent
-    configuration = _strict_json((run_root / "run_config.json").read_text(encoding="utf-8"))
-    if configuration.get("contract_hashes") != contracts:
-        raise ValueError("prior_run_contracts_changed")
-    if (configuration.get("seed_prior") is not True or
-            episode_root.parent.name != SEED_VARIANT or episode_root.name != "B"):
-        raise ValueError("prior_must_be_separate_unscored_seed")
-    completed_rows = [_strict_json(line) for line in
-                      (run_root / "results.jsonl").read_text(encoding="utf-8").splitlines()]
-    matched = [row for row in completed_rows if row.get("variant") == episode_root.parent.name
-               and row.get("arm") == episode_root.name]
-    if len(matched) != 1 or matched[0].get("budget", {}).get("estimated_total_usd") is None:
-        raise ValueError("prior_episode_not_recorded")
-    verify_terminal(episode_root, matched[0], contracts,
-                    configuration["budget"]["sandbox_image"])
-    recorded = {item.get("id"): item for item in matched[0].get("attempts", [])}
-    records = AttemptStore(state_root).all()
-    usable = []
-    for item in records:
-        if (item.get("status") != "finished" or item.get("target") not in COMPONENTS
-                or item.get("observed_outcome") in {None, "proposed_pending_evaluation",
-                                                      "proposal_failed"}):
-            continue
-        if item.get("contract_hash") != digest(contracts):
-            raise ValueError("prior_contract_mismatch")
-        recorded_item = recorded.get(item.get("id"))
-        if recorded_item != item:
-            raise ValueError("prior_attempt_not_in_completed_evidence")
-        try:
-            signature = json.loads(item["failure_signature"])
-        except (KeyError, TypeError, json.JSONDecodeError):
-            raise ValueError("prior_public_diagnostic_invalid") from None
-        if (not isinstance(signature, dict) or set(signature) != {
-                "outcome", "exit_code", "diagnostic", "stdout_truncated", "stderr_truncated"}
-                or signature["outcome"] != "tests_failed"
-                or not isinstance(signature["diagnostic"], str)
-                or len(signature["diagnostic"]) > 6000):
-            raise ValueError("prior_public_diagnostic_invalid")
-        proposal_dir = item.get("proposal_dir")
-        if not proposal_dir:
-            raise ValueError("prior_proposal_missing")
-        folder = (state_root / proposal_dir).resolve()
-        if not folder.is_relative_to(state_root):
-            raise ValueError("prior_proposal_escaped_state")
-        proposal = {"module": read_text_exact(folder / "service.py"),
-                    "tests": read_text_exact(folder / "test_service.py")}
-        if digest(proposal) != item.get("candidate_hash"):
-            raise ValueError("prior_candidate_changed")
-        validate_module(proposal["module"])
-        # Only fields generated by this harness may reach retrieval and prompts.
-        safe = {key: item.get(key) for key in (
-            "id", "status", "target", "action", "base_hash", "dependency_manifest",
-            "contract_hash", "environment_hash", "failure_signature",
-            "observed_outcome", "candidate_hash", "revision")}
-        safe["patch_source"] = proposal["module"][:4000]
-        usable.append(safe)
-    return usable, float(matched[0]["budget"]["estimated_total_usd"])
 
 
 def write_terminal(root: Path, result: dict) -> None:
@@ -787,235 +621,53 @@ def verify_terminal(root: Path, row: dict, contracts: dict[str, str],
         raise ValueError("accepted_evaluation_binding_changed")
 
 
-def summarize(results: list[dict], *, prior_creation_estimated_usd: float = 0.0) -> dict:
-    """Descriptive pilot score only; no small pilot licenses deployment."""
-    by_arm = {}
-    for arm in ARMS:
-        rows = [item for item in results if item["arm"] == arm]
-        known = all(item.get("budget", {}).get("estimated_total_usd") is not None for item in rows)
-        cost = sum(item["budget"]["estimated_total_usd"] for item in rows) if known else None
-        accepted = sum(item.get("status") == "accepted" for item in rows)
-        construction = prior_creation_estimated_usd if arm in {"D", "E"} else 0.0
-        fully_loaded = cost + construction if cost is not None else None
-        qwen_calls = ([attempt["qwen"] for row in rows
-                       for attempt in row.get("attempts", []) if attempt.get("qwen")] +
-                      [decision["route"] for row in rows
-                       for decision in row.get("decisions", [])
-                       if decision.get("route", {}).get("source") == "qwen"
-                       and decision["route"].get("model")])
-        revisions = sorted({item.get("revision") for item in qwen_calls
-                            if isinstance(item.get("revision"), str) and item["revision"]})
-        jev_routes = [decision["route"] for row in rows
-                      for decision in row.get("decisions", [])
-                      if decision.get("route", {}).get("source") == "jev"]
-        jev_models = sorted({route.get("model") for route in jev_routes
-                             if isinstance(route.get("model"), str) and route["model"]})
-        by_arm[arm] = {
-            "episodes": len(rows), "accepted": accepted,
-            "completion_rate": accepted / len(rows) if rows else None,
-            "pilot_estimated_usd": cost, "prior_creation_estimated_usd": construction,
-            "fully_loaded_estimated_usd": fully_loaded,
-            "repairs_per_estimated_usd": accepted / fully_loaded if fully_loaded else None,
-            "escalations": sum(item.get("status") == "escalated" for item in rows),
-            "blocked": sum(item.get("status") == "blocked" for item in rows),
-            "worker_attempts": sum(item.get("worker_attempts", 0) for item in rows),
-            "wall_seconds": sum(item.get("budget", {}).get("wall_seconds", 0) for item in rows),
-            "limit_breaches": sum(bool(item.get("budget", {}).get("limit_breached")) for item in rows),
-            "qwen_revisions": revisions,
-            "qwen_revision_known": bool(qwen_calls) and len(revisions) == 1 and all(
-                item.get("revision") == revisions[0] for item in qwen_calls),
-            "jev_route_calls": len(jev_routes),
-            "jev_models": jev_models,
-            "jev_model_known": bool(jev_routes) and len(jev_models) == 1 and all(
-                route.get("model") == jev_models[0] for route in jev_routes),
-            "observed_false_acceptances": sum(
-                item.get("status") == "accepted" and (
-                    not item.get("evaluation_binding") or
-                    len(item.get("manifest", {})) != len(COMPONENTS)) for item in rows),
-        }
-    comparisons = {}
-    for label, baseline, challenger in (("C_vs_A", "A", "C"),
-                                        ("C_vs_B", "B", "C"),
-                                        ("D_vs_C", "C", "D"),
-                                        ("E_vs_D", "D", "E")):
-        left, right = by_arm[baseline], by_arm[challenger]
-        left_rows = {item["variant"]: item for item in results if item["arm"] == baseline}
-        right_rows = {item["variant"]: item for item in results if item["arm"] == challenger}
-        paired = {"both": 0, "challenger_only": 0, "baseline_only": 0, "neither": 0}
-        for variant in set(left_rows) & set(right_rows):
-            left_ok = left_rows[variant].get("status") == "accepted"
-            right_ok = right_rows[variant].get("status") == "accepted"
-            bucket = ("both" if left_ok and right_ok else
-                      "challenger_only" if right_ok else
-                      "baseline_only" if left_ok else "neither")
-            paired[bucket] += 1
-        versions_match = (left["qwen_revision_known"] and right["qwen_revision_known"]
-                          and left["qwen_revisions"] == right["qwen_revisions"]
-                          and (baseline not in {"C", "D", "E"} or left["jev_model_known"])
-                          and (challenger not in {"C", "D", "E"} or right["jev_model_known"])
-                          and (label not in {"D_vs_C", "E_vs_D"} or
-                               left["jev_models"] == right["jev_models"]))
-        complete = (set(left_rows) == set(right_rows) == set(VARIANTS)
-                    and left["episodes"] == right["episodes"] == len(VARIANTS)
-                    and left["blocked"] == right["blocked"] == 0
-                    and left["limit_breaches"] == right["limit_breaches"] == 0
-                    and versions_match
-                    and left["repairs_per_estimated_usd"] is not None
-                    and right["repairs_per_estimated_usd"] is not None)
-        gain = (right["repairs_per_estimated_usd"] / left["repairs_per_estimated_usd"] - 1
-                if left["repairs_per_estimated_usd"] and right["repairs_per_estimated_usd"] is not None else None)
-        jev_unexposed = any(by_arm[arm]["jev_route_calls"] == 0
-                            for arm in (baseline, challenger) if arm in {"C", "D", "E"})
-        comparisons[label] = {
-            "comparable": complete, "observed_relative_gain": gain,
-            "paired_outcomes": paired, "provider_versions_match": versions_match,
-            "observed_effect_exceeds_threshold": bool(
-                complete and gain is not None and gain >= MIN_WORTHWHILE_GAIN
-                and right["accepted"] >= left["accepted"]
-                and right["observed_false_acceptances"] == 0),
-            "retention_supported": False,
-            "retention_reason": ("no_jev_decision_exposure" if jev_unexposed else
-                                 "single_small_pilot_no_uncertainty_estimate"),
-        }
-    return {"primary_metric": "accepted_complete_tasks_per_estimated_usd",
-            "cost_basis": "configured_token_tariffs_plus_executor_time_estimate",
-            "minimum_worthwhile_relative_gain": MIN_WORTHWHILE_GAIN,
-            "prior_creation_estimated_usd": prior_creation_estimated_usd,
-            "arms": by_arm, "comparisons": comparisons,
-            "interpretation": "pilot_only_no_production_promotion"}
-
-
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--check", action="store_true", help="offline preflight; executes no candidate")
-    parser.add_argument("--live", action="store_true", help="run paired pilot with authorized providers")
-    parser.add_argument("--seed-prior", action="store_true",
-                        help="run one separate deterministic seed episode")
-    parser.add_argument("--resume", action="store_true",
-                        help="continue only after fully recorded episode boundaries")
+    parser.add_argument("--live", action="store_true", help="run one Qwen-assisted repair episode")
     parser.add_argument("--budget", type=Path)
-    parser.add_argument("--prior-state", type=Path,
-                        help="separate GrokCell state with canonical public attempt records")
     parser.add_argument("--output", type=Path)
-    parser.add_argument("--seed", type=int, default=260925)
     args = parser.parse_args(argv)
     contracts = verify_contracts()
     if args.check and not args.live:
         print(json.dumps({"status": "offline_preflight_only", "contract_count": len(contracts),
-                          "variants": list(VARIANTS), "arms": list(ARMS),
-                          "paired_pilot_ready": PAIRED_PILOT_READY,
+                          "fixture": SEED_VARIANT,
                           "sandbox_configured": bool(os.environ.get(SANDBOX_IMAGE_ENV)),
                           "docker_available": bool(shutil.which("docker")),
-                          "qwen_credential": bool(os.environ.get("HF_TOKEN")),
-                          "jev_credential": bool(os.environ.get("TYPESAFE_API_KEY"))}, indent=2))
+                          "qwen_credential": bool(os.environ.get("HF_TOKEN"))}, indent=2))
         return 0
     if not args.live or not args.budget or not args.output:
-        parser.error("live run requires --live --budget FILE --output DIR")
+        parser.error("repair run requires --live --budget FILE --output DIR")
+    if args.output.exists():
+        raise SystemExit("choose a new output directory")
     budget_config = _strict_json(args.budget.read_text(encoding="utf-8"))
     Budget(budget_config)  # Validate schema before any side effect.
-    if not args.seed_prior and not PAIRED_PILOT_READY:
-        raise SystemExit("paired pilot blocked: current fixture has no Jev routing opportunity")
-    if (not shutil.which("docker") or not os.environ.get("HF_TOKEN") or
-            (not args.seed_prior and not os.environ.get("TYPESAFE_API_KEY"))):
-        raise SystemExit("live prerequisites missing: Docker, HF_TOKEN, and TypeSafe key for paired pilot")
+    if not shutil.which("docker") or not os.environ.get("HF_TOKEN"):
+        raise SystemExit("live prerequisites missing: Docker and HF_TOKEN")
     if subprocess.run(["docker", "image", "inspect", budget_config["sandbox_image"]],
                       stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL,
                       timeout=10, check=False).returncode != 0:
         raise SystemExit("pinned sandbox image is not present locally")
-    prior, prior_creation_estimated_usd = _read_prior(args.prior_state, contracts)
-    if not prior and not args.seed_prior:
-        raise SystemExit("paired memory comparison requires --prior-state with public attempts")
-    if args.output.exists() != args.resume:
-        raise SystemExit("new runs need a new output directory; existing runs require --resume")
-    if not args.resume:
-        args.output.mkdir(parents=True)
     os.environ[SANDBOX_IMAGE_ENV] = budget_config["sandbox_image"]
-    order = ([(SEED_VARIANT, 'B')] if args.seed_prior else
-             [(variant, arm) for variant in VARIANTS for arm in ARMS])
-    if budget_config["max_total_usd"] < len(order) * budget_config["max_task_usd"]:
-        raise SystemExit("total dollar cap must fund every paired task at its equal task cap")
-    if budget_config["max_elapsed_seconds"] < len(order) * budget_config["max_task_elapsed_seconds"]:
-        raise SystemExit("total elapsed cap must fund every paired task at its equal task cap")
-    for task_field, total_field in (("max_calls", "max_total_calls"),
-                                    ("max_output_tokens", "max_total_output_tokens"),
-                                    ("max_worker_attempts", "max_total_worker_attempts"),
-                                    ("max_retrieval_rounds", "max_total_retrieval_rounds")):
-        if budget_config[total_field] < len(order) * budget_config[task_field]:
-            raise SystemExit(f"{total_field} must fund every paired task equally")
-    random.Random(args.seed).shuffle(order)
-    run_config = {
-        "seed": args.seed, "seed_prior": args.seed_prior,
-        "order": order, "contract_hashes": contracts,
-        "budget": budget_config,
-        "prior_state": str(args.prior_state.resolve()) if args.prior_state else None,
-        "prior_records_hash": digest(prior),
-        "prior_creation_estimated_usd": prior_creation_estimated_usd}
-    config_path = args.output / "run_config.json"
-    if args.resume:
-        if _strict_json(config_path.read_text(encoding="utf-8")) != run_config:
-            raise SystemExit("resume configuration or prior evidence changed")
-    else:
-        config_path.write_text(json.dumps(run_config, indent=2) + "\n", encoding="utf-8")
-    evidence = args.output / "results.jsonl"
-    results = ([_strict_json(line) for line in evidence.read_text(encoding="utf-8").splitlines()]
-               if args.resume and evidence.exists() else [])
-    completed = [(item.get("variant"), item.get("arm")) for item in results]
-    if completed != order[:len(completed)]:
-        raise SystemExit("resume result order or identity changed")
-    for item in results:
-        verify_terminal(args.output / item["variant"] / item["arm"], item,
-                        contracts, budget_config["sandbox_image"])
-    if any(item.get("budget", {}).get("estimated_total_usd") is None for item in results):
-        raise SystemExit("resume blocked: completed episode has unknown external cost")
-    total_spent = sum(item["budget"]["estimated_total_usd"] for item in results)
-    totals = {"max_total_calls": sum(item["budget"]["calls"] for item in results),
-              "max_total_output_tokens": sum(item["budget"]["output_tokens"] for item in results),
-              "max_total_worker_attempts": sum(item.get("worker_attempts", 0) for item in results),
-              "max_total_retrieval_rounds": sum(item.get("retrieval_rounds", 0) for item in results)}
-    run_started = time.monotonic()
-    with evidence.open("a" if args.resume else "w", encoding="utf-8") as handle:
-        for variant, arm in order[len(results):]:
-            episode_root = args.output / variant / arm
-            if episode_root.exists():
-                unfinished = AttemptStore(episode_root / "state").unfinished()
-                detail = ("uncertain external attempt: " + ",".join(item["id"] for item in unfinished)
-                          if unfinished else "admission or usage may have committed before result")
-                raise SystemExit("resume blocked at interrupted episode; " + detail)
-            budget = Budget(budget_config)
-            episode = Episode(variant=variant, arm=arm, root=episode_root,
-                              budget=budget, prior_records=list(prior), contracts=contracts)
-            try:
-                result = episode.run()
-            except Exception as exc:
-                result = {"variant": variant, "arm": arm, "status": "blocked",
-                          "reason": type(exc).__name__ + ": " + str(exc)[:120],
-                          "budget": budget.summary()}
-                write_terminal(episode_root, result)
-            verify_terminal(episode_root, result, contracts,
-                            budget_config["sandbox_image"], allow_unknown=True)
-            handle.write(json.dumps(result, sort_keys=True, allow_nan=False) + "\n")
-            handle.flush()
-            os.fsync(handle.fileno())
-            results.append(result)
-            if budget.unknown_cost or budget.limit_breached:
-                break
-            total_spent += budget.total_usd
-            if total_spent > budget_config["max_total_usd"]:
-                raise RuntimeError("portfolio_dollar_limit_breached")
-            for field, used in (("max_total_calls", budget.calls),
-                                ("max_total_output_tokens", budget.output_tokens),
-                                ("max_total_worker_attempts", result.get("worker_attempts", 0)),
-                                ("max_total_retrieval_rounds", result.get("retrieval_rounds", 0))):
-                totals[field] += used
-                if totals[field] > budget_config[field]:
-                    raise RuntimeError("portfolio_limit_breached:" + field)
-            if time.monotonic() - run_started > budget_config["max_elapsed_seconds"]:
-                break
-    (args.output / "summary.json").write_text(
-        json.dumps(summarize(results,
-                             prior_creation_estimated_usd=prior_creation_estimated_usd),
-                   indent=2, allow_nan=False) + "\n",
-        encoding="utf-8")
+    args.output.mkdir(parents=True)
+    (args.output / "run_config.json").write_text(json.dumps({
+        "fixture": SEED_VARIANT, "contract_hashes": contracts, "budget": budget_config
+    }, indent=2) + "\n", encoding="utf-8")
+    budget = Budget(budget_config)
+    episode = Episode(root=args.output,
+                      budget=budget, contracts=contracts)
+    try:
+        result = episode.run()
+    except Exception as exc:
+        result = {"variant": SEED_VARIANT, "status": "blocked",
+                  "reason": type(exc).__name__ + ": " + str(exc)[:120],
+                  "budget": budget.summary()}
+        write_terminal(args.output, result)
+    verify_terminal(args.output, result, contracts,
+                    budget_config["sandbox_image"], allow_unknown=True)
+    evidence = args.output / "result.json"
+    evidence.write_text(json.dumps(result, sort_keys=True, indent=2, allow_nan=False) + "\n",
+                        encoding="utf-8")
     print(str(evidence))
     return 0
 
