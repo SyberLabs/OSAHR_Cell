@@ -17,7 +17,7 @@ from .examples import FixtureChooser, FixtureWorker
 from .journal import read_json
 from .providers import HuggingFaceWorker, JevAdapter, ProviderConfig, preflight
 from .records import JsonSnapshot, Limits, Permission
-from .report import write_report
+from .report import write_report, write_static_export
 from .runtime import ExecutionBlocked
 from . import workflows
 
@@ -32,7 +32,8 @@ def _live_configuration(path):
         raise ExecutionBlocked("live mode requires an explicit operator configuration")
     data = read_json(Path(path), 64_000)
     if (set(data) != {"authorized", "budget_scope", "limits", "jev", "hf"}
-            or data["authorized"] is not True or data["budget_scope"] != "dedicated_credentials_operator_reviewed_bounds"):
+            or data["authorized"] is not True
+            or data["budget_scope"] != "credential_owner_no_bill_to_override"):
         raise ExecutionBlocked("explicit authorization and reviewed account scope required")
     limits = Limits(**data["limits"])
     jev, hf = ProviderConfig(**data["jev"]), ProviderConfig(**data["hf"])
@@ -93,7 +94,7 @@ def _child(name, state, mode, *, resume=False):
     return json.loads(proc.stdout)
 
 
-def demo(output, mode="offline"):
+def demo(output, mode="offline", static_export=None):
     output = Path(output)
     output.mkdir(parents=True, exist_ok=False)
     runs = []
@@ -112,11 +113,15 @@ def demo(output, mode="offline"):
         with (output / (name + (".py.txt" if name == "repair" else ".candidate.json"))).open("x", encoding="utf-8") as handle:
             handle.write(replay["candidate"])
     write_report(output / "index.html", runs)
+    if static_export is not None:
+        write_static_export(Path(static_export), runs)
     with (output / "README.txt").open("x", encoding="utf-8") as handle:
         handle.write("Open index.html. Reports are recorded evidence, not live provider execution.\n"
                      "State folders contain operator-owned journals; do not publish them with private inputs.\n"
                      "No deployment permission or performance claim is granted.\n")
-    return {"report": str(output / "index.html"), "mode": mode, "process_restart_replay": True,
+    return {"report": str(output / "index.html"),
+            "static_export": str(static_export) if static_export is not None else None,
+            "mode": mode, "process_restart_replay": True,
             "workflows": [item["workflow"] for item in runs], "live_provider_calls": 0}
 
 
@@ -170,6 +175,8 @@ def main(argv=None):
     item = commands.add_parser("demo")
     item.add_argument("--out", type=Path, required=True)
     item.add_argument("--mode", choices=("offline", "isolated"), default="offline")
+    item.add_argument("--static-export", type=Path,
+                      help="write a sanitized offline-only Cloudflare Pages folder")
     item = commands.add_parser("release-check")
     item.add_argument("--out", type=Path, required=True)
     commands.add_parser("preflight")
@@ -186,7 +193,7 @@ def main(argv=None):
         elif args.command == "run":
             result = execute(args.workflow, args.state, mode=args.mode, config_path=args.config, resume=args.resume)
         elif args.command == "demo":
-            result = demo(args.out, args.mode)
+            result = demo(args.out, args.mode, args.static_export)
         elif args.command == "release-check":
             result = release_check(args.out)
         elif args.command in ("cancel", "revoke"):
