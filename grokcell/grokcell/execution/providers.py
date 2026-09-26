@@ -212,22 +212,6 @@ def _metadata(config, result, request_id, elapsed):
         if count is not None:
             integer(count)
     cost = config.estimate(inputs, outputs)
-    cached_tokens = reasoning_tokens = None
-    if config.provider == "hf":
-        prompt_details = usage.get("prompt_tokens_details")
-        completion_details = usage.get("completion_tokens_details")
-        if prompt_details is not None and type(prompt_details) is not dict:
-            raise ValueError("invalid prompt token details")
-        if completion_details is not None and type(completion_details) is not dict:
-            raise ValueError("invalid completion token details")
-        cached_tokens = (prompt_details or {}).get("cached_tokens")
-        reasoning_tokens = (completion_details or {}).get("reasoning_tokens")
-        for count in (cached_tokens, reasoning_tokens):
-            if count is not None:
-                integer(count)
-        if ((cached_tokens is not None and inputs is not None and cached_tokens > inputs)
-                or (reasoning_tokens is not None and outputs is not None and reasoning_tokens > outputs)):
-            raise ValueError("provider token detail exceeds total usage")
     violation = ((inputs is not None and inputs > config.max_input_tokens)
                  or (outputs is not None and outputs > config.max_output_tokens))
     revision = result.get("system_fingerprint") or result.get("model_revision")
@@ -241,7 +225,7 @@ def _metadata(config, result, request_id, elapsed):
                 "input_microusd_per_million": config.input_microusd_per_million,
                 "output_microusd_per_million": config.output_microusd_per_million,
                 "pricing_method": "configured_rates_applied_to_provider_total_token_counts",
-                "cached_input_tokens": cached_tokens, "reasoning_output_tokens": reasoning_tokens,
+                "cached_input_tokens": None, "reasoning_output_tokens": None,
                 "billing_scope": config.billing_scope,
                 "billing_scope_note": "credential owner; no organization bill-to header is sent",
                 "max_input_tokens": config.max_input_tokens,
@@ -252,6 +236,35 @@ def _metadata(config, result, request_id, elapsed):
                 "retry_policy": RETRY_POLICY,
                 "estimated_microusd": cost, "configuration_hash": config.identity,
                 "limits_breached": bool(violation)}
+    if config.provider == "hf":
+        try:
+            prompt_details = usage.get("prompt_tokens_details")
+            completion_details = usage.get("completion_tokens_details")
+            if prompt_details is not None and type(prompt_details) is not dict:
+                raise ValueError("invalid prompt token details")
+            if completion_details is not None and type(completion_details) is not dict:
+                raise ValueError("invalid completion token details")
+            cached_tokens = (prompt_details or {}).get("cached_tokens")
+            reasoning_tokens = (completion_details or {}).get("reasoning_tokens")
+            for count in (cached_tokens, reasoning_tokens):
+                if count is not None:
+                    integer(count)
+            if ((cached_tokens is not None and inputs is not None and cached_tokens > inputs)
+                    or (reasoning_tokens is not None and outputs is not None and reasoning_tokens > outputs)):
+                raise ValueError("provider token detail exceeds total usage")
+            metadata["cached_input_tokens"] = cached_tokens
+            metadata["reasoning_output_tokens"] = reasoning_tokens
+        except (TypeError, ValueError) as exc:
+            # Preserve the specific safe validation reason, never exception text
+            # derived from provider-controlled values.
+            known_errors = {
+                "invalid prompt token details", "invalid completion token details",
+                "expected nonnegative integer", "provider token detail exceeds total usage",
+            }
+            error_text = exc.args[0] if exc.args and type(exc.args[0]) is str else None
+            metadata["validation_error"] = (error_text if error_text in known_errors
+                                             else "invalid optional provider token details")
+            raise _observed_error("Hugging Face", cost, metadata, detail="usage details") from None
     return cost, metadata
 
 
@@ -262,16 +275,16 @@ _OBSERVED_METADATA_FIELDS = (
     "cached_input_tokens", "reasoning_output_tokens", "billing_scope", "billing_scope_note",
     "max_input_tokens", "max_output_tokens", "max_input_bytes", "max_response_bytes",
     "timeout_seconds", "retry_policy", "estimated_microusd", "configuration_hash",
-    "limits_breached",
+    "limits_breached", "validation_error",
 )
 
 
-def _observed_error(provider, cost, metadata):
+def _observed_error(provider, cost, metadata, *, detail="response content"):
     """Retain only bounded accounting/identity metadata; never include response content."""
     safe = {key: metadata.get(key) for key in _OBSERVED_METADATA_FIELDS}
     if type(safe["serving_revision"]) is not str:
         safe["serving_revision"] = None
-    return ObservedReplyError(f"invalid {provider} response content", cost,
+    return ObservedReplyError(f"invalid {provider} {detail}", cost,
                               JsonSnapshot.capture(safe))
 
 

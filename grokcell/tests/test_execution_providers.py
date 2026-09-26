@@ -147,6 +147,32 @@ def test_hf_missing_or_malformed_content_preserves_valid_usage(result):
     assert error.value.metadata.value()["output_tokens"] == 50
 
 
+@pytest.mark.parametrize("details,validation_error", [
+    ("malformed optional detail", "invalid prompt token details"),
+    ({"cached_tokens": 101}, "provider token detail exceeds total usage"),
+])
+def test_hf_invalid_optional_usage_details_preserve_total_cost(details, validation_error):
+    config_with_small_ceiling = ProviderConfig(
+        "hf", "openai/gpt-oss-20b:ovhcloud", ("openai/gpt-oss-20b",),
+        1_000_000, 1_000_000, 20, 10, 10)
+    body = {"model": "openai/gpt-oss-20b", "id": "known-billing-id",
+            "usage": {"prompt_tokens": 100, "completion_tokens": 100,
+                      "prompt_tokens_details": details},
+            "choices": [{"message": {"content": '{"module":"private candidate text"}'}}]}
+    with pytest.raises(ObservedReplyError, match="usage details") as error:
+        HuggingFaceWorker(config_with_small_ceiling, output_key="module",
+                          transport=lambda *a: (body, None, 1)).propose(JsonSnapshot.capture({}))
+    assert error.value.actual_microusd == 200
+    metadata = error.value.metadata.value()
+    assert metadata["estimated_microusd"] == 200
+    assert metadata["input_tokens"] == 100 and metadata["output_tokens"] == 100
+    assert metadata["request_id"] == "known-billing-id"
+    assert metadata["limits_breached"] is True
+    assert metadata["validation_error"] == validation_error
+    assert "private candidate text" not in json.dumps(metadata)
+    assert "cached_tokens" not in json.dumps(metadata)
+
+
 @pytest.mark.parametrize("field,value", [("input_microusd_per_million", -1),
                                          ("max_charge_microusd", 1), ("max_input_tokens", 0),
                                          ("timeout_seconds", 61), ("max_output_tokens", True)])
