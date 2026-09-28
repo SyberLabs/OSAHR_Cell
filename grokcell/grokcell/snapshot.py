@@ -10,12 +10,23 @@ import uuid
 from contextlib import contextmanager
 from dataclasses import dataclass
 from pathlib import Path
-from typing import Iterator
+from typing import TYPE_CHECKING, Iterator
 
-from osahr import RuntimeConfig, load_checkpoint, save_checkpoint
+if TYPE_CHECKING:
+    from osahr import RuntimeConfig
+    from .messages import Message
+
+
+def save_checkpoint(*args, **kwargs):
+    from osahr import save_checkpoint as save
+    return save(*args, **kwargs)
+
+
+def load_checkpoint(*args, **kwargs):
+    from osahr import load_checkpoint as load
+    return load(*args, **kwargs)
 
 from . import protocol
-from .messages import Message
 
 KERNEL_NAME = "kernel.osahr.gz"
 SURFACE_NAME = "surface.json"
@@ -113,6 +124,7 @@ class SurfaceSnapshot:
             or not isinstance(held_payload, list)
         ):
             raise ValueError("invalid grokcell surface counters or queues")
+        from .messages import Message
         queued = [Message.from_json(item) for item in queued_payload]
         held_list = [Message.from_json(item) for item in held_payload]
         messages = queued + held_list
@@ -237,7 +249,18 @@ class SnapshotStore:
             )
         return None
 
+    def load_execution(self) -> dict | None:
+        """Load an execution-only generation; refuse legacy roots or corruption."""
+        from .execution.journal import load
+        return load(self)
+
+    def save_execution(self, payload: dict) -> None:
+        """Commit one execution generation through this store's lock and CURRENT."""
+        from .execution.journal import save
+        save(self, payload)
+
     def save(self, runtime: object, surface: SurfaceSnapshot) -> None:
+        from .execution.journal import sync_directory, sync_file
         with self.locked():
             if not self._loaded:
                 raise RuntimeError("grokcell state must be loaded before it is saved")
@@ -259,8 +282,11 @@ class SnapshotStore:
                     json.dumps(surface.to_json(), indent=2) + "\n",
                     encoding="utf-8",
                 )
+                sync_file(kernel_tmp)
+                sync_file(surface_tmp)
                 kernel_tmp.replace(kernel_path)
                 surface_tmp.replace(surface_path)
+                sync_directory(self.root)
                 manifest = {
                     "version": SNAPSHOT_VERSION,
                     "generation": generation,
@@ -273,7 +299,9 @@ class SnapshotStore:
                     json.dumps(manifest, indent=2) + "\n",
                     encoding="utf-8",
                 )
+                sync_file(current_tmp)
                 current_tmp.replace(self.current_path)
+                sync_directory(self.root)
             finally:
                 for temporary in (kernel_tmp, surface_tmp, current_tmp):
                     temporary.unlink(missing_ok=True)
