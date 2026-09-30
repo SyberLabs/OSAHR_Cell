@@ -13,6 +13,9 @@ dependencies = [
   "pytest>=8,<10",
 ]
 
+[project.optional-dependencies]
+hosted = ["psycopg[binary]>=3.2,<4"]
+
 [tool.setuptools.packages.find]
 include = ["grokcell*"]
 
@@ -21,6 +24,7 @@ grokcell = [
   "resources/vault/concepts/*.md",
   "resources/world/pytest.ini",
   "resources/world/suites/*/*.py",
+  "resources/sql/*.sql",
 ]
 
 [tool.pytest.ini_options]
