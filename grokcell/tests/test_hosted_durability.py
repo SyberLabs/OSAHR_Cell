@@ -74,7 +74,7 @@ def _begin(store, owner, cell, *, controller, fence, revision=0, key="request", 
 def test_postgres_admission_replay_and_lost_ack_returns_original_receipt(hosted):
     store, coordinator, _, runtime, owner, cell = hosted
     controller = "controller-a"
-    fence = store.claim_cell(cell_id=cell, controller_id=controller)
+    fence = store.claim_cell(owner_id=owner, cell_id=cell, controller_id=controller)
     attempt = _begin(store, owner, cell, controller=controller, fence=fence)
     licensed_assemble(runtime, name="core.api", constraint="critical_module", seq=1)
     first = coordinator.commit_admission(
@@ -124,7 +124,7 @@ def test_postgres_admission_replay_and_lost_ack_returns_original_receipt(hosted)
 
 def test_idempotency_digest_covers_revision_and_reserved_units(hosted):
     store, _, _, _, owner, cell = hosted
-    fence = store.claim_cell(cell_id=cell, controller_id="controller-a")
+    fence = store.claim_cell(owner_id=owner, cell_id=cell, controller_id="controller-a")
     original = _begin(store, owner, cell, controller="controller-a", fence=fence)
     assert not _begin(store, owner, cell, controller="controller-a", fence=fence).dispatch_allowed
     with pytest.raises(IdempotencyConflict):
@@ -147,7 +147,7 @@ def test_idempotency_digest_covers_revision_and_reserved_units(hosted):
 def test_expired_lease_cannot_mutate_unknown_attempt_before_takeover(hosted):
     store, _, _, _, owner, cell = hosted
     controller = "controller-a"
-    fence = store.claim_cell(cell_id=cell, controller_id=controller)
+    fence = store.claim_cell(owner_id=owner, cell_id=cell, controller_id=controller)
     attempt = _begin(store, owner, cell, controller=controller, fence=fence)
     import psycopg
 
@@ -168,7 +168,7 @@ def test_expired_lease_cannot_mutate_unknown_attempt_before_takeover(hosted):
     with pytest.raises(StaleFence):
         _begin(store, owner, cell, controller=controller, fence=fence, key="after-expiry")
 
-    new_fence = store.claim_cell(cell_id=cell, controller_id="controller-b")
+    new_fence = store.claim_cell(owner_id=owner, cell_id=cell, controller_id="controller-b")
     assert new_fence == fence + 1
     with pytest.raises(StaleFence):
         store._commit_admission(
@@ -213,7 +213,7 @@ def test_restore_rejects_correctly_hashed_untrusted_namespace_before_pickle(host
 def test_replay_segment_query_excludes_revisions_after_captured_head(hosted):
     store, coordinator, _, runtime, owner, cell = hosted
     controller = "controller-a"
-    fence = store.claim_cell(cell_id=cell, controller_id=controller)
+    fence = store.claim_cell(owner_id=owner, cell_id=cell, controller_id=controller)
     first_attempt = _begin(store, owner, cell, controller=controller, fence=fence)
     licensed_assemble(runtime, name="core.api", constraint="critical_module", seq=1)
     coordinator.commit_admission(
@@ -248,7 +248,7 @@ def test_replay_segment_query_excludes_revisions_after_captured_head(hosted):
 def test_outbox_conflict_rolls_back_head_segment_attempt_and_budget(hosted):
     store, coordinator, _, runtime, owner, cell = hosted
     controller = "controller-a"
-    fence = store.claim_cell(cell_id=cell, controller_id=controller)
+    fence = store.claim_cell(owner_id=owner, cell_id=cell, controller_id=controller)
     attempt = _begin(store, owner, cell, controller=controller, fence=fence)
     licensed_assemble(runtime, name="core.api", constraint="critical_module", seq=1)
     import psycopg
@@ -276,9 +276,9 @@ def test_outbox_conflict_rolls_back_head_segment_attempt_and_budget(hosted):
 
 
 def test_lock_wait_is_bounded_and_expired_cell_can_be_taken_over(hosted):
-    store, _, _, _, _, cell = hosted
+    store, _, _, _, owner, cell = hosted
     controller = "controller-a"
-    fence = store.claim_cell(cell_id=cell, controller_id=controller, lease_seconds=1)
+    fence = store.claim_cell(owner_id=owner, cell_id=cell, controller_id=controller, lease_seconds=1)
     import psycopg
 
     blocker = psycopg.connect(store._dsn)
@@ -286,11 +286,11 @@ def test_lock_wait_is_bounded_and_expired_cell_can_be_taken_over(hosted):
     time.sleep(1.1)
     started = time.monotonic()
     with pytest.raises(psycopg.errors.LockNotAvailable):
-        store.claim_cell(cell_id=cell, controller_id="controller-b", lease_seconds=5)
+        store.claim_cell(owner_id=owner, cell_id=cell, controller_id="controller-b", lease_seconds=5)
     assert time.monotonic() - started < 5
     blocker.rollback()
     blocker.close()
-    assert store.claim_cell(cell_id=cell, controller_id="controller-b") == fence + 1
+    assert store.claim_cell(owner_id=owner, cell_id=cell, controller_id="controller-b") == fence + 1
 
 
 def test_initialization_readback_failure_never_registers_head(hosted, tmp_path):
@@ -312,3 +312,49 @@ def test_initialization_readback_failure_never_registers_head(hosted, tmp_path):
     with psycopg.connect(store._dsn) as connection, connection.cursor() as cursor:
         cursor.execute("SELECT 1 FROM grokcell_cell_heads WHERE cell_id=%s", (cell,))
         assert cursor.fetchone() is None
+
+
+@pytest.mark.parametrize("field", ["config", "root_seed", "run_id"])
+def test_admission_rejects_foreign_runtime_identity_before_writing(hosted, field):
+    from dataclasses import replace
+    from grokcell.hosted_types import HostedStoreError
+
+    store, coordinator, objects, runtime, owner, cell = hosted
+    fence = store.claim_cell(owner_id=owner, cell_id=cell, controller_id="controller-a")
+    attempt = _begin(store, owner, cell, controller="controller-a", fence=fence)
+    licensed_assemble(runtime, name="core.api", constraint="critical_module", seq=1)
+    original_hash = runtime.state_hash
+    if field == "config":
+        runtime.config = replace(runtime.config, max_events=runtime.config.max_events + 1)
+    elif field == "root_seed":
+        runtime.root_seed += 1
+    else:
+        runtime.run_id = "f" * 64
+    assert runtime.state_hash == original_hash
+    objects_before = dict(objects.values)
+    with pytest.raises(HostedStoreError, match="identity differs"):
+        coordinator.commit_admission(
+            attempt=attempt, controller_id="controller-a", fence=fence,
+            candidate_runtime=runtime, actual_units=2, model=construction_model(),
+        )
+    assert objects.values == objects_before
+    assert store.load_replay_records(cell_id=cell, owner_id=owner)[0].revision == 0
+
+
+def test_foreign_owner_cannot_claim_expired_lease_or_mutate_pending_attempt(hosted):
+    import psycopg
+
+    store, _, _, _, owner, cell = hosted
+    fence = store.claim_cell(owner_id=owner, cell_id=cell, controller_id="controller-a")
+    attempt = _begin(store, owner, cell, controller="controller-a", fence=fence)
+    with psycopg.connect(store._dsn) as connection:
+        connection.execute(
+            "UPDATE grokcell_cell_heads SET lease_expires_at=clock_timestamp()-interval '1 second' WHERE cell_id=%s",
+            (cell,),
+        )
+    with pytest.raises(StaleFence):
+        store.claim_cell(owner_id="another-owner", cell_id=cell, controller_id="attacker")
+    with psycopg.connect(store._dsn) as connection:
+        assert connection.execute("SELECT fence,lease_owner FROM grokcell_cell_heads WHERE cell_id=%s", (cell,)).fetchone() == (fence, "controller-a")
+        assert connection.execute("SELECT status FROM grokcell_attempts WHERE attempt_id=%s", (attempt.attempt_id,)).fetchone() == ("dispatch_intent",)
+    assert store.claim_cell(owner_id=owner, cell_id=cell, controller_id="controller-b") == fence + 1

@@ -152,9 +152,9 @@ class PostgresHostedStore:
             )
 
     def claim_cell(
-        self, *, cell_id: str, controller_id: str, lease_seconds: int = 30
+        self, *, owner_id: str, cell_id: str, controller_id: str, lease_seconds: int = 30
     ) -> int:
-        if not controller_id or not 1 <= lease_seconds <= _MAX_LEASE_SECONDS:
+        if not owner_id or not controller_id or not 1 <= lease_seconds <= _MAX_LEASE_SECONDS:
             raise ValueError("invalid controller lease")
         with self._connect() as connection, connection.cursor() as cursor:
             cursor.execute(
@@ -162,10 +162,10 @@ class PostgresHostedStore:
                    SET fence = fence + 1, lease_owner = %s,
                        lease_expires_at = clock_timestamp() + (%s * interval '1 second'),
                        updated_at = clock_timestamp()
-                   WHERE cell_id = %s
+                   WHERE cell_id = %s AND owner_id = %s
                      AND (lease_expires_at IS NULL OR lease_expires_at <= clock_timestamp())
                    RETURNING fence""",
-                (controller_id, lease_seconds, cell_id),
+                (controller_id, lease_seconds, cell_id, owner_id),
             )
             row = cursor.fetchone()
             if row is None:

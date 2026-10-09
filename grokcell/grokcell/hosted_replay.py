@@ -287,6 +287,13 @@ class HostedStateCoordinator:
             raise HostedStoreError("attempt no longer matches current cell head")
         if type(candidate_runtime) is not Runtime:
             raise HostedStoreError("admission requires a native controller Runtime")
+        if (
+            candidate_runtime.config.to_canonical() != current.runtime.config.to_canonical()
+            or candidate_runtime.root_seed != current.runtime.root_seed
+            or candidate_runtime.run_id != current.runtime.run_id
+            or candidate_runtime.model_hash != current.runtime.model_hash
+        ):
+            raise HostedStoreError("controller runtime identity differs from current head")
         events = [
             record for record in candidate_runtime.event_log
             if record.event_index > head.last_event_index
