@@ -1,0 +1,22 @@
+{
+  "scope": "local static report review only",
+  "date": "2026-09-25",
+  "source": "S06 sanitized renderer using the kit-supplied recorded-demo/repair.json and dependency.json fixture recordings",
+  "url": "http://127.0.0.1:8765/",
+  "browser": "Chrome via CUA",
+  "desktop": {
+    "screenshot_viewport_px": [1140, 749],
+    "result": "visible; heading, recorded-fixture warning, workflow controls, and report section rendered"
+  },
+  "keyboard": {
+    "actions": ["Tab", "Tab", "Enter"],
+    "result": "Component repair became selected; dependency section was hidden"
+  },
+  "workflow_switching": {
+    "action": "Activate Both workflows",
+    "result": "Both report sections were present in the accessibility tree"
+  },
+  "mobile_viewport": "not verified; this subagent browser surface did not expose a viewport override",
+  "network_requests": "not instrumented; the exported HTML contains no external script, stylesheet, image, font, or fetch URL",
+  "cloudflare": "not deployed; no account/project mutation or public preview"
+}
