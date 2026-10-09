@@ -158,10 +158,10 @@ class DurableRuntime(PreviewRuntime):
     def __exit__(self, *args):
         self.close()
 
-    def _guard(self, effect, *, count=False):
+    def _guard(self, effect, *, count=False, allow_paused=False):
         if getattr(self, "_closed", False):
             raise ExecutionBlocked("runtime closed")
-        super()._guard(effect, count=count)
+        super()._guard(effect, count=count, allow_paused=allow_paused)
 
     def _assurance(self):
         return {"isolated": "isolated_contract_checked", "data_only": "data_contract_checked"}.get(
