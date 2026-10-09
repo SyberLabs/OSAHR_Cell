@@ -59,6 +59,8 @@ def _order() -> list[list[str]]:
 
 
 def _live_guards(monkeypatch) -> None:
+    # Exercise restart handling behind the real fail-closed pilot readiness gate.
+    monkeypatch.setattr("grokcell.repair_experiment.PAIRED_PILOT_READY", True)
     monkeypatch.setenv("HF_TOKEN", "fake")
     monkeypatch.setenv("TYPESAFE_API_KEY", "fake")
     monkeypatch.setattr("grokcell.repair_experiment.shutil.which",
