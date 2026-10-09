@@ -422,3 +422,20 @@ def test_real_process_crash_windows(tmp_path, stage, expected_calls, recoverable
                 repair_workflow(runtime)
             assert runtime.audit()["revision"] == 0
     assert (len(trace.read_text().splitlines()) if trace.exists() else 0) == expected_calls
+
+
+def test_completed_yield_checkpoint_is_already_paused(tmp_path):
+    with open_run(tmp_path) as runtime:
+        checkpoint = runtime._checkpoint
+        def stop_after_completion(stage):
+            checkpoint(stage)
+            if stage == "complete":
+                raise SystemExit("crash after completed yield")
+        runtime._checkpoint = stop_after_completion
+        with pytest.raises(SystemExit):
+            runtime.yield_("review", "maintainer review")
+    with open_run(tmp_path) as restored:
+        with pytest.raises(ExecutionBlocked, match="yielded"):
+            restored.read("next", JsonSnapshot.capture({"next": True}))
+        restored.resume()
+        restored.read("next", JsonSnapshot.capture({"next": True}))

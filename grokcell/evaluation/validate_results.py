@@ -60,7 +60,7 @@ def validate_record(record, study, registry):
         "study_id", "protocol_version", "split", "case_family", "repository_id", "case_id",
         "system_id", "controller_id", "worker_id", "verifier_contract_id", "environment_id",
         "permission_profile_id", "resource_limits_profile_id", "acceptance_owner_id",
-        "sealed_case_commitment", "attempts", "uncertainty_notes",
+        "sealed_case_commitment", "attempts", "uncertainty_notes", "retry_policy_id",
     }
     if type(record) is not dict or set(record) != required:
         raise ValueError("record fields do not match the frozen result contract")
@@ -70,7 +70,7 @@ def validate_record(record, study, registry):
         raise ValueError("only independent sealed evaluation cases can be scored")
     for key in ("case_family", "repository_id", "case_id", "system_id", "worker_id",
                 "verifier_contract_id", "environment_id", "permission_profile_id",
-                "resource_limits_profile_id", "acceptance_owner_id"):
+                "resource_limits_profile_id", "acceptance_owner_id", "retry_policy_id"):
         if not _nonempty(record[key]):
             raise ValueError("missing required identity: " + key)
     case = cases.get(record["case_id"])
@@ -121,25 +121,26 @@ def validate_record(record, study, registry):
 
 
 def validate_dataset(records, study):
-    if study != "A":
-        return
-    arms = PROTOCOLS[study][1]
+    arms = PROTOCOLS[study][1] if study == "A" else {record["system_id"] for record in records}
     paired = {}
     matched = ("worker_id", "verifier_contract_id", "environment_id", "permission_profile_id",
-               "resource_limits_profile_id")
+               "resource_limits_profile_id", "retry_policy_id") if study == "A" else (
+        "verifier_contract_id", "permission_profile_id", "resource_limits_profile_id")
     for record in records:
         key = (record["repository_id"], record["case_id"])
         arms_for_case = paired.setdefault(key, {})
-        arm = record["controller_id"]
+        arm = record["controller_id"] if study == "A" else record["system_id"]
         if arm in arms_for_case:
-            raise ValueError("duplicate controller arm for paired case")
+            raise ValueError("duplicate arm for paired case")
         arms_for_case[arm] = record
     if not paired or any(set(values) != arms for values in paired.values()):
-        raise ValueError("Study A requires all pre-registered controller arms for every case")
+        raise ValueError("Study A requires all pre-registered controller arms for every case" if study == "A"
+                         else "Study B requires all compared systems for every case")
     for values in paired.values():
-        baseline = values["fixed"]
+        baseline = next(iter(values.values()))
         if any(any(record[key] != baseline[key] for key in matched) for record in values.values()):
-            raise ValueError("Study A arms do not share worker, checks, environment, authority, and limits")
+            raise ValueError("Study A arms do not share worker, checks, environment, authority, limits, and retry policy"
+                             if study == "A" else "Study B systems do not share checks, authority, and limits")
 
 
 def summarize(records, study):

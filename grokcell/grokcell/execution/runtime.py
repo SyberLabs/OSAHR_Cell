@@ -68,7 +68,7 @@ class PreviewRuntime:
             if type(metadata) is dict and metadata.get("limits_breached") is True:
                 self._breach = True
 
-    def _guard(self, effect: str, *, count: bool = False):
+    def _guard(self, effect: str, *, count: bool = False, allow_paused: bool = False):
         if self._faulted:
             raise ExecutionBlocked("runtime faulted; reopen durable state")
         now = self._clock()
@@ -77,7 +77,7 @@ class PreviewRuntime:
         self._last_time = now
         if self._canceled or self._epoch != self._permission.epoch:
             raise ExecutionBlocked("canceled or revoked")
-        if self._paused:
+        if self._paused and not allow_paused:
             raise ExecutionBlocked("yielded; resume explicitly")
         if now >= self._permission.expires_at or now - self._started >= self._limits.max_seconds:
             raise ExecutionBlocked("expired")
@@ -102,7 +102,7 @@ class PreviewRuntime:
         self._pending_step = None
         self._checkpoint("complete")
         # Keep the response/accounting even when it arrived after cancellation.
-        self._guard(effect)
+        self._guard(effect, allow_paused=effect == "yield")
 
     def _run(self, step: str, effect: str, binding: object, operation: Callable,
              *, reserve: int | None = None, fresh_revision: int | None = None):
@@ -142,7 +142,7 @@ class PreviewRuntime:
                 self._active = False
                 raise
         try:
-            if effect in ("read", "admit"):
+            if effect in ("read", "admit", "yield"):
                 # These callbacks only mutate local state. Keep that mutation and
                 # its journal receipt under one lock so operator checkpoints see
                 # either the old state or the completed transition.
@@ -318,12 +318,11 @@ class PreviewRuntime:
 
     def yield_(self, step: str, reason: str) -> JsonSnapshot:
         text(reason)
-        result = self._run(step, "yield", reason,
-                           lambda: (JsonSnapshot.capture({"reason": reason}), 0))
-        with self._lock:
+        def operation():
             self._paused = True
-            self._checkpoint("yield")
-        return result
+            return JsonSnapshot.capture({"reason": reason}), 0
+
+        return self._run(step, "yield", reason, operation)
 
     def resume(self):
         """Continue the same object; this is NOT process-restart recovery."""

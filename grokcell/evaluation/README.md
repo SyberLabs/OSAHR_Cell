@@ -55,3 +55,5 @@ OpenAI-compatible routed Chat Completion endpoint
 ([task documentation](https://huggingface.co/docs/inference-providers/tasks/chat-completion)).
 This confirms interface shape only, not current account access, model service,
 price, or any live result.
+
+Every result must include a nonempty `retry_policy_id` identifying the policy registered before evaluation. Study A matches this identifier across controller arms. Study B requires every compared system to run every included case with matching verifier contracts, permission profiles, and resource limit profiles.

@@ -137,6 +137,7 @@ def test_frozen_studies_require_complete_attempt_records_and_report_unknown_cost
         "environment_id": "env-v1",
         "permission_profile_id": "permission-v1",
         "resource_limits_profile_id": "limits-v1",
+        "retry_policy_id": "retry-v1",
         "acceptance_owner_id": "independent-owner",
         "sealed_case_commitment": "a" * 64,
         "uncertainty_notes": ["provider invoice pending"],
@@ -162,6 +163,11 @@ def test_frozen_studies_require_complete_attempt_records_and_report_unknown_cost
     rows = [validate_record({**record, "controller_id": arm, "system_id": "system-" + arm}, "A", registry)
             for arm in ("fixed", "jev", "inexpensive_alternative")]
     validate_dataset(rows, "A")
+    without_retry = {key: value for key, value in record.items() if key != "retry_policy_id"}
+    with pytest.raises(ValueError, match="frozen result contract"):
+        validate_record(without_retry, "A", registry)
+    with pytest.raises(ValueError, match="retry_policy_id"):
+        validate_record({**record, "retry_policy_id": ""}, "A", registry)
     summary = summarize(rows, "A")["jev"]
     assert summary["failed_attempts"] == 1
     assert summary["human_rescue_attempts"] == 1
@@ -186,3 +192,24 @@ def test_frozen_studies_require_complete_attempt_records_and_report_unknown_cost
     system_validated = validate_record(system_record, "B", registry)
     validate_dataset([system_validated], "B")
     assert summarize([system_validated], "B")["complete-system-x"]["episodes"] == 1
+
+
+@pytest.mark.parametrize("field", ["verifier_contract_id", "permission_profile_id", "resource_limits_profile_id"])
+def test_study_b_rejects_unmatched_envelopes(field):
+    base = dict(repository_id="repo", case_id="case", system_id="a", verifier_contract_id="v", permission_profile_id="p", resource_limits_profile_id="r")
+    with pytest.raises(ValueError, match="do not share"):
+        validate_dataset([base, {**base, "system_id": "b", field: "different"}], "B")
+
+
+def test_study_b_rejects_disjoint_cases():
+    base = dict(repository_id="repo", case_id="case", system_id="a", verifier_contract_id="v", permission_profile_id="p", resource_limits_profile_id="r")
+    with pytest.raises(ValueError, match="every case"):
+        validate_dataset([base, {**base, "system_id": "b", "case_id": "other"}], "B")
+
+
+def test_study_a_rejects_different_retry_policies():
+    base = dict(repository_id="repo", case_id="case", worker_id="w", verifier_contract_id="v", environment_id="e", permission_profile_id="p", resource_limits_profile_id="r", retry_policy_id="retry-v1")
+    rows = [{**base, "controller_id": arm} for arm in ("fixed", "jev", "inexpensive_alternative")]
+    rows[2]["retry_policy_id"] = "retry-v2"
+    with pytest.raises(ValueError, match="retry policy"):
+        validate_dataset(rows, "A")
