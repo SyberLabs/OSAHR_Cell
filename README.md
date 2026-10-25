@@ -87,6 +87,8 @@ GrokCell's isolated runner, operator-owned checks, host oracle, and admission
 gate control whether a revision is accepted. The Jev router and paid routing
 comparison were removed because the live fixture chain exposes only one
 productive repair action at a time. No provider-based repair result has been measured.
+The current Kev migration does not add a decision-model router here; the
+deterministic repair gate remains the owner of action and admission.
 
 From `grokcell/`, run `python -m grokcell.repair_experiment --check` for the
 offline preflight. A live single-episode run requires Docker, a digest-pinned
