@@ -46,6 +46,33 @@ Opening a checkpoint resumes state; it does not restore earlier event records.
 This guarantee covers admission, not every control-plane memory mutation.
 See the [replay regression case](../ontology-kernel/cases/admission-replay/README.md).
 
+## Hosted durability scaffold
+
+Install `grokcell-surface[hosted]` to use the PostgreSQL attempt/head store. A controller
+must reserve budget and commit a fenced dispatch intent before external work;
+admission then verifies a controller-generated checkpoint and kernel event log,
+replays accepted deltas, and atomically writes the new head, attempt outcome,
+and outbox record. Restore reads only exact versions named by the committed
+head and replays admissions without invoking models or executors. Unknown work
+stays blocked until the controller explicitly reconciles it.
+
+| Attempt state | Transition | Recovery rule |
+|---|---|---|
+| `dispatch_intent` | A fenced PostgreSQL transaction reserves budget before work starts. | Never redispatch the same attempt after an uncertain acknowledgment. |
+| `admitted` | One PostgreSQL transaction commits the immutable segment, head CAS, budget settlement, and outbox. | A retry returns this attempt's original receipt, even after later head revisions. |
+| `outcome_unknown` | The controller loses the result or a new fence takes over. | Block new cell work until explicit no-admission reconciliation. |
+| `reconciled_unknown` | A current controller records no-admission evidence and settles reserved units. | Terminal; a later request needs a new idempotency key. |
+
+The object-store contract is `ControllerObjectStore`; this repository does not
+yet provide or verify a cloud adapter or its IAM policy. Before enabling a
+hosted endpoint, establish a controller-only PostgreSQL role and verify that
+API, candidate, and executor roles cannot mutate heads, attempts, budgets, or
+object references. Also verify that only the controller role can write/read
+the controller-generated per-owner/cell object namespace, cannot select
+quarantined versions, and that the coordinator scratch directory is
+controller-only. The PostgreSQL test suite exercises transaction and code
+provenance boundaries locally, not live IAM, deployment, or paid Jev comparisons.
+
 ## Run
 
 ```bash
