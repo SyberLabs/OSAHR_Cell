@@ -1,0 +1,14 @@
+{
+  "artifact": "sanitized static Pages report",
+  "scope": "recorded fixture evidence; no live providers or Cloudflare deployment",
+  "generated_by": "grokcell.execution.report.write_static_export",
+  "source_recording_sha256": {
+    "repair.json": "89bcde539fc425f776906bb3f37b31e56d82b1a24ade6cf5fbfc643119303044",
+    "dependency.json": "60c691ec4b348069027013776b41a9ad01775df34a7f324e4aa75cf67c993105"
+  },
+  "upload_allowlist": {
+    "index.html": "549ed242cd9cb28f8cc50761371d280bcc5eb8f86c8e74789c1d78a0086174eb",
+    "_headers": "05b2fd1bdb5ae14c35ec5adff9ec3a1a221417d5a541c1fd22d7614a802b9c0a"
+  },
+  "build_source": "supplied demo kit recorded-demo fixture JSON files; this Windows host could not regenerate durable execution evidence"
+}

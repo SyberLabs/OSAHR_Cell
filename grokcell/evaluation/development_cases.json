@@ -1,0 +1,43 @@
+{
+  "case_family": "development-only-synthetic",
+  "not_for_scoring": true,
+  "cases": [
+    {
+      "case_id": "repair-availability-clarified-v1",
+      "workflow": "repair",
+      "input": {
+        "component": "available",
+        "source": "def available(on_hand, reserved): return on_hand + reserved",
+        "public_diagnostic": "available(10,4) returned 14; expected 6",
+        "public_contract": "Accept non-Boolean nonnegative integer counts; reserved must not exceed on_hand. Return on_hand minus reserved. Raise ValueError for invalid inputs. Do not mutate inputs."
+      },
+      "fixture_decision": "repair",
+      "expected_control_flow": "offline fixture proposal and bytes contract check"
+    },
+    {
+      "case_id": "repair-availability-review-v1",
+      "workflow": "repair",
+      "input": {
+        "component": "available",
+        "source": "def available(on_hand, reserved): return on_hand + reserved",
+        "public_diagnostic": "available(10,4) returned 14; expected 6",
+        "public_contract": ""
+      },
+      "fixture_decision": "review",
+      "expected_control_flow": "yield for maintainer review; no candidate call"
+    },
+    {
+      "case_id": "dependency-result-shape-unknown-v1",
+      "workflow": "dependency",
+      "input": {
+        "dependency": "inventory-client",
+        "from_version": "1.4",
+        "to_version": "2.0",
+        "changes": ["reserve() result changes from a scalar to an object"],
+        "compatibility": "not_established"
+      },
+      "fixture_decision": "assess",
+      "expected_control_flow": "data-only fact assessment preserves unknown compatibility and denies upgrade authority"
+    }
+  ]
+}

@@ -1,0 +1,26 @@
+{
+  "study_id": "grokcell-controller-ablation",
+  "protocol_version": "1.0.0",
+  "status": "frozen-no-scored-runs",
+  "question": "Under matched worker, verifier, environment, authority, and resource limits, how do pre-registered controllers differ on the same sealed cases?",
+  "arms": ["fixed", "jev", "inexpensive_alternative"],
+  "arm_registration": {
+    "alternative_identity_required_before_cases_open": true,
+    "record_exact_model_or_code_version": true,
+    "record_public_cost_basis_and_date": true,
+    "same_worker_verifier_environment_permissions_limits_and_retry_policy": true
+  },
+  "case_control": {
+    "case_families": ["development", "retrieval", "evaluation"],
+    "repository_split_required": true,
+    "case_family_overlap_forbidden": true,
+    "repository_overlap_forbidden": true,
+    "sealed_cases_controlled_by_independent_acceptance_owner": true,
+    "owner_id": null,
+    "sealed_case_commitment": null
+  },
+  "report_all": ["all_attempts_and_failures", "required_and_passed_checks", "human_rescue",
+                 "latency", "provider_cost", "billing_reconciliation", "coverage", "uncertainty"],
+  "decision_rule": "Descriptive paired results only until an independent owner approves the cases, analysis plan, and uncertainty treatment. No arm is presumed better.",
+  "paid_or_live_execution_authorized": false
+}

@@ -185,7 +185,7 @@ def _sandbox_base(path: Path, image: str) -> tuple[list[str], str]:
         "--log-driver=none",
         "--network=none", "--read-only", "--cap-drop=ALL",
         "--security-opt=no-new-privileges", "--pids-limit=64",
-        "--memory=512m", "--cpus=1", "--user=65534:65534",
+        "--memory=512m", "--memory-swap=512m", "--cpus=1", "--user=65534:65534",
         "--tmpfs=/tmp:rw,nosuid,nodev,size=64m",
         "--mount", f"type=bind,source={path.resolve()},target=/workspace,readonly",
         "--workdir=/workspace", "--env=HOME=/tmp",
