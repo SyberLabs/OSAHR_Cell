@@ -1,7 +1,7 @@
 # OSAHR 0.2
 
 **This is the project:** [SyberLabs/OSAHR_Cell](https://github.com/SyberLabs/OSAHR_Cell).
-`sykosyber/osahr_project` is a private Cursor workspace, not a second OSAHR. See `CELL.md`.
+A separate private development workspace exists; it is not a second OSAHR. See `CELL.md`.
 
 Exact open stochastic adaptive graph-rewrite over a typed directed hypergraph.
 Python 3.11+, no kernel runtime dependencies.
